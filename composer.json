@@ -1,0 +1,24 @@
+{
+    "name": "zoomyboy/laravel-nami-guard",
+    "description": "Authentication provider against NaMi for Laravel",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Philipp Lang",
+            "email": "philipp@zoomyboy.de"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Zoomyboy\\LaravelNamiGuard\\": "./src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Zoomyboy\\LaravelNamiGuard\\ServiceProvider"
+            ]
+        }
+    }
+}
