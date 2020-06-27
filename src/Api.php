@@ -6,6 +6,7 @@ use App\Conf;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
 use App\Nami\Interfaces\UserResolver;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Collection;
 
 class Api {
 
@@ -57,9 +58,19 @@ class Api {
         return $this;
     }
 
+    public function hasGroup($groupId): bool {
+        return $this->groups()->search(function($group) use ($groupId) {
+            return $group->id == $groupId;
+        }) !== false;
+    }
 
-    public function groups() {
-        $r = $this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root')->body();
+    public function groups(): Collection {
+        return collect($this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root')->json()['data'])->map(function($group) {
+            return (object) [
+                'name' => $group['descriptor'],
+                'id' => $group['id']
+            ];
+        });
     }
 
     public function fees() {
