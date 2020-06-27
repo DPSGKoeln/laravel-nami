@@ -1,5 +1,5 @@
 {
-    "name": "zoomyboy/laravel-nami-guard",
+    "name": "zoomyboy/laravel-nami",
     "description": "Authentication provider against NaMi for Laravel",
     "type": "library",
     "authors": [
@@ -11,14 +11,16 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Zoomyboy\\LaravelNamiGuard\\": "./src"
+            "Zoomyboy\\LaravelNami\\": "src/"
         }
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Zoomyboy\\LaravelNamiGuard\\ServiceProvider"
-            ]
+    "autoload-dev": {
+        "psr-4": {
+            "Zoomyboy\\LaravelNami\\Tests\\": "tests/"
         }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.3",
+        "guzzlehttp/guzzle": "^6.3.1|^7.0"
     }
 }
