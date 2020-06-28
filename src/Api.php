@@ -64,13 +64,21 @@ class Api {
         }) !== false;
     }
 
-    public function groups(): Collection {
-        return collect($this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root')->json()['data'])->map(function($group) {
-            return (object) [
-                'name' => $group['descriptor'],
-                'id' => $group['id']
-            ];
+    public function groups($parentGroupId  = null): Collection {
+        $parentGroupId = $parentGroupId ?: 'root';
+        return collect($this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.$parentGroupId)->json()['data'])->map(function($group) {
+            return Group::fromResponse($group);
         });
+    }
+
+    public function group($groupId) {
+        return $this->groups()->first(function($group) use ($groupId) {
+            return $group->id == $groupId;
+        });
+    }
+
+    public function subgroupsOf($groupId) {
+        return $this->groups($groupId);
     }
 
     public function fees() {
