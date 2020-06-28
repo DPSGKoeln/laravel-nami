@@ -4,6 +4,8 @@ namespace Zoomyboy\LaravelNami\Tests;
 
 use Illuminate\Support\Facades\Config;
 use Zoomyboy\LaravelNami\NamiServiceProvider;
+use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Tests\Stub\Member;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -24,6 +26,17 @@ class TestCase extends \Orchestra\Testbench\TestCase
         Config::set('nami.auth.mglnr', '11223');
         Config::set('nami.auth.password', 'secret');
         Config::set('nami.auth.groupid', '55555');
+    }
+
+    public function login() {
+        return [
+            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::response('<html></html>', 200),
+            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::response($this->successJson, 200)
+        ];
+    }
+
+    public function fakeJson($file) {
+        return file_get_contents(__DIR__.'/json/'.$file);
     }
 
 }

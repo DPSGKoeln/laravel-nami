@@ -58,13 +58,26 @@ class Api {
         return $this;
     }
 
+    public function memberModel($member): Model {
+        $eloquentClass = config('nami.models.member');
+        return $eloquentClass::findByNamiId($member['id']) ?: $this->fillFromOverview(new $eloquentClass);
+    }
+
+    public function membersOf($groupId): Collection {
+        return collect($this->http()->get(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist')->json()['data']);
+    }
+
+    public function member($groupId, $memberId) {
+        return $this->http()->get(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId)->json()['data'];
+    }
+
     public function hasGroup($groupId): bool {
         return $this->groups()->search(function($group) use ($groupId) {
             return $group->id == $groupId;
         }) !== false;
     }
 
-    public function groups($parentGroupId  = null): Collection {
+    public function groups($parentGroupId = null): Collection {
         $parentGroupId = $parentGroupId ?: 'root';
         return collect($this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.$parentGroupId)->json()['data'])->map(function($group) {
             return Group::fromResponse($group);

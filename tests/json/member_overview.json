@@ -1,0 +1,58 @@
+{
+    "success": true,
+    "data": [
+        {
+            "id": 16
+        },
+        {
+            "id": 17
+        }
+    ],
+    "responseType": "OK",
+    "totalEntries": 25,
+    "metaData": {
+        "totalProperty": "totalEntries",
+        "root": "data",
+        "id": "id",
+        "fields": [
+            {"name":"id","header":null,"hidden":false,"width":80},
+            {"name":"descriptor","header":null,"hidden":false,"flex":3},
+            {"name":"entries_geschlecht","header":null,"hidden":false,"flex":3},
+            {"name":"entries_staatangehoerigkeitText","header":null,"hidden":false,"flex":3},
+            {"name":"entries_lastUpdated","header":null,"hidden":false,"flex":3},
+            {"name":"entries_id","header":null,"hidden":true,"flex":3},
+            {"name":"entries_version","header":null,"hidden":false,"flex":3},
+            {"name":"entries_spitzname","header":null,"hidden":false,"flex":3},
+            {"name":"entries_nachname","header":null,"hidden":false,"flex":3},
+            {"name":"entries_eintrittsdatum","header":null,"hidden":false,"flex":3},
+            {"name":"entries_rover","header":null,"hidden":false,"flex":3},
+            {"name":"entries_status","header":null,"hidden":false,"flex":3},
+            {"name":"entries_fixBeitrag","header":null,"hidden":false,"flex":3},
+            {"name":"entries_pfadfinder","header":null,"hidden":false,"flex":3},
+            {"name":"entries_telefon3","header":null,"hidden":false,"flex":3},
+            {"name":"entries_kontoverbindung","header":null,"hidden":false,"flex":3},
+            {"name":"entries_email","header":null,"hidden":false,"flex":3},
+            {"name":"entries_telefon1","header":null,"hidden":false,"flex":3},
+            {"name":"entries_woelfling","header":null,"hidden":false,"flex":3},
+            {"name":"entries_telefon2","header":null,"hidden":false,"flex":3},
+            {"name":"entries_beitragsarten","header":null,"hidden":false,"flex":3},
+            {"name":"entries_austrittsDatum","header":null,"hidden":true,"flex":3},
+            {"name":"entries_stufe","header":null,"hidden":false,"flex":3},
+            {"name":"entries_genericField1","header":null,"hidden":true,"flex":3},
+            {"name":"entries_genericField2","header":null,"hidden":true,"flex":3},
+            {"name":"entries_jungpfadfinder","header":null,"hidden":false,"flex":3},
+            {"name":"entries_mglType","header":null,"hidden":false,"flex":3},
+            {"name":"entries_staatsangehoerigkeit","header":null,"hidden":false,"flex":3},
+            {"name":"entries_ersteTaetigkeitId","header":null,"hidden":false,"flex":3},
+            {"name":"entries_emailVertretungsberechtigter","header":null,"hidden":false,"flex":3},
+            {"name":"entries_konfession","header":null,"hidden":false,"flex":3},
+            {"name":"entries_rowCssClass","header":null,"hidden":false,"flex":3},
+            {"name":"entries_vorname","header":null,"hidden":false,"flex":3},
+            {"name":"entries_mitgliedsNummer","header":null,"hidden":false,"flex":3},
+            {"name":"entries_ersteUntergliederungId","header":null,"hidden":false,"flex":3},
+            {"name":"entries_wiederverwendenFlag","header":null,"hidden":false,"flex":3},
+            {"name":"entries_geburtsDatum","header":null,"hidden":false,"flex":3},
+            {"name":"entries_telefax","header":null,"hidden":false,"flex":3}
+        ]
+    }
+}

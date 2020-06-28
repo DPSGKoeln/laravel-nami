@@ -25,4 +25,14 @@ class Group implements Arrayable {
         return Nami::subgroupsOf($this->id);
     }
 
+    public function members(): MemberCollection {
+        return new MemberCollection(Nami::membersOf($this->id)->map(function($member) {
+            return $this->member($member['id']);
+        }));
+    }
+
+    public function member($id): Member {
+        return Member::fromNami(Nami::member($this->id, $id));
+    }
+
 }
