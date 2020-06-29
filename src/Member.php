@@ -30,7 +30,8 @@ class Member extends Model {
         'telefax' => 'fax',
         'email' => 'email',
         'geschlechtId' => 'gender_id',
-        'emailVertretungsberechtigter' => 'email_parents'
+        'emailVertretungsberechtigter' => 'email_parents',
+        'staatsangehoerigkeitId' => 'nationality_id'
     ];
 
     protected $guarded = [];
@@ -42,7 +43,6 @@ class Member extends Model {
                 return [ data_get(static::$overviewAttributes, $key, $key) => $item ];
             })
             ->toArray();
-
         return (new self($item));
     }
 

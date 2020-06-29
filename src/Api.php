@@ -100,18 +100,16 @@ class Api {
         });
     }
 
+    public function nationalities(): Collection {
+        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/staatsangehoerigkeit")['data'])->map(function($gender) {
+            return Nationality::fromNami($gender);
+        });
+    }
+
     // -------------------------------------
 
     public function fees() {
         $response = $this->client->get("/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$this->user->getNamiGroupId()}", [
-            'cookies' => $this->cookie
-        ]);
-
-        return json_decode((string)$response->getBody());
-    }
-
-    public function nationalities() {
-        $response = $this->client->get("/ica/rest/baseadmin/staatsangehoerigkeit", [
             'cookies' => $this->cookie
         ]);
 

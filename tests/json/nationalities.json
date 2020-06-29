@@ -1,0 +1,41 @@
+{
+    "success": true,
+    "data":
+    [
+        {
+            "descriptor": "deutsch",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.base.Staatsangehoerigkeit",
+            "id": 1054
+        }
+    ],
+    "responseType": "OK",
+    "totalEntries": 255,
+    "metaData":
+    {
+        "totalProperty": "totalEntries",
+        "root": "data",
+        "id": "id",
+        "fields":
+        [
+            {
+                "name": "id",
+                "header": null,
+                "hidden": false,
+                "width": 80
+            },
+            {
+                "name": "descriptor",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "name",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            }
+        ]
+    }
+}
