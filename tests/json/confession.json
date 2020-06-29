@@ -1,0 +1,41 @@
+{
+    "success": true,
+    "data":
+    [
+        {
+            "descriptor": "römisch-katholisch",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.base.Konfession",
+            "id": 1
+        }
+    ],
+    "responseType": "OK",
+    "totalEntries": 10,
+    "metaData":
+    {
+        "totalProperty": "totalEntries",
+        "root": "data",
+        "id": "id",
+        "fields":
+        [
+            {
+                "name": "id",
+                "header": null,
+                "hidden": false,
+                "width": 80
+            },
+            {
+                "name": "descriptor",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "name",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            }
+        ]
+    }
+}

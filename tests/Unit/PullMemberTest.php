@@ -32,6 +32,7 @@ class PullMemberTest extends TestCase
             'email_parents' => ['email_parents', ['testp@example.com', 'test2p@example.com']],
             'gender_id' => ['gender_id', [19, null]],
             'nationality_id' => ['nationality_id', [1054, null]],
+            'confession_id' => ['confession_id', [1, null]],
         ];
     }
 

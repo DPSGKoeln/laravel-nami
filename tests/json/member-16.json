@@ -30,7 +30,7 @@
         "status": "Aktiv",
         "konfession": null,
         "fixBeitrag": null,
-        "konfessionId": null,
+        "konfessionId": 1,
         "zeitschriftenversand": true,
         "pfadfinder": null,
         "telefon3": "+11111",

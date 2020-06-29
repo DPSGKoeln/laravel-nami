@@ -31,7 +31,8 @@ class Member extends Model {
         'email' => 'email',
         'geschlechtId' => 'gender_id',
         'emailVertretungsberechtigter' => 'email_parents',
-        'staatsangehoerigkeitId' => 'nationality_id'
+        'staatsangehoerigkeitId' => 'nationality_id',
+        'konfessionId' => 'confession_id'
     ];
 
     protected $guarded = [];

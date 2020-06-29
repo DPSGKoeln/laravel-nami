@@ -106,6 +106,12 @@ class Api {
         });
     }
 
+    public function confessions(): Collection {
+        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/konfession")['data'])->map(function($gender) {
+            return Confession::fromNami($gender);
+        });
+    }
+
     // -------------------------------------
 
     public function fees() {
@@ -115,15 +121,6 @@ class Api {
 
         return json_decode((string)$response->getBody());
     }
-
-    public function confessions() {
-        $response = $this->client->get("/ica/rest/baseadmin/konfession", [
-            'cookies' => $this->cookie
-        ]);
-
-        return json_decode((string)$response->getBody());
-    }
-
 
     public function regions() {
         $response = $this->client->get("/ica/rest/baseadmin/region", [
