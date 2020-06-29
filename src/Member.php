@@ -2,17 +2,10 @@
 
 namespace Zoomyboy\LaravelNami;
 
-use \ArrayAccess;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Eloquent\Concerns\HasAttributes;
-use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
-use Illuminate\Contracts\Support\Arrayable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Member extends Model {
-
-    use HasAttributes;
-    use HidesAttributes;
 
     protected static $overviewAttributes = [
         'vorname' => 'firstname',
@@ -32,7 +25,8 @@ class Member extends Model {
         'geschlechtId' => 'gender_id',
         'emailVertretungsberechtigter' => 'email_parents',
         'staatsangehoerigkeitId' => 'nationality_id',
-        'konfessionId' => 'confession_id'
+        'konfessionId' => 'confession_id',
+        'geburtsDatum' => 'birthday'
     ];
 
     protected $guarded = [];
@@ -49,6 +43,10 @@ class Member extends Model {
 
     public function __construct($member) {
         parent::__construct($member);
+    }
+
+    public function getBirthdayAttribute() {
+        return Carbon::parse($this->attributes['birthday'])->format('Y-m-d');
     }
 
     public function getGenderIdAttribute() {
