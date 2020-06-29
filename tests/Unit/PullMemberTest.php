@@ -33,7 +33,8 @@ class PullMemberTest extends TestCase
             'gender_id' => ['gender_id', [19, null]],
             'nationality_id' => ['nationality_id', [1054, null]],
             'confession_id' => ['confession_id', [1, null]],
-            'birthday' => ['birthday', ['1991-06-20', '1984-01-17']]
+            'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
+            'joined_at' => ['joined_at', ['2005-05-01', '2003-11-17']],
         ];
     }
 

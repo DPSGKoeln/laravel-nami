@@ -26,7 +26,8 @@ class Member extends Model {
         'emailVertretungsberechtigter' => 'email_parents',
         'staatsangehoerigkeitId' => 'nationality_id',
         'konfessionId' => 'confession_id',
-        'geburtsDatum' => 'birthday'
+        'geburtsDatum' => 'birthday',
+        'eintrittsdatum' => 'joined_at',
     ];
 
     protected $guarded = [];
@@ -47,6 +48,10 @@ class Member extends Model {
 
     public function getBirthdayAttribute() {
         return Carbon::parse($this->attributes['birthday'])->format('Y-m-d');
+    }
+
+    public function getJoinedAtAttribute() {
+        return Carbon::parse($this->attributes['joined_at'])->format('Y-m-d');
     }
 
     public function getGenderIdAttribute() {
