@@ -1,0 +1,53 @@
+{
+    "success": true,
+    "data":
+    [
+        {
+            "descriptor": "keine Angabe",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.base.Geschlecht",
+            "id": 23
+        },
+        {
+            "descriptor": "männlich",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.base.Geschlecht",
+            "id": 19
+        },
+        {
+            "descriptor": "weiblich",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.base.Geschlecht",
+            "id": 20
+        }
+    ],
+    "responseType": "OK",
+    "totalEntries": 3,
+    "metaData":
+    {
+        "totalProperty": "totalEntries",
+        "root": "data",
+        "id": "id",
+        "fields":
+        [
+            {
+                "name": "id",
+                "header": null,
+                "hidden": false,
+                "width": 80
+            },
+            {
+                "name": "descriptor",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "name",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            }
+        ]
+    }
+}

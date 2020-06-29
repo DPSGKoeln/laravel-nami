@@ -94,6 +94,14 @@ class Api {
         return $this->groups($groupId);
     }
 
+    public function genders(): Collection {
+        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/geschlecht")['data'])->map(function($gender) {
+            return Gender::fromNami($gender);
+        });
+    }
+
+    // -------------------------------------
+
     public function fees() {
         $response = $this->client->get("/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$this->user->getNamiGroupId()}", [
             'cookies' => $this->cookie
@@ -118,13 +126,6 @@ class Api {
         return json_decode((string)$response->getBody());
     }
 
-    public function genders() {
-        $response = $this->client->get("/ica/rest/baseadmin/geschlecht", [
-            'cookies' => $this->cookie
-        ]);
-
-        return json_decode((string)$response->getBody());
-    }
 
     public function regions() {
         $response = $this->client->get("/ica/rest/baseadmin/region", [

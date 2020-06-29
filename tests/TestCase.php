@@ -39,4 +39,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return file_get_contents(__DIR__.'/json/'.$file);
     }
 
+    public function fakeGenders() {
+        return [
+            'https://nami.dpsg.de/ica/rest/baseadmin/geschlecht' => Http::response($this->fakeJson('genders.json'), 200)
+        ];
+    }
+
 }
