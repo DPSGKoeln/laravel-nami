@@ -29,6 +29,7 @@ class Member extends Model {
         'telefon3' => 'work_phone',
         'telefax' => 'fax',
         'email' => 'email',
+        'geschlechtId' => 'gender_id',
         'emailVertretungsberechtigter' => 'email_parents'
     ];
 
@@ -47,6 +48,10 @@ class Member extends Model {
 
     public function __construct($member) {
         parent::__construct($member);
+    }
+
+    public function getGenderIdAttribute() {
+        return $this->attributes['gender_id'] == Gender::getNullValue() ? null : $this->attributes['gender_id'];
     }
 
 }

@@ -6,4 +6,6 @@ interface Nullable {
 
     public function getIsNullAttribute();
 
+    public static function getNullValue();
+
 }

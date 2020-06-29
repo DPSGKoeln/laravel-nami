@@ -9,6 +9,10 @@ class Gender extends Model implements Nullable {
 
     protected $guarded = [];
 
+    public static function getNullValue() {
+        return 23;
+    }
+
     public static function fromNami($item) {
         $item = collect($item)
             ->only(['descriptor', 'id'])
@@ -25,7 +29,7 @@ class Gender extends Model implements Nullable {
     }
 
     public function getIsNullAttribute() {
-        return $this->attributes['name'] == 'keine Angabe';
+        return $this->attributes['id'] == self::getNullValue();
     }
 
 }

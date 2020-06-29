@@ -30,6 +30,7 @@ class PullMemberTest extends TestCase
             'fax' => ['fax', ['+55111', '+55222']],
             'email' => ['email', ['test@example.com', 'test2@example.com']],
             'email_parents' => ['email_parents', ['testp@example.com', 'test2p@example.com']],
+            'gender_id' => ['gender_id', [19, null]],
         ];
     }
 
