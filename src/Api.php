@@ -2,7 +2,9 @@
 
 namespace Zoomyboy\LaravelNami;
 
+use Log;
 use App\Conf;
+use Illuminate\Support\Str;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
 use App\Nami\Interfaces\UserResolver;
 use Illuminate\Support\Facades\Http;
@@ -68,7 +70,25 @@ class Api {
     }
 
     public function member($groupId, $memberId) {
-        return $this->http()->get(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId)->json()['data'];
+        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
+        $response = $this->http()->get($url);
+
+        Log::debug('Member Request '.$memberId, [
+            'url' => $url,
+            'response' => $response->body(),
+            'json' => $response->json()
+        ]);
+
+        if ($response->json()['success'] === true) {
+            return $response->json()['data'];
+        }
+
+
+        if(Str::startsWith($response['message'], 'Access denied')) {
+            return $this->singleMemberFallback($groupId, $memberId);
+        }
+
+        return $response->json()['data'];
     }
 
     public function hasGroup($groupId): bool {
@@ -110,6 +130,21 @@ class Api {
         return collect($this->http()->get(self::$url."/ica/rest/baseadmin/konfession")['data'])->map(function($gender) {
             return Confession::fromNami($gender);
         });
+    }
+
+    private function singleMemberFallback($groupId, $memberId) {
+        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
+        $response = $this->http()->get($url);
+
+        $member = collect($response['data'])->first(function($member) use ($memberId) {
+            return $member['id'] == $memberId;
+        });
+        
+        $member = collect($member)->mapWithKeys(function($value, $key) {
+            return [ str_replace('entries_', '', $key) => $value ];
+        });
+
+        return $member->toArray();
     }
 
     // -------------------------------------
