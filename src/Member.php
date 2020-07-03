@@ -40,7 +40,7 @@ class Member extends Model {
 
     protected $casts = [];
 
-    protected $nullable = ['further_address', 'other_country', 'nickname'];
+    protected $nullable = ['further_address', 'other_country', 'nickname', 'main_phone', 'mobile_phone', 'work_phone', 'fax', 'email', 'email_parents'];
 
     protected $guarded = [];
 
