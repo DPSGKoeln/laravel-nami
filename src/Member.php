@@ -38,6 +38,10 @@ class Member extends Model {
         'eintrittsdatum' => 'joined_at',
     ];
 
+    protected $casts = [];
+
+    protected $nullable = ['further_address', 'other_country', 'nickname'];
+
     protected $guarded = [];
 
     public static function fromNami($item) {
@@ -59,7 +63,11 @@ class Member extends Model {
     }
 
     public function getJoinedAtAttribute() {
-        return Carbon::parse($this->attributes['joined_at'])->format('Y-m-d');
+        $date = $this->attributes['joined_at'];
+
+        return empty($date)
+            ? null
+            : Carbon::parse($date)->format('Y-m-d');
     }
 
     public function getGenderIdAttribute() {
@@ -68,6 +76,16 @@ class Member extends Model {
 
     public function setGeschlechtTextAttribute($v) {
         $this->attributes['gender_id'] = data_get($this->geschlechtMaps, $v, null);
+    }
+
+    public function getAttributeValue($key) {
+        $original = parent::getAttributeValue($key);
+
+        if (in_array($key, $this->nullable) && $original === '') {
+            return null;
+        }
+
+        return $original;
     }
 
 }

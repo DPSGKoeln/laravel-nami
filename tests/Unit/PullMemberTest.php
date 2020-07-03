@@ -23,7 +23,7 @@ class PullMemberTest extends TestCase
             'other_country' => ['other_country', ['deutsch', null]],
             'address' => ['address', ['straße 1', 'straße 2']],
             'further_address' => ['further_address', ['addrz', null]],
-            'zip' => ['zip', [12345, 5555]],
+            'zip' => ['zip', ['12345', '5555']],
             'location' => ['location', ['SG', 'Köln']],
             'main_phone' => ['main_phone', ['+49888', '+49668']],
             'mobile_phone' => ['mobile_phone', ['+49176', '+49172']],
@@ -35,7 +35,7 @@ class PullMemberTest extends TestCase
             'nationality_id' => ['nationality_id', [1054, null]],
             'confession_id' => ['confession_id', [1, null]],
             'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
-            'joined_at' => ['joined_at', ['2005-05-01', '2003-11-17']],
+            'joined_at' => ['joined_at', ['2005-05-01', null]],
         ];
     }
 
@@ -53,7 +53,7 @@ class PullMemberTest extends TestCase
             'email_parents' => ['email_parents', ['testp@example.com', 'test2p@example.com']],
             'gender_id' => ['gender_id', [19, null]],
             'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
-            'joined_at' => ['joined_at', ['2005-05-01', '2003-11-17']],
+            'joined_at' => ['joined_at', ['2005-05-01', null]],
         ];
     }
 
@@ -79,8 +79,8 @@ class PullMemberTest extends TestCase
 
         $group = Nami::group(103);
 
-        $this->assertEquals($values[0], $group->member(16)->{$key});
-        $this->assertEquals($values[1], $group->member(17)->{$key});
+        $this->assertSame($values[0], $group->member(16)->{$key});
+        $this->assertSame($values[1], $group->member(17)->{$key});
 
         Http::assertSentCount(5);
     }
@@ -100,7 +100,7 @@ class PullMemberTest extends TestCase
 
         Nami::login();
 
-        $this->assertEquals([
+        $this->assertSame([
             16 => $values[0],
             17 => $values[1]
         ], Nami::group(103)->members()->pluck($key, 'id')->toArray());
@@ -123,7 +123,7 @@ class PullMemberTest extends TestCase
 
         Nami::login();
 
-        $this->assertEquals([
+        $this->assertSame([
             16 => $values[0],
             17 => $values[1]
         ], Nami::group(103)->members()->pluck($key, 'id')->toArray());
@@ -147,7 +147,7 @@ class PullMemberTest extends TestCase
 
         $group = Nami::group(103);
 
-        $this->assertEquals($values[0], $group->member(16)->{$key});
+        $this->assertSame($values[0], $group->member(16)->{$key});
 
         Http::assertSentCount(5);
     }
