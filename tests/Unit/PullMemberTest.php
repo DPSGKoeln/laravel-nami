@@ -79,8 +79,8 @@ class PullMemberTest extends TestCase
 
         $group = Nami::group(103);
 
-        $this->assertSame($values[0], $group->member(16)->{$key});
-        $this->assertSame($values[1], $group->member(17)->{$key});
+        $this->assertSame($values[0], $group->member(16)->toArray()[$key]);
+        $this->assertSame($values[1], $group->member(17)->toArray()[$key]);
 
         Http::assertSentCount(5);
     }
@@ -100,10 +100,9 @@ class PullMemberTest extends TestCase
 
         Nami::login();
 
-        $this->assertSame([
-            16 => $values[0],
-            17 => $values[1]
-        ], Nami::group(103)->members()->pluck($key, 'id')->toArray());
+        $member = Nami::group(103)->members();
+        $this->assertSame($values[0], $member->get(0)->toArray()[$key]);
+        $this->assertSame($values[1], $member->get(1)->toArray()[$key]);
 
         Http::assertSentCount(6);
     }
@@ -147,7 +146,7 @@ class PullMemberTest extends TestCase
 
         $group = Nami::group(103);
 
-        $this->assertSame($values[0], $group->member(16)->{$key});
+        $this->assertSame($values[0], $group->member(16)->toArray()[$key]);
 
         Http::assertSentCount(5);
     }

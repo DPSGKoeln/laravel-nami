@@ -78,14 +78,12 @@ class Member extends Model {
         $this->attributes['gender_id'] = data_get($this->geschlechtMaps, $v, null);
     }
 
-    public function getAttributeValue($key) {
-        $original = parent::getAttributeValue($key);
-
-        if (in_array($key, $this->nullable) && $original === '') {
-            return null;
+    public function setAttribute($key, $value) {
+        if (in_array($key, $this->nullable) && $value === '') {
+            return parent::setAttribute($key, null);
         }
 
-        return $original;
+        return parent::setAttribute($key, $value);
     }
 
 }
