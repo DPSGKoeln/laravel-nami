@@ -25,8 +25,13 @@ class Membership extends Model {
 
     protected $guarded = [];
 
+    public static $default = [
+        'untergliederungId' => null,
+        'untergliederung' => null
+    ];
+
     public static function fromNami($item) {
-        $item = collect($item)
+        $item = collect(static::$default)->merge(collect($item))
             ->only(array_keys(static::$overviewAttributes))
             ->mapWithKeys(function($item, $key) {
                 return [ data_get(static::$overviewAttributes, $key, $key) => $item ];

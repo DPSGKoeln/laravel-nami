@@ -17,11 +17,11 @@ class PullMembershipsTest extends TestCase
             'id' => ['id', [68, 69]],
             'group_id' => ['group_id', [103,104]],
             'activity_id' => ['activity_id', [33, 34]],
-            'subactivity_id' => ['subactivity_id', [55, 56]],
+            'subactivity_id' => ['subactivity_id', [55, null]],
             'starts_at' => ['starts_at', ['2017-02-11', '2017-11-12']],
             'ends_at' => ['ends_at', ['2017-03-11', null]],
             'activity_name' => ['activity_name', ['ReferentIn', 'Wö']],
-            'subactivity_name' => ['subactivity_name', ['Pfadfinder', 'AAA']],
+            'subactivity_name' => ['subactivity_name', ['Pfadfinder', null]],
         ];
     }
 
