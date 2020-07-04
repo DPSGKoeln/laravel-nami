@@ -110,16 +110,15 @@ class Api {
         $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);
 
-        Log::debug('Member Request '.$memberId, [
-            'url' => $url,
-            'response' => $response->body(),
-            'json' => $response->json()
-        ]);
+        if ($response->status() == 200) {
+            Log::debug('Member Request '.$memberId, [ 'url' => $url, 'response' => $response->body(), 'json' => $response->json(), 'memberId' => $memberId ]);
+        } else {
+            Log::error('Member Request '.$memberId, [ 'url' => $url, 'response' => $response->body(), 'json' => $response->json(), 'memberId' => $memberId ]);
+        }
 
         if ($response->json()['success'] === true) {
             return $response->json()['data'];
         }
-
 
         if(Str::startsWith($response['message'], 'Access denied')) {
             return $this->singleMemberFallback($groupId, $memberId);
