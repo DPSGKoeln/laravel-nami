@@ -9,16 +9,17 @@ class Group implements Arrayable {
     public $name;
     public $id;
 
-    public static function fromResponse($response) {
+    public static function fromResponse($response, $parent) {
         $group = new self();
         $group->name = $response['descriptor'];
         $group->id = $response['id'];
+        $group->parent_id = $parent;
 
         return $group;
     }
 
     public function toArray() {
-        return [ 'id' => $this->id, 'name' => $this->name ];
+        return [ 'id' => $this->id, 'name' => $this->name, 'parent_id' => $this->parent_id ];
     }
 
     public function subgroups() {

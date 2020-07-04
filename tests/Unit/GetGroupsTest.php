@@ -29,7 +29,7 @@ class GetGroupsTest extends TestCase
 
         Nami::login();
         $this->assertEquals([
-            ['id' => 100, 'name' => 'Group']
+            ['id' => 100, 'name' => 'Group', 'parent_id' => null]
         ], Nami::groups()->toArray());
 
         Http::assertSent(function($request) {
@@ -70,10 +70,10 @@ class GetGroupsTest extends TestCase
         $subgroups = Nami::group(100)->subgroups();
 
         $this->assertEquals([
-            ['id' => 101300, 'name' => 'Siebengebirge'],
-            ['id' => 100900, 'name' => 'Sieg'],
-            ['id' => 100900, 'name' => 'Sieg'],
-            ['id' => 101000, 'name' => 'Voreifel']
+            ['id' => 101300, 'parent_id' => 100, 'name' => 'Siebengebirge'],
+            ['id' => 100900, 'parent_id' => 100, 'name' => 'Sieg'],
+            ['id' => 100900, 'parent_id' => 100, 'name' => 'Sieg'],
+            ['id' => 101000, 'parent_id' => 100, 'name' => 'Voreifel']
         ], $subgroups->toArray());
 
         $subgroups->each(function($group) {

@@ -98,9 +98,8 @@ class Api {
     }
 
     public function groups($parentGroupId = null): Collection {
-        $parentGroupId = $parentGroupId ?: 'root';
-        return collect($this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.$parentGroupId)->json()['data'])->map(function($group) {
-            return Group::fromResponse($group);
+        return collect($this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroupId ?: 'root'))->json()['data'])->map(function($group) use ($parentGroupId) {
+            return Group::fromResponse($group, $parentGroupId);
         });
     }
 
