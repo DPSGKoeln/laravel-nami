@@ -70,7 +70,21 @@ class Api {
     }
 
     public function membershipsOf($memberId): Collection {
-        return collect($this->http()->get(self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist')->json()['data']);
+        $url = self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
+
+        $r = $this->http()->get($url);
+
+        if ($r->status() == 200) {
+            Log::debug('Member Request '.$memberId, [ 'url' => $url, 'response' => $r->body(), 'json' => $r->json(), 'memberId' => $memberId ]);
+        } else {
+            Log::error('Member Request '.$memberId, [ 'url' => $url, 'response' => $r->body(), 'json' => $r->json(), 'memberId' => $memberId ]);
+        }
+
+        if (!isset($r->json()['data'])) {
+            return collect([]);
+        }
+
+        return collect($r->json()['data']);
     }
 
     public function subactivitiesOf($activityId) {

@@ -10,7 +10,14 @@ use Zoomyboy\LaravelNami\Member;
 class PullMembershipsTest extends TestCase
 {
     public $groupsResponse = '{"success":true,"data":[{"descriptor":"Group","name":"","representedClass":"de.iconcept.nami.entity.org.Gruppierung","id":103}],"responseType":"OK"}';
-    public $unauthorizedResponse = '{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}';
+    public $unauthorizedResponse = '';
+
+    public function errorProvider() {
+        return [
+            'unauth' => ['{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}'],
+            'noright' => ['{"success":false,"responseType":"EXCEPTION","message":"Sicherheitsverletzung: Zugriff auf Rechte Recht (n:2001002 o:2) fehlgeschlagen"}']
+        ];
+    }
 
     public function dataProvider() {
         return [
@@ -49,4 +56,22 @@ class PullMembershipsTest extends TestCase
         Http::assertSentCount(5);
     }
 
+    /**
+     * @dataProvider errorProvider
+     */
+    public function test_it_gets_no_memberships_with_no_rights($error) {
+        Http::fake(array_merge($this->login(), [
+            'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/flist' => Http::response($error, 200)
+        ]));
+
+        $this->setCredentials();
+
+        Nami::login();
+        $member = new Member(['id' => 16]);
+
+        $memberships = $member->memberships();
+        $this->assertSame([], $member->memberships()->toArray());
+
+        Http::assertSentCount(4);
+    }
 }
