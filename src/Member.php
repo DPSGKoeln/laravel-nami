@@ -36,6 +36,7 @@ class Member extends Model {
         'konfessionId' => 'confession_id',
         'geburtsDatum' => 'birthday',
         'eintrittsdatum' => 'joined_at',
+        'gruppierungId' => 'group_id'
     ];
 
     protected $casts = [];

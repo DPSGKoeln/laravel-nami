@@ -36,6 +36,7 @@ class PullMemberTest extends TestCase
             'confession_id' => ['confession_id', [1, null]],
             'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
             'joined_at' => ['joined_at', ['2005-05-01', null]],
+            'group_id' => ['group_id', [103, 103]],
         ];
     }
 
@@ -54,6 +55,7 @@ class PullMemberTest extends TestCase
             'gender_id' => ['gender_id', [19, null]],
             'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
             'joined_at' => ['joined_at', ['2005-05-01', null]],
+            'group_id' => ['group_id', [103, 103]],
         ];
     }
 

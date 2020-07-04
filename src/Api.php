@@ -143,6 +143,7 @@ class Api {
         $member = collect($member)->mapWithKeys(function($value, $key) {
             return [ str_replace('entries_', '', $key) => $value ];
         });
+        $member['gruppierungId'] = $groupId;
 
         return $member->toArray();
     }
