@@ -14,7 +14,9 @@ class Membership extends Model {
         'taetigkeitId' => 'activity_id',
         'untergliederungId' => 'subactivity_id',
         'aktivVon' => 'starts_at',
-        'aktivBis' => 'ends_at'
+        'aktivBis' => 'ends_at',
+        'taetigkeit' => 'activity_name',
+        'untergliederung' => 'subactivity_name'
     ];
 
     protected $casts = [];

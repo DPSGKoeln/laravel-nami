@@ -19,7 +19,9 @@ class PullMembershipsTest extends TestCase
             'activity_id' => ['activity_id', [33, 34]],
             'subactivity_id' => ['subactivity_id', [55, 56]],
             'starts_at' => ['starts_at', ['2017-02-11', '2017-11-12']],
-            'ends_at' => ['ends_at', ['2017-03-11', null]]
+            'ends_at' => ['ends_at', ['2017-03-11', null]],
+            'activity_name' => ['activity_name', ['ReferentIn', 'Wö']],
+            'subactivity_name' => ['subactivity_name', ['Pfadfinder', 'AAA']],
         ];
     }
 
