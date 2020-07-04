@@ -4,6 +4,7 @@ namespace Zoomyboy\LaravelNami;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\LazyCollection;
 
 class Member extends Model {
 
@@ -85,6 +86,20 @@ class Member extends Model {
         }
 
         return parent::setAttribute($key, $value);
+    }
+
+    public function memberships() {
+        $memberships = Nami::membershipsOf($this->id);
+
+        return LazyCollection::make(function() use ($memberships) {
+            foreach ($memberships as $membership) {
+                yield $this->membership($membership['id']);
+            }
+        });
+    }
+
+    public function membership($id): Membership {
+        return Membership::fromNami(Nami::membership($this->id, $id));
     }
 
 }

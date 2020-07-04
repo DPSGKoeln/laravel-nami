@@ -1,0 +1,92 @@
+{
+    "success": true,
+    "data": [
+        {
+            "id": 68
+        },
+        {
+            "id": 69
+        }
+    ],
+    "responseType": "OK",
+    "totalEntries": 14,
+    "metaData": {
+        "totalProperty": "totalEntries",
+        "root": "data",
+        "id": "id",
+        "fields": [
+            {
+                "name": "id",
+                "header": null,
+                "hidden": false,
+                "width": 80
+            },
+            {
+                "name": "descriptor",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_untergliederung",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_taetigkeit",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_beitragsArt",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_aktivVon",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_caeaGroup",
+                "header": null,
+                "hidden": true,
+                "flex": 3
+            },
+            {
+                "name": "entries_aktivBis",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_caeaGroupForGf",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_gruppierung",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_mitglied",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            },
+            {
+                "name": "entries_anlagedatum",
+                "header": null,
+                "hidden": false,
+                "flex": 3
+            }
+        ]
+    }
+}

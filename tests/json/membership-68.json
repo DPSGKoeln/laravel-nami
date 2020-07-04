@@ -1,0 +1,17 @@
+{
+  "success": true,
+  "data": {
+    "id": 68,
+    "gruppierung": "Diözesanleitung Köln 100000",
+    "gruppierungId": 103,
+    "taetigkeit": "€ ReferentIn",
+    "taetigkeitId": 33,
+    "untergliederung": "Pfadfinder",
+    "untergliederungId": 55,
+    "aktivVon": "2017-02-11 00:00:00",
+    "aktivBis": "2017-03-11 00:00:00"
+  },
+  "responseType": null,
+  "message": null,
+  "title": null
+}
