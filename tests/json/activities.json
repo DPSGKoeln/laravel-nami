@@ -1,0 +1,18 @@
+{
+    "success": true,
+    "data": [
+        {
+            "descriptor": "Ac1",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.taetigkeit.FunktionsTaetigkeit",
+            "id": 4
+        },
+        {
+            "descriptor": "Ac2",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.taetigkeit.FunktionsTaetigkeit",
+            "id": 3
+        }
+    ],
+    "responseType": "OK"
+}

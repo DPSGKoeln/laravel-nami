@@ -2,6 +2,8 @@
 
 namespace Zoomyboy\LaravelNami;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Contracts\Support\Arrayable;
 
 class Group implements Arrayable {
@@ -41,6 +43,10 @@ class Group implements Arrayable {
 
     public function member($id): Member {
         return Member::fromNami(Nami::member($this->id, $id));
+    }
+
+    public function activities(): Collection {
+        return Nami::activities($this->id);
     }
 
 }

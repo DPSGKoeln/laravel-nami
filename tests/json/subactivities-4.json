@@ -1,0 +1,18 @@
+{
+    "success": true,
+    "data": [
+        {
+            "descriptor": "Biber",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.taetigkeit.Stufe",
+            "id": 40
+        },
+        {
+            "descriptor": "Wölfling",
+            "name": "",
+            "representedClass": "de.iconcept.nami.entity.taetigkeit.Stufe",
+            "id": 30
+        }
+    ],
+    "responseType": "OK"
+}

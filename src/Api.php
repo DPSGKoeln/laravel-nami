@@ -73,6 +73,12 @@ class Api {
         return collect($this->http()->get(self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist')->json()['data']);
     }
 
+    public function subactivitiesOf($activityId) {
+        return collect($this->http()->get(self::$url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId)->json()['data'])->map(function($subactivity) {
+            return Subactivity::fromNami($subactivity);
+        });;
+    }
+
     public function membership($memberId, $membershipId) {
         $url = self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
         $response = $this->http()->get($url);
@@ -148,6 +154,12 @@ class Api {
         });
     }
 
+    public function activities($groupId) {
+        return collect($this->http()->get(self::$url."/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/".$groupId)['data'])->map(function($activity) {
+            return Activity::fromNami($activity);
+        });
+    }
+
     private function singleMemberFallback($groupId, $memberId) {
         $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
         $response = $this->http()->get($url);
@@ -184,14 +196,6 @@ class Api {
 
     public function countries() {
         $response = $this->client->get("/ica/rest/baseadmin/land", [
-            'cookies' => $this->cookie
-        ]);
-
-        return json_decode((string)$response->getBody());
-    }
-
-    public function activities() {
-        $response = $this->client->get("/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/{$this->user->getNamiGroupId()}", [
             'cookies' => $this->cookie
         ]);
 
