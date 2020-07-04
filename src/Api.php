@@ -126,7 +126,7 @@ class Api {
         });
     }
 
-    public function group($groupId) {
+    public function group($groupId): Group {
         return $this->groups()->first(function($group) use ($groupId) {
             return $group->id == $groupId;
         });
