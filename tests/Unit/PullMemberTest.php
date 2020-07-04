@@ -100,9 +100,10 @@ class PullMemberTest extends TestCase
 
         Nami::login();
 
-        $member = Nami::group(103)->members();
-        $this->assertSame($values[0], $member->get(0)->toArray()[$key]);
-        $this->assertSame($values[1], $member->get(1)->toArray()[$key]);
+        $members = Nami::group(103)->members();
+        foreach ($members as $i => $m) {
+            $this->assertSame($values[$i], $m->toArray()[$key]);
+        }
 
         Http::assertSentCount(6);
     }

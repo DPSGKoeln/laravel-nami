@@ -2,9 +2,9 @@
 
 namespace Zoomyboy\LaravelNami;
 
-use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 
-class MemberCollection extends Collection {
+class MemberCollection extends LazyCollection {
 
     public static function fromOverview($items) {
         $self = new self($items);

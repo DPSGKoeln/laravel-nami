@@ -26,6 +26,13 @@ class Group implements Arrayable {
     }
 
     public function members(): MemberCollection {
+        $members = Nami::membersOf($this->id);
+
+        return MemberCollection::make(function() use ($members) {
+            foreach ($members as $member) {
+                yield $this->member($member['id']);
+            }
+        });
         return new MemberCollection(Nami::membersOf($this->id)->map(function($member) {
             return $this->member($member['id']);
         }));
