@@ -74,11 +74,7 @@ class Api {
 
         $r = $this->http()->get($url);
 
-        if ($r->status() == 200) {
-            Log::debug('Member Request '.$memberId, [ 'url' => $url, 'response' => $r->body(), 'json' => $r->json(), 'memberId' => $memberId ]);
-        } else {
-            Log::error('Member Request '.$memberId, [ 'url' => $url, 'response' => $r->body(), 'json' => $r->json(), 'memberId' => $memberId ]);
-        }
+        Logger::http($url, $r, 'Memberships from '.$memberId, ['memberId' => $memberId]);
 
         if (!isset($r->json()['data'])) {
             return collect([]);
@@ -97,11 +93,7 @@ class Api {
         $url = self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
         $response = $this->http()->get($url);
 
-        Log::debug('Membership Request '.$memberId.' - '.$membershipId, [
-            'url' => $url,
-            'response' => $response->body(),
-            'json' => $response->json()
-        ]);
+        Logger::http($url, $response, 'Single Membership '.$membershipId.' from '.$memberId, ['memberId' => $memberId]);
 
         return $response->json()['data'];
     }
@@ -110,11 +102,7 @@ class Api {
         $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);
 
-        if ($response->status() == 200) {
-            Log::debug('Member Request '.$memberId, [ 'url' => $url, 'response' => $response->body(), 'json' => $response->json(), 'memberId' => $memberId ]);
-        } else {
-            Log::error('Member Request '.$memberId, [ 'url' => $url, 'response' => $response->body(), 'json' => $response->json(), 'memberId' => $memberId ]);
-        }
+        Logger::http($url, $response, 'Show member '.$memberId, ['memberId' => $memberId]);
 
         if ($response->json()['success'] === true) {
             return $response->json()['data'];
