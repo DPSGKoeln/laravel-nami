@@ -69,6 +69,14 @@ class Api {
         return collect($this->http()->get(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist')->json()['data']);
     }
 
+    public function putMember(Member $member) {
+        $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, [
+            'vorname' => $member->firstname,
+            'nachname' => $member->lastname,
+            'spitzname' => $member->nickname ?: ''
+        ]);
+    }
+
     public function membershipsOf($memberId): Collection {
         $url = self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
 

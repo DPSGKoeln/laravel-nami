@@ -102,4 +102,8 @@ class Member extends Model {
         return Membership::fromNami(Nami::membership($this->id, $id));
     }
 
+    public function store() {
+        app('nami.api')->putMember($this);
+    }
+
 }
