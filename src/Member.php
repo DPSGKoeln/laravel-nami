@@ -8,6 +8,8 @@ use Illuminate\Support\LazyCollection;
 
 class Member extends Model {
 
+    public $timestamps = false;
+
     public $geschlechtMaps = [
         'männlich' => 19,
         'weiblich' => 20,
@@ -37,7 +39,8 @@ class Member extends Model {
         'konfessionId' => 'confession_id',
         'geburtsDatum' => 'birthday',
         'eintrittsdatum' => 'joined_at',
-        'gruppierungId' => 'group_id'
+        'gruppierungId' => 'group_id',
+        'lastUpdated' => 'updated_at'
     ];
 
     protected $casts = [];
