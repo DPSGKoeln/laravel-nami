@@ -90,7 +90,7 @@ class PullMemberTest extends TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function test_get_attribute_of_overview($key, $values) {
+    public function test_get_attribute_of_member_collection($key, $values) {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/flist' => Http::response($this->fakeJson('member_overview.json'), 200),
@@ -108,6 +108,27 @@ class PullMemberTest extends TestCase
         }
 
         Http::assertSentCount(6);
+    }
+
+    /**
+     * @dataProvider overviewDataProvider
+     */
+    public function test_get_attribute_of_member_overview($key, $values) {
+        Http::fake(array_merge($this->login(), [
+            'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/flist' => Http::response($this->fakeJson('member_overview.json'), 200)
+        ]));
+
+        $this->setCredentials();
+
+        Nami::login();
+
+        $members = Nami::group(103)->memberOverview();
+        foreach ($members as $i => $m) {
+            $this->assertSame($values[$i], $m->toArray()[$key]);
+        }
+
+        Http::assertSentCount(4);
     }
 
     /**

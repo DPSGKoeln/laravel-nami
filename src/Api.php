@@ -169,6 +169,20 @@ class Api {
         });
     }
 
+    public function memberOverviewOf($groupId) {
+        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
+        $response = $this->http()->get($url);
+
+        return collect($response['data'])->map(function($member) use ($groupId) {
+            $member = collect($member)->mapWithKeys(function($value, $key) {
+                return [ str_replace('entries_', '', $key) => $value ];
+            });
+            $member['gruppierungId'] = $groupId;
+
+            return $member;
+        });
+    }
+
     private function singleMemberFallback($groupId, $memberId) {
         $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
         $response = $this->http()->get($url);
