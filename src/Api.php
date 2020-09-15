@@ -112,15 +112,24 @@ class Api {
 
         Logger::http($url, $response, 'Show member '.$memberId, ['memberId' => $memberId]);
 
-        if ($response->json()['success'] === true) {
-            return $response->json()['data'];
-        }
-
-        if(Str::startsWith($response['message'], 'Access denied')) {
+        if($response->json()['success'] === false && Str::startsWith($response['message'], 'Access denied')) {
             return $this->singleMemberFallback($groupId, $memberId);
         }
 
-        return $response->json()['data'];
+        if($response->json()['success'] === false && Str::startsWith($response['message'], 'Sicherheitsverletzung: Zugriff')) {
+            return $this->singleMemberFallback($groupId, $memberId);
+        }
+
+        if ($response->json()['success'] === true) {
+            return $response->json()['data'];
+        } else {
+            $e = new NamiException('Fetch von Mitglied fehlgeschlagen');
+            $e->setData([
+                'response' => $response->body(),
+                'url' => $url
+            ]);
+            throw $e;
+        }
     }
 
     public function hasGroup($groupId): bool {
