@@ -37,6 +37,7 @@ class PullMemberTest extends TestCase
             'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
             'joined_at' => ['joined_at', ['2005-05-01', null]],
             'group_id' => ['group_id', [103, 103]],
+            'mitgliedsnr' => ['mitgliedsnr', [12345, null]],
             'updated_at' => ['updated_at', ['2020-06-28 02:15:24', '2015-02-03 15:20:07']]
         ];
     }
@@ -57,6 +58,7 @@ class PullMemberTest extends TestCase
             'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
             'joined_at' => ['joined_at', ['2005-05-01', null]],
             'group_id' => ['group_id', [103, 103]],
+            'mitgliedsnr' => ['mitgliedsnr', [12345, null]],
             'updated_at' => ['updated_at', ['2020-06-28 02:15:24', '2015-02-03 15:20:07']]
         ];
     }

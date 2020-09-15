@@ -40,7 +40,8 @@ class Member extends Model {
         'geburtsDatum' => 'birthday',
         'eintrittsdatum' => 'joined_at',
         'gruppierungId' => 'group_id',
-        'lastUpdated' => 'updated_at'
+        'lastUpdated' => 'updated_at',
+        'mitgliedsNummer' => 'mitgliedsnr',
     ];
 
     protected $casts = [];
