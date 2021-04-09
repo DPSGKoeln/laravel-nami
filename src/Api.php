@@ -6,7 +6,6 @@ use Log;
 use App\Conf;
 use Illuminate\Support\Str;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
-use App\Nami\Interfaces\UserResolver;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
 
