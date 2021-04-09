@@ -165,6 +165,12 @@ class Api {
         });
     }
 
+    public function countries() {
+        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/land")['data'])->map(function($country) {
+            return Country::fromNami($country);
+        });
+    }
+
     public function feesOf($groupid) {
         return collect($this->http()->get(self::$url."/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupid}")['data'])->map(function($fee) {
             return Fee::fromNami($fee);
@@ -217,14 +223,6 @@ class Api {
 
     public function regions() {
         $response = $this->client->get("/ica/rest/baseadmin/region", [
-            'cookies' => $this->cookie
-        ]);
-
-        return json_decode((string)$response->getBody());
-    }
-
-    public function countries() {
-        $response = $this->client->get("/ica/rest/baseadmin/land", [
             'cookies' => $this->cookie
         ]);
 
