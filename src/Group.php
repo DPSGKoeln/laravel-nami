@@ -28,6 +28,10 @@ class Group implements Arrayable {
         return Nami::subgroupsOf($this->id);
     }
 
+    public function fees() {
+        return Nami::feesOf($this->id);
+    }
+
     public function members(): MemberCollection {
         $members = Nami::membersOf($this->id);
 

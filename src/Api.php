@@ -165,6 +165,12 @@ class Api {
         });
     }
 
+    public function feesOf($groupid) {
+        return collect($this->http()->get(self::$url."/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupid}")['data'])->map(function($fee) {
+            return Fee::fromNami($fee);
+        });
+    }
+
     public function confessions(): Collection {
         return collect($this->http()->get(self::$url."/ica/rest/baseadmin/konfession")['data'])->map(function($gender) {
             return Confession::fromNami($gender);
@@ -208,14 +214,6 @@ class Api {
     }
 
     // -------------------------------------
-
-    public function fees() {
-        $response = $this->client->get("/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$this->user->getNamiGroupId()}", [
-            'cookies' => $this->cookie
-        ]);
-
-        return json_decode((string)$response->getBody());
-    }
 
     public function regions() {
         $response = $this->client->get("/ica/rest/baseadmin/region", [
