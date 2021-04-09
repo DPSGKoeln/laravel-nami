@@ -31,7 +31,7 @@
         "konfession": null,
         "fixBeitrag": null,
         "konfessionId": null,
-        "zeitschriftenversand": true,
+        "zeitschriftenversand": false,
         "pfadfinder": null,
         "telefon3": "+22222",
         "kontoverbindung":
