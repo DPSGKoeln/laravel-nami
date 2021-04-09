@@ -16,7 +16,7 @@ class NamiServiceProvider extends ServiceProvider
     }
 
     public function register() {
-        $this->app->bind('nami.api', function() {
+        $this->app->singleton('nami.api', function() {
             return new Api();
         });
     }

@@ -28,7 +28,7 @@ class NamiUser implements Authenticatable {
     }
 
     public function attemptNamiLogin($password) {
-        return app(Api::class)->setUser($this)->login($this->mglnr, $password, $this->groupid);
+        return Nami::setUser($this)->login($this->mglnr, $password, $this->groupid);
     }
 
     public function getNamiGroupId() {
