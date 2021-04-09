@@ -34,12 +34,17 @@ class NamiUserProvider implements UserProvider {
         try {
             $api = $user->attemptNamiLogin($credentials['password']);
 
-            $data = collect($api->allMembers()->data)->first(function($member) use ($credentials) {
-                return $member->entries_mitgliedsNummer == $credentials['mglnr'];
+            $group = $api->group($credentials['groupid']);
+            $data = $group->memberOverview()->first(function($member) use ($credentials) {
+                return $member->mitgliedsnr == $credentials['mglnr'];
             });
+
+            if (!$data) {
+                return false;
+            }
                 
             Cache::forever('member.'.$credentials['mglnr'], [
-                'data' => $api->getMember($data->id)->data,
+                'data' => $data,
                 'credentials' => $credentials
             ]);
 
