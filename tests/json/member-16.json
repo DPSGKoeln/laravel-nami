@@ -18,7 +18,7 @@
         "sonst01": false,
         "sonst02": false,
         "spitzname": "spitz1",
-        "landId": 1,
+        "landId": 100,
         "staatsangehoerigkeitText": "deutsch",
         "gruppierungId": 103,
         "mglTypeId": "MITGLIED",

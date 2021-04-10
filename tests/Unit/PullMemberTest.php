@@ -41,6 +41,7 @@ class PullMemberTest extends TestCase
             'updated_at' => ['updated_at', ['2020-06-28 02:15:24', '2015-02-03 15:20:07']],
             'send_newspaper' => ['send_newspaper', [true, false]],
             'region_id' => ['region_id', [10, 11]],
+            'country_id' => ['country_id', [100, 101]],
         ];
     }
 

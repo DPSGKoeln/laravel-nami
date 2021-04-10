@@ -44,6 +44,7 @@ class Member extends Model {
         'mitgliedsNummer' => 'mitgliedsnr',
         'zeitschriftenversand' => 'send_newspaper',
         'regionId' => 'region_id',
+        'landId' => 'country_id',
     ];
 
     protected $casts = [];
