@@ -42,6 +42,7 @@ class PullMemberTest extends TestCase
             'send_newspaper' => ['send_newspaper', [true, false]],
             'region_id' => ['region_id', [10, 11]],
             'country_id' => ['country_id', [100, 101]],
+            'fee_id' => ['fee_id', [1, 15]],
         ];
     }
 
