@@ -43,6 +43,7 @@ class Member extends Model {
         'lastUpdated' => 'updated_at',
         'mitgliedsNummer' => 'mitgliedsnr',
         'zeitschriftenversand' => 'send_newspaper',
+        'regionId' => 'region_id',
     ];
 
     protected $casts = [];
