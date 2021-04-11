@@ -14,22 +14,14 @@ class Gender extends Model implements Nullable {
     }
 
     public static function fromNami($item) {
-        $item = collect($item)
-            ->only(['descriptor', 'id'])
-            ->mapWithKeys(function($item,$key) {
-                if ($key == 'id') { return ['id' => $item]; }
-                return ['name' => $item];
-            })->toArray();
-
-        return (new self($item));
-    }
-
-    public function getNameAttribute() {
-        return ucfirst($this->attributes['name']);
+        return new self([
+            'id' => $item['id'],
+            'name' => ucfirst($item['descriptor'])
+        ]);
     }
 
     public function getIsNullAttribute() {
-        return $this->attributes['id'] == self::getNullValue();
+        return $this->id == self::getNullValue();
     }
 
 }

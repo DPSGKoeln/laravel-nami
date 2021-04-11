@@ -156,7 +156,7 @@ class Api {
     public function genders(): Collection {
         return collect($this->http()->get(self::$url."/ica/rest/baseadmin/geschlecht")['data'])->map(function($gender) {
             return Gender::fromNami($gender);
-        });
+        })->filter(fn($gender) => !$gender->isNull);
     }
 
     public function nationalities(): Collection {

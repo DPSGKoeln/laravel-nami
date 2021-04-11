@@ -21,22 +21,9 @@ class PullGenderTest extends TestCase
         Nami::login();
 
         $this->assertEquals([
-            23 => 'Keine Angabe',
             19 => 'Männlich',
             20 => 'Weiblich'
         ], Nami::genders()->pluck('name', 'id')->toArray());
-
-        Http::assertSentCount(3);
-    }
-
-    public function test_a_gender_can_be_null() {
-        Http::fake(array_merge($this->login(), $this->fakeGenders()));
-
-        $this->setCredentials();
-
-        Nami::login();
-
-        $this->assertEquals([true, false, false], Nami::genders()->pluck('isNull')->toArray());
 
         Http::assertSentCount(3);
     }
