@@ -72,7 +72,8 @@ class Api {
         $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, [
             'vorname' => $member->firstname,
             'nachname' => $member->lastname,
-            'spitzname' => $member->nickname ?: ''
+            'spitzname' => $member->nickname ?: '',
+            'geschlechtId' => $member->gender_id ?: Gender::getNullValue(),
         ]);
     }
 

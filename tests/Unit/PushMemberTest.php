@@ -11,7 +11,7 @@ use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Group;
 use Zoomyboy\LaravelNami\Member;
 
-class PushlMemberTest extends TestCase
+class PushMemberTest extends TestCase
 {
     public $groupsResponse = '{"success":true,"data":[{"descriptor":"Group","name":"","representedClass":"de.iconcept.nami.entity.org.Gruppierung","id":103}],"responseType":"OK"}';
     public $unauthorizedResponse = '{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}';
@@ -22,13 +22,15 @@ class PushlMemberTest extends TestCase
             'lastname' => 'Nach1',
             'group_id' => 103,
             'nickname' => 'spitz1',
-            'id' => 16
+            'gender_id' => 17,
+            'id' => 16,
         ], [
             'firstname' => 'Jane',
             'lastname' => 'Nach2',
             'nickname' => null,
             'group_id' => 103,
-            'id' => 17
+            'gender_id' => null,
+            'id' => 17,
         ]
     ];
 
@@ -37,6 +39,7 @@ class PushlMemberTest extends TestCase
             'firstname' => ['vorname', ['Max', 'Jane']],
             'lastname' => ['nachname', ['Nach1', 'Nach2']],
             'nickname' => ['spitzname', ['spitz1', '']],
+            'gender_id' => ['geschlechtId', [17, 23]],
             /* 
             'other_country' => ['other_country', ['deutsch', null]],
             'address' => ['address', ['straße 1', 'straße 2']],
@@ -56,31 +59,6 @@ class PushlMemberTest extends TestCase
             'joined_at' => ['joined_at', ['2005-05-01', null]],
             'group_id' => ['group_id', [103, 103]],
              */
-        ];
-    }
-
-    public function overviewDataProvider() {
-        return [
-            'firstname' => ['firstname', ['Max', 'Jane']],
-            'lastname' => ['lastname', ['Nach1', 'Nach2']],
-            'nickname' => ['nickname', ['spitz1', null]],
-            'other_country' => ['other_country', ['deutsch', null]],
-            'main_phone' => ['main_phone', ['+49888', '+49668']],
-            'mobile_phone' => ['mobile_phone', ['+49176', '+49172']],
-            'work_phone' => ['work_phone', ['+11111', '+22222']],
-            'fax' => ['fax', ['+55111', '+55222']],
-            'email' => ['email', ['test@example.com', 'test2@example.com']],
-            'email_parents' => ['email_parents', ['testp@example.com', 'test2p@example.com']],
-            'gender_id' => ['gender_id', [19, null]],
-            'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
-            'joined_at' => ['joined_at', ['2005-05-01', null]],
-            'group_id' => ['group_id', [103, 103]],
-        ];
-    }
-
-    public function relationProvider() {
-        return [
-            'firstname' => ['firstname', ['Max', 'Jane']],
         ];
     }
 
