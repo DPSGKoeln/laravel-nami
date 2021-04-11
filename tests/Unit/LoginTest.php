@@ -7,7 +7,7 @@ use Zoomyboy\LaravelNami\Tests\TestCase;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\LoginException;
 
-class Login extends TestCase
+class LoginTest extends TestCase
 {
 
     /**
