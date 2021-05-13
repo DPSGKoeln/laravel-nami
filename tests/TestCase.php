@@ -3,9 +3,9 @@
 namespace Zoomyboy\LaravelNami\Tests;
 
 use Illuminate\Support\Facades\Config;
-use Zoomyboy\LaravelNami\NamiServiceProvider;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Tests\Stub\Member;
+use Zoomyboy\LaravelNami\Providers\NamiServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {

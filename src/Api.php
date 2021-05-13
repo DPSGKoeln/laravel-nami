@@ -8,9 +8,9 @@ use Illuminate\Support\Str;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
-use Zoomyboy\LaravelNami\Concerns\NamiData;
+use Zoomyboy\LaravelNami\Backend\Backend;
 
-class Api implements NamiData {
+class Api {
 
     public $cookie;
     public $loggedIn = null;
@@ -20,8 +20,8 @@ class Api implements NamiData {
         $this->cookie = new \GuzzleHttp\Cookie\CookieJar();
     }
 
-    private function http() {
-        return Http::withOptions(['cookies' => $this->cookie]);
+    public function http() {
+        return Backend::cookie($this->cookie);
     }
 
     public function setUser(NamiUser $user) {
