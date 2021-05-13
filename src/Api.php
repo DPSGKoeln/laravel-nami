@@ -8,8 +8,9 @@ use Illuminate\Support\Str;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
+use Zoomyboy\LaravelNami\Concerns\NamiData;
 
-class Api {
+class Api implements NamiData {
 
     public $cookie;
     public $loggedIn = null;
