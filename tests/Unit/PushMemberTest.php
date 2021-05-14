@@ -10,6 +10,7 @@ use Zoomyboy\LaravelNami\NamiServiceProvider;
 use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Group;
 use Zoomyboy\LaravelNami\Member;
+use Illuminate\Database\Eloquent\Model;
 
 class PushMemberTest extends TestCase
 {
@@ -74,11 +75,8 @@ class PushMemberTest extends TestCase
         $this->setCredentials();
         Nami::login();
 
-        $member1 = new Member($this->attributes[0]);
-        $member2 = new Member($this->attributes[1]);
-
-        $member1->store();
-        $member2->store();
+        Nami::putMember($this->attributes[0]);
+        Nami::putMember($this->attributes[1]);
 
         Http::assertSent(function($request) use ($key, $values) {
             return $request->url() == 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16'

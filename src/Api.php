@@ -9,6 +9,7 @@ use App\Nami\Exceptions\TooManyLoginAttemptsException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
 use Zoomyboy\LaravelNami\Backend\Backend;
+use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
 
 class Api {
 
@@ -64,13 +65,9 @@ class Api {
         return collect($this->http()->get(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist')->json()['data']);
     }
 
-    public function putMember(Member $member) {
-        $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, [
-            'vorname' => $member->firstname,
-            'nachname' => $member->lastname,
-            'spitzname' => $member->nickname ?: '',
-            'geschlechtId' => $member->gender_id ?: Gender::getNullValue(),
-        ]);
+    public function putMember(array $attributes) {
+        $member = Member::fromAttributes($attributes);
+        $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
     }
 
     public function membershipsOf($memberId): Collection {

@@ -64,6 +64,19 @@ class Member extends Model {
         return (new self($item));
     }
 
+    public static function fromAttributes($attributes) {
+        return new self($attributes);
+    }
+
+    public function toNami() {
+        return [
+            'vorname' => $this->firstname,
+            'nachname' => $this->lastname,
+            'spitzname' => $this->nickname ?: '',
+            'geschlechtId' => $this->gender_id ?: Gender::getNullValue(),
+        ];
+    }
+
     public function __construct($member) {
         parent::__construct($member);
     }
@@ -108,10 +121,6 @@ class Member extends Model {
 
     public function membership($id): Membership {
         return Membership::fromNami(Nami::membership($this->id, $id));
-    }
-
-    public function store() {
-        app('nami.api')->putMember($this);
     }
 
 }
