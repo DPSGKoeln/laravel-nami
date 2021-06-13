@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
 use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
+use Zoomyboy\LaravelNami\NamiException;
 
 class Api {
 
@@ -67,7 +68,11 @@ class Api {
 
     public function putMember(array $attributes) {
         $member = Member::fromAttributes($attributes);
-        $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
+        $response = $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
+
+        if (!data_get($response->json(), 'id')) {
+            throw new NamiException('update failed');
+        }
     }
 
     public function membershipsOf($memberId): Collection {

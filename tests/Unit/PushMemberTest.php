@@ -70,8 +70,8 @@ class PushMemberTest extends TestCase
      */
     public function test_push_a_single_member($key, $values) {
         Http::fake(array_merge($this->login(), [
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('', 200),
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/17' => Http::response('', 200),
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('{"id": 16}', 200),
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/17' => Http::response('{"id": 17}', 200),
         ]));
 
         $this->setCredentials();
