@@ -1,6 +1,6 @@
 <?php
 
-namespace Zoomyboy\LaravelNami;
+namespace Zoomyboy\LaravelNami\Providers;
 
 use Cache;
 use Illuminate\Contracts\Auth\UserProvider;

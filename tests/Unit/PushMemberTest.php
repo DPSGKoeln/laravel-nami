@@ -41,6 +41,8 @@ class PushMemberTest extends TestCase
             'lastname' => ['nachname', ['Nach1', 'Nach2']],
             'nickname' => ['spitzname', ['spitz1', '']],
             'gender_id' => ['geschlechtId', [17, 23]],
+            'group_id' => ['gruppierungId', [103, 103]],
+            'nami_id' => ['id', [16, 17]],
             /* 
             'other_country' => ['other_country', ['deutsch', null]],
             'address' => ['address', ['straße 1', 'straße 2']],

@@ -74,6 +74,8 @@ class Member extends Model {
             'nachname' => $this->lastname,
             'spitzname' => $this->nickname ?: '',
             'geschlechtId' => $this->gender_id ?: Gender::getNullValue(),
+            'gruppierungId' => $this->group_id,
+            'id' => $this->id,
         ];
     }
 
