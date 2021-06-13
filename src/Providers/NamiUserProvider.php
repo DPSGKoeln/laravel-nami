@@ -43,8 +43,9 @@ class NamiUserProvider implements UserProvider {
                 return false;
             }
                 
-            Cache::forever('member.'.$credentials['mglnr'], [
-                'data' => $data,
+            Cache::forever('namicookie-'.$credentials['mglnr'], [
+                'data' => $data->toArray(),
+                'cookie' => $api->cookie->toArray(),
                 'credentials' => $credentials
             ]);
 

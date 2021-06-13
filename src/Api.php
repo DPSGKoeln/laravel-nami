@@ -42,17 +42,17 @@ class Api {
         $password = $password ?: config('nami.auth.password');
         $groupid = $groupid ?: config('nami.auth.groupid');
 
-        Http::withOptions(['cookies' => $this->cookie])->get(self::$url.'/ica/pages/login.jsp');
-        $response = Http::asForm()->withOptions(['cookies' => $this->cookie])->post(self::$url.'/ica/rest/nami/auth/manual/sessionStartup', [
+        $this->http()->get(self::$url.'/ica/pages/login.jsp');
+        $response = $this->http()->asForm()->post(self::$url.'/ica/rest/nami/auth/manual/sessionStartup', [
             'Login' => 'API',
             'redirectTo' => './app.jsp',
             'username' => $mglnr,
             'password' => $password
-        ])->json();
+        ]);
 
-        if ($response['statusCode'] !== 0) {
+        if ($response->json()['statusCode'] !== 0) {
             $e = new LoginException();
-            $e->setResponse($response);
+            $e->setResponse($response->json());
             throw $e;
         }
 
