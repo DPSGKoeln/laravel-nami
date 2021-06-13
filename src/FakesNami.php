@@ -3,16 +3,17 @@
 namespace Zoomyboy\LaravelNami;
 
 use PHPUnit\Framework\Assert;
+use Zoomyboy\LaravelNami\Backend\Backend;
 
 trait FakesNami {
 
     public function fakeNami() {
-        Nami::fake();
+        Backend::fake();
     }
 
     public function fakeNamiMembers($members) {
         foreach ($members as $member) {
-            Nami::addMember($member);
+            Backend::addMember($member);
         }
     }
 
