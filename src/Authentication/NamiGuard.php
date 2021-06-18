@@ -47,14 +47,13 @@ class NamiGuard {
             return;
         }
 
-        return NamiUser::fromCredentials($cache['credentials']);
+        return new NamiUser($cache);
     }
 
     public function attempt(array $credentials = [], $remember = false) {
         $api = Nami::login($credentials['mglnr'], $credentials['password']);
 
         $payload = [
-            'cookie' => $api->cookie->toArray(),
             'credentials' => $credentials
         ];
 
@@ -77,7 +76,7 @@ class NamiGuard {
     }
 
     private function resolveCache() {
-        return $this->cache->get($this->session->get($this->getName()));
+        return $this->cache->get('namiauth-'.$this->session->get($this->getName()));
     }
 
     private function newCacheKey() {

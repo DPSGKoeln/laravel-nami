@@ -32,6 +32,27 @@ class Api {
         return $this;
     }
 
+    public function findNr($nr) {
+        return $this->search(['mitgliedsNummber' => $nr]);
+    }
+
+    public function search($payload) {
+        $url = self::$url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode($payload)).'&page=1&start=0&limit=10';
+        $response = $this->http()->get($url);
+
+        if ($response->json()['success'] === true) {
+
+            if (!count($response->json()['data'])) {
+                return null;
+            }
+            $data = collect($response->json()['data'][0])->mapWithKeys(function($value, $key) {
+                return [ str_replace('entries_', '', $key) => $value ];
+            });
+
+            return Member::fromNami($data);
+        }
+    }
+
     protected function loggedInAlready(): bool {
         return $this->loggedIn !== null;
     }
