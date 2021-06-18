@@ -7,12 +7,12 @@ use Illuminate\Contracts\Auth\Authenticatable;
 class NamiUser implements Authenticatable {
 
     public $mglnr;
+    public $password;
 
-    public static function fromCredentials(array $credentials): ?self {
-        $user = new static();
-        $user->mglnr = $credentials['mglnr'];
-
-        return $user;
+    public function __construct($payload) {
+        $this->mglnr = data_get($payload, 'credentials.mglnr');
+        $this->password = data_get($payload, 'credentials.password');
+        $this->cookie = data_get($payload, 'cookie');
     }
 
     public function getNamiApi() {

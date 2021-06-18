@@ -7,53 +7,23 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Zoomyboy\LaravelNami\Nami;
 use Illuminate\Support\Facades\Cache;
 use Zoomyboy\LaravelNami\NamiUser;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Auth\GuardHelpers;
+use Illuminate\Support\Str;
 
-class NamiGuard implements Guard {
+class NamiGuard {
 
-    /**
-     * Determine if the current user is authenticated.
-     *
-     * @return bool
-     */
-    public function check() {
+    use GuardHelpers;
 
-    }
+    protected $cache;
+    protected $user;
+    protected $session;
 
-    /**
-     * Determine if the current user is a guest.
-     *
-     * @return bool
-     */
-    public function guest() {
-
-    }
-
-    /**
-     * Get the currently authenticated user.
-     *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
-     */
-    public function user() {
-
-    }
-
-    /**
-     * Get the ID for the currently authenticated user.
-     *
-     * @return int|string|null
-     */
-    public function id() {
-
-    }
-
-    /**
-     * Validate a user's credentials.
-     *
-     * @param  array  $credentials
-     * @return bool
-     */
-    public function validate(array $credentials = []) {
-
+    public function __construct($config, $session, $cache) {
+        $this->config = $config;
+        $this->session = $session;
+        $this->cache = $cache;
     }
 
     /**
@@ -62,20 +32,57 @@ class NamiGuard implements Guard {
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    public function setUser(Authenticatable $user) {
-        
+    public function setUser(NamiUser $user) {
+        $this->user = $user;
     }
 
-    public function attempt($credentials) {
+    public function user()
+    {
+        if (! is_null($this->user)) {
+            return $this->user;
+        }
+
+        $cache = $this->resolveCache();
+
+        if (!$cache) {
+            return;
+        }
+
+        return NamiUser::fromCredentials($cache['credentials']);
+    }
+
+    public function attempt(array $credentials = [], $remember = false) {
         $api = Nami::login($credentials['mglnr'], $credentials['password']);
 
-        Cache::forever('namicookie-'.$credentials['mglnr'], [
-            'user' => NamiUser::fromCredentials($credentials),
+        $payload = [
             'cookie' => $api->cookie->toArray(),
             'credentials' => $credentials
-        ]);
+        ];
+
+        $this->setUser(new NamiUser($payload));
+        $key = $this->newCacheKey();
+        Cache::forever("namiauth-{$key}", $payload);
+        $this->updateSession($key);
 
         return true;
+    }
+
+    protected function updateSession($data)
+    {
+        $this->session->put($this->getName(), $data);
+        $this->session->migrate(true);
+    }
+
+    public function getName() {
+        return 'auth_key';
+    }
+
+    private function resolveCache() {
+        return $this->cache->get($this->session->get($this->getName()));
+    }
+
+    private function newCacheKey() {
+        return Str::random(16);
     }
 
 }

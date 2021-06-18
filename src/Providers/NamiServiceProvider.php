@@ -14,7 +14,7 @@ class NamiServiceProvider extends ServiceProvider
     public function boot()
     {
         Auth::extend('nami', function ($app, $name, array $config) {
-            return new NamiGuard($config);
+            return new NamiGuard($config['beforeDriver'], $this->app['session.store'], $this->app['cache.store']);
         });
     }
 
