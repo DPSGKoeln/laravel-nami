@@ -22,6 +22,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return [ NamiServiceProvider::class ];
     }
 
+    public function getAnnotations(): array {
+        return [];
+    }
+
     protected function setCredentials() {
         Config::set('nami.auth.mglnr', '11223');
         Config::set('nami.auth.password', 'secret');

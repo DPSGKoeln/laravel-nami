@@ -20,8 +20,7 @@ class NamiGuard {
     protected $user;
     protected $session;
 
-    public function __construct($config, $session, $cache) {
-        $this->config = $config;
+    public function __construct($session, $cache) {
         $this->session = $session;
         $this->cache = $cache;
     }
