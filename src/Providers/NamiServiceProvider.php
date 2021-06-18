@@ -7,13 +7,14 @@ use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\ServiceProvider;
 use Zoomyboy\LaravelNami\Backend\LiveBackend;
 use Zoomyboy\LaravelNami\Api;
+use Zoomyboy\LaravelNami\Authentication\NamiGuard;
 
 class NamiServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Auth::provider('nami', function ($app, array $config) {
-            return new NamiUserProvider($config['model']);
+        Auth::extend('nami', function ($app, $name, array $config) {
+            return new NamiGuard($config);
         });
     }
 

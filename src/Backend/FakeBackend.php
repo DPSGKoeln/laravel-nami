@@ -28,6 +28,10 @@ class FakeBackend {
     }
 
     public function put($url, $data) {
+        if (is_null($this->cookie->getCookieByName('JSESSIONID'))) {
+            return $this->notAuthorizedResponse();
+        }
+
         if (preg_match('|/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/([0-9]+)/([0-9]+)|', $url, $matches)) {
             list($url, $groupId, $memberId) = $matches;
             $existing = $this->members->search(function($m) use ($groupId, $memberId) {
@@ -37,7 +41,9 @@ class FakeBackend {
                 $this->members[$existing] = $data;
             }
 
-            return;
+            return $this->response([
+                'id' => $memberId
+            ]);
         }
 
         $this->urlNotFoundException($url);
@@ -132,6 +138,16 @@ class FakeBackend {
             "apiSessionToken" => "qrjlt_YFVhtRPU-epc-58AB1",
             "minorNumber" => 0,
             "majorNumber" => 0,
+        ]);
+    }
+
+    private function notAuthorizedResponse() {
+        return $this->response([
+            'success' => true,
+            'data' => null,
+            'responseType' => 'ERROR',
+            'message' => 'Session expired',
+            'title' => 'Exception',
         ]);
     }
 
