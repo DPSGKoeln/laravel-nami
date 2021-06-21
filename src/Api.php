@@ -92,9 +92,11 @@ class Api {
         $member = Member::fromAttributes($attributes);
         $response = $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
 
-        if (!data_get($response->json(), 'id')) {
-            $this->exception('Update failed', $response->json(), $member->toNami());
+        if (data_get($response->json(), 'success') !== true) {
+            $this->exception('Update failed', $member->toNami(), $response->json());
         }
+
+        return $response->json()['data'];
     }
 
     public function membershipsOf($memberId): Collection {

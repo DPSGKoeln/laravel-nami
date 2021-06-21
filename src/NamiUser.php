@@ -30,7 +30,7 @@ class NamiUser implements Authenticatable {
     }
 
     public function getNamiGroupId() {
-        return $this->groupid;
+        return $this->api()->findNr($this->mglnr)->group_id;
     }
 
     public function getAuthIdentifierName() {
