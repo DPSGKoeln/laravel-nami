@@ -5,7 +5,8 @@ namespace Zoomyboy\LaravelNami\Backend;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use GuzzleHttp\Cookie\SetCookie;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class FakeBackend {
 
@@ -19,10 +20,11 @@ class FakeBackend {
     }
 
     public function addMember(array $member) {
+        $member['mitgliedsNummer'] = $member['id'];
         $this->members->push($member);
     }
 
-    public function cookie($cookie) {
+    public function init($cookie) {
         $this->cookie = $cookie;
         return $this;
     }
@@ -104,7 +106,33 @@ class FakeBackend {
             ]);
         }
 
+        if (Str::contains($url, 'search-multi/result-list')) {
+            $query = parse_url($url)['query'];
+            parse_str($query, $q);
+            $params = json_decode($q['searchedValues'], true);
+            if (array_keys($params) === ['mitgliedsNummber']) {
+                return $this->findNr($params['mitgliedsNummber']);
+            }
+        }
+
         $this->urlNotFoundException($url);
+    }
+
+    public function findNr($nr) {
+        $found = $this->members->first(fn($m) => $m['id'] === $nr);
+
+        $found = [
+            'entries_mitgliedsNummer' => $found['mitgliedsNummer'],
+            'entries_vorname' => $found['vorname'],
+            'entries_nachname' => $found['nachname'],
+        ];
+
+        return $this->response([
+            "success" => true,
+            "data" => [$found],
+            "responseType" => "OK",
+            "totalEntries" => 1
+        ]);
     }
 
     public function post($url, $data) {
@@ -115,9 +143,7 @@ class FakeBackend {
 
             if ($this->passwords[data_get($data, 'username')] === data_get($data, 'password')) {
                 $this->loggedInAs = data_get($data, 'username');
-                $this->cookie->setCookie(tap(SetCookie::fromString('JSESSIONID=rZMBv1McDAJ-KukQ6BboJBTq.srv-nami06; path=/ica'), function($cookie) {
-                    $cookie->setDomain('nami.dpsg.de');
-                }));
+                $this->cookie->set($data['username'], 'rZMBv1McDAJ-KukQ6BboJBTq.srv-nami06');
                 return $this->response([
                     "statusCode" => 0,
                 ]);

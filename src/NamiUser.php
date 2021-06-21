@@ -4,15 +4,25 @@ namespace Zoomyboy\LaravelNami;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Cache;
 
-class NamiUser extends Model implements Authenticatable {
+class NamiUser implements Authenticatable {
 
     public $mglnr;
     public $password;
 
-    public function __construct($payload) {
-        $this->mglnr = data_get($payload, 'credentials.mglnr');
-        $this->password = data_get($payload, 'credentials.password');
+    public function __construct($attributes) {
+        $this->mglnr = $attributes['mglnr'];
+        $this->password = $attributes['password'];
+    }
+
+    public static function fromPayload($payload) {
+        $user = new static([
+            'mglnr' => data_get($payload, 'credentials.mglnr'),
+            'password' => data_get($payload, 'credentials.password'),
+        ]);
+
+        return $user;
     }
 
     public function api() {
@@ -27,12 +37,20 @@ class NamiUser extends Model implements Authenticatable {
         return 'mglnr';
     }
 
-    public function getFirstnameAttribute() {
-        return $this->api()->findNr($this->mglnr)->vorname;
+    public function getMglnr() {
+        return $this->mglnr;
     }
 
-    public function getLastnameAttribute() {
-        return $this->api()->findNr($this->mglnr)->nachname;
+    public function getFirstname() {
+        return Cache::remember('member-'.$this->mglnr.'-firstname', 3600, function() {
+            return $this->api()->findNr($this->mglnr)->firstname;
+        });
+    }
+
+    public function getLastname() {
+        return Cache::remember('member-'.$this->mglnr.'-lastname', 3600, function() {
+            return $this->api()->findNr($this->mglnr)->lastname;
+        });
     }
 
     public function getAuthIdentifier() {
@@ -52,4 +70,5 @@ class NamiUser extends Model implements Authenticatable {
     public function getRememberTokenName() {
         return null;
     }
+
 }

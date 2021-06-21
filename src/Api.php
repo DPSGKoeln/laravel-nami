@@ -11,25 +11,21 @@ use Illuminate\Support\Collection;
 use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
 use Zoomyboy\LaravelNami\NamiException;
+use Illuminate\Support\Facades\Cache;
+use Zoomyboy\LaravelNami\Cookies\Cookie;
 
 class Api {
 
-    public $cookie;
+    private $cookie;
     public $loggedIn = null;
     public static $url = 'https://nami.dpsg.de';
 
-    public function __construct() {
-        $this->cookie = new \GuzzleHttp\Cookie\CookieJar();
+    public function __construct($cookieStore) {
+        $this->cookie = $cookieStore;
     }
 
     public function http() {
-        return Backend::cookie($this->cookie);
-    }
-
-    public function setUser(NamiUser $user) {
-        $this->user = $user;
-
-        return $this;
+        return Backend::init($this->cookie);
     }
 
     public function findNr($nr) {
@@ -51,6 +47,8 @@ class Api {
 
             return Member::fromNami($data);
         }
+
+        $this->exception('Search failed', ['url' => $url], $response->json());
     }
 
     protected function loggedInAlready(): bool {
@@ -58,7 +56,9 @@ class Api {
     }
 
     public function login($mglnr = null, $password = null, $groupid = null): self {
-        if ($this->loggedIn) { return $this; }
+        if ($this->cookie->resolve($mglnr)) {
+            return $this;
+        }
 
         $mglnr = $mglnr ?: config('nami.auth.mglnr');
         $password = $password ?: config('nami.auth.password');
@@ -78,6 +78,7 @@ class Api {
             throw $e;
         }
 
+        $this->cookie->store($mglnr);
         $this->loggedIn = $mglnr;
 
         return $this;
@@ -92,7 +93,7 @@ class Api {
         $response = $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
 
         if (!data_get($response->json(), 'id')) {
-            throw new NamiException('update failed');
+            $this->exception('Update failed', $response->json(), $member->toNami());
         }
     }
 
@@ -244,6 +245,10 @@ class Api {
         $member['gruppierungId'] = $groupId;
 
         return $member->toArray();
+    }
+
+    private function exception($message, $request, $response) {
+        throw (new NamiException($message))->response($response)->request($request);
     }
 
 }

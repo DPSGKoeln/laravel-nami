@@ -24,6 +24,8 @@ class PushMemberTest extends TestCase
             'group_id' => 103,
             'nickname' => 'spitz1',
             'gender_id' => 17,
+            'joined_at' => '2021-02-02T00:00:00',
+            'birthday' => '2021-02-02',
             'id' => 16,
         ], [
             'firstname' => 'Jane',
@@ -31,6 +33,8 @@ class PushMemberTest extends TestCase
             'nickname' => null,
             'group_id' => 103,
             'gender_id' => null,
+            'joined_at' => '2021-02-02T00:00:00',
+            'birthday' => '2021-02-02',
             'id' => 17,
         ]
     ];

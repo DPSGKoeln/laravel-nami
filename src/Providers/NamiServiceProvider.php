@@ -7,6 +7,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\ServiceProvider;
 use Zoomyboy\LaravelNami\Backend\LiveBackend;
 use Zoomyboy\LaravelNami\Api;
+use Zoomyboy\LaravelNami\Cookies\CacheCookie;
 use Zoomyboy\LaravelNami\Authentication\NamiGuard;
 
 class NamiServiceProvider extends ServiceProvider
@@ -20,10 +21,13 @@ class NamiServiceProvider extends ServiceProvider
 
     public function register() {
         $this->app->singleton('nami.api', function() {
-            return new Api();
+            return new Api($this->app['nami.cookie']);
         });
         $this->app->bind('nami.backend', function() {
             return new LiveBackend();
+        });
+        $this->app->singleton('nami.cookie', function() {
+            return new CacheCookie();
         });
     }
 }

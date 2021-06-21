@@ -47,7 +47,7 @@ class NamiGuard {
             return;
         }
 
-        return new NamiUser($cache);
+        return NamiUser::fromPayload($cache);
     }
 
     public function attempt(array $credentials = [], $remember = false) {
@@ -57,7 +57,7 @@ class NamiGuard {
             'credentials' => $credentials
         ];
 
-        $this->setUser(new NamiUser($payload));
+        $this->setUser(NamiUser::fromPayload($payload));
         $key = $this->newCacheKey();
         Cache::forever("namiauth-{$key}", $payload);
         $this->updateSession($key);

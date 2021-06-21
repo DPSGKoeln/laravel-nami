@@ -46,6 +46,7 @@ class Member extends Model {
         'regionId' => 'region_id',
         'landId' => 'country_id',
         'beitragsartId' => 'fee_id',
+        'version' => 'version',
     ];
 
     protected $casts = [];
@@ -73,6 +74,16 @@ class Member extends Model {
             'vorname' => $this->firstname,
             'nachname' => $this->lastname,
             'spitzname' => $this->nickname ?: '',
+            'strasse' => $this->address,
+            'plz' => $this->zip,
+            'ort' => $this->location,
+            'eintrittsdatum' => $this->joined_at.'T00:00:00',
+            'version' => $this->version,
+            'beitragsartId' => $this->fee_id,
+            'regionId' => $this->region_id,
+            'landId' => $this->country_id,
+            'staatsangehoerigkeitId' => $this->nationality_id,
+            'geburtsDatum' => $this->birthday,
             'geschlechtId' => $this->gender_id ?: Gender::getNullValue(),
             'gruppierungId' => $this->group_id,
             'id' => $this->id,
