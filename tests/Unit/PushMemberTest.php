@@ -74,15 +74,16 @@ class PushMemberTest extends TestCase
      */
     public function test_push_a_single_member($key, $values) {
         Http::fake(array_merge($this->login(), [
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('{"id": 16}', 200),
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/17' => Http::response('{"id": 17}', 200),
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('{"success": true, "data": {"id": 16}}', 200),
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/17' => Http::response('{"success": true, "data": {"id": 17}}', 200),
         ]));
 
         $this->setCredentials();
         Nami::login();
 
         Nami::putMember($this->attributes[0]);
-        Nami::putMember($this->attributes[1]);
+        $res = Nami::putMember($this->attributes[1]);
+        $this->assertEquals(17, $res['id']);
 
         Http::assertSent(function($request) use ($key, $values) {
             return $request->url() == 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16'

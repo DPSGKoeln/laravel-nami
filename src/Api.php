@@ -90,10 +90,18 @@ class Api {
 
     public function putMember(array $attributes) {
         $member = Member::fromAttributes($attributes);
-        $response = $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
+        if (data_get($attributes, 'id')) {
+            $response = $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
+            if (data_get($response->json(), 'success') !== true) {
+                $this->exception('Update failed', $member->toNami(), $response->json());
+            }
+        } else {
+            $response = $this->http()->post(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id, $member->toNami());
+            if (data_get($response->json(), 'success') !== true) {
+                $this->exception('Update failed', $member->toNami(), $response->json());
+            }
 
-        if (data_get($response->json(), 'success') !== true) {
-            $this->exception('Update failed', $member->toNami(), $response->json());
+            return ['id' => $response->json()['data']];
         }
 
         return $response->json()['data'];
