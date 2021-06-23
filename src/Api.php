@@ -56,7 +56,7 @@ class Api {
     }
 
     public function deleteMember($id) {
-        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/mglschaft-beenden?gruppierung=100105';
+        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/mglschaft-beenden';
         $payload = [
             'id' => $id,
             'isConfirmed' => 'true',
