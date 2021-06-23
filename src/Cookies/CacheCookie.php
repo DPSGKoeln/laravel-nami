@@ -22,7 +22,10 @@ class CacheCookie {
      * Store the current cookie in the cache
      */
     public function store($mglnr) {
-        Cache::forever("namicookie-{$mglnr}", $this->store->getCookieByName('JSESSIONID')->getValue());
+        Cache::forever("namicookie-{$mglnr}", [
+            'cookie' => $this->store->getCookieByName('JSESSIONID')->getValue(),
+            'created_at' => now(),
+        ]);
     }
 
     /**
@@ -43,7 +46,7 @@ class CacheCookie {
             return false;
         }
 
-        $this->set($mglnr, $cookie);
+        $this->set($mglnr, $cookie['cookie']);
         return true;
     }
 
