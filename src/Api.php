@@ -55,6 +55,20 @@ class Api {
         return $this->loggedIn !== null;
     }
 
+    public function deleteMember($id) {
+        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/mglschaft-beenden?gruppierung=100105';
+        $payload = [
+            'id' => $id,
+            'isConfirmed' => 'true',
+            'beendenZumDatum' => now()->subDays(1)->format('Y-m-d').' 00:00:00',
+        ];
+        $response = $this->http()->asForm()->post($url, $payload);
+
+        if ($response['success'] !== true) {
+            $this->exception('Deleting member failed', ['url' => $url, 'post' => $payload], $response->json());
+        }
+    }
+
     public function login($mglnr = null, $password = null, $groupid = null): self {
         if ($this->cookie->resolve($mglnr)) {
             return $this;
