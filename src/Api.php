@@ -70,7 +70,9 @@ class Api {
     }
 
     public function login($mglnr = null, $password = null, $groupid = null): self {
-        if ($this->cookie->resolve($mglnr)) {
+        $resolved = $this->cookie->resolve($mglnr);
+
+        if ($resolved && !$this->cookie->isExpired()) {
             return $this;
         }
 

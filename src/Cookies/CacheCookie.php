@@ -8,6 +8,7 @@ use GuzzleHttp\Cookie\SetCookie;
 class CacheCookie {
 
     private $store;
+    private $createdAt;
 
     public function __construct() {
         $this->store = new \GuzzleHttp\Cookie\CookieJar();
@@ -26,6 +27,11 @@ class CacheCookie {
             'cookie' => $this->store->getCookieByName('JSESSIONID')->getValue(),
             'created_at' => now(),
         ]);
+        $this->createdAt = now();
+    }
+
+    public function isExpired() {
+        return $this->createdAt->addHour(1)->isPast();
     }
 
     /**
@@ -47,6 +53,7 @@ class CacheCookie {
         }
 
         $this->set($mglnr, $cookie['cookie']);
+        $this->createdAt = $cookie['created_at'];
         return true;
     }
 
