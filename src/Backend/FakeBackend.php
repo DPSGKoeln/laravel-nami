@@ -2,11 +2,11 @@
 
 namespace Zoomyboy\LaravelNami\Backend;
 
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Illuminate\Support\Str;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class FakeBackend {
 

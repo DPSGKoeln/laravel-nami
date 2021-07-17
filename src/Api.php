@@ -2,17 +2,17 @@
 
 namespace Zoomyboy\LaravelNami;
 
-use Log;
 use App\Conf;
-use Illuminate\Support\Str;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use Log;
 use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
-use Zoomyboy\LaravelNami\NamiException;
-use Illuminate\Support\Facades\Cache;
 use Zoomyboy\LaravelNami\Cookies\Cookie;
+use Zoomyboy\LaravelNami\NamiException;
 
 class Api {
 
