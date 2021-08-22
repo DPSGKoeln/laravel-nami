@@ -2,15 +2,15 @@
 
 namespace Zoomyboy\LaravelNami\Authentication;
 
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Zoomyboy\LaravelNami\Nami;
-use Illuminate\Support\Facades\Cache;
-use Zoomyboy\LaravelNami\NamiUser;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Auth\SessionGuard;
 use Illuminate\Auth\GuardHelpers;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\NamiUser;
 
 class NamiGuard {
 

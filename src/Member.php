@@ -5,6 +5,7 @@ namespace Zoomyboy\LaravelNami;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\LazyCollection;
+use Zoomyboy\LaravelNami\Exceptions\RightException;
 
 class Member extends Model {
 
@@ -140,13 +141,23 @@ class Member extends Model {
 
         return LazyCollection::make(function() use ($memberships) {
             foreach ($memberships as $membership) {
-                yield $this->membership($membership['id']);
+                $m = $this->membership($membership['id']);
+
+                if ($m === null) {
+                    continue;
+                }
+
+                yield $m;
             }
         });
     }
 
-    public function membership($id): Membership {
-        return Membership::fromNami(Nami::membership($this->id, $id));
+    public function membership($id): ?Membership {
+        try {
+            return Membership::fromNami(Nami::membership($this->id, $id));
+        } catch (RightException $e) {
+            return null;
+        }
     }
 
 }

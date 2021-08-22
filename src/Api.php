@@ -12,6 +12,7 @@ use Log;
 use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
 use Zoomyboy\LaravelNami\Cookies\Cookie;
+use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\NamiException;
 
 class Api {
@@ -148,6 +149,10 @@ class Api {
         $response = $this->http()->get($url);
 
         Logger::http($url, $response, 'Single Membership '.$membershipId.' from '.$memberId, ['memberId' => $memberId]);
+
+        if($response->json()['success'] === false && Str::startsWith($response['message'], 'Sicherheitsverletzung')) {
+            throw new RightException('');
+        }
 
         return $response->json()['data'];
     }
