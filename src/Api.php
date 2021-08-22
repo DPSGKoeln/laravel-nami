@@ -124,6 +124,18 @@ class Api {
         return $response->json()['data'];
     }
 
+    public function putMembership(int $memberId, array $data): int
+    {
+        $url = self::$url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
+
+        $response = $this->http()->post($url, $data);
+        if (data_get($response->json(), 'success') !== true) {
+            $this->exception('Update failed', ['url' => $url, 'data' => $data], $response->json());
+        }
+
+        return $response->json()['data'];
+    }
+
     public function membershipsOf($memberId): Collection {
         $url = self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
 

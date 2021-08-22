@@ -152,6 +152,16 @@ class Member extends Model {
         });
     }
 
+    public function putMembership(array $data): int
+    {
+        return Nami::putMembership($this->id, [
+            'gruppierungId' => $data['group_id'],
+            'taetigkeitId' => $data['activity_id'],
+            'untergliederungId' => $data['subactivity_id'],
+            'aktivVon' => $data['created_at']->format('Y-m-d').'T00:00:00',
+        ]);
+    }
+
     public function membership($id): ?Membership {
         try {
             return Membership::fromNami(Nami::membership($this->id, $id));
