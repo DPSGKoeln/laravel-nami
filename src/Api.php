@@ -126,14 +126,22 @@ class Api {
 
     public function putMembership(int $memberId, array $data): int
     {
-        $url = self::$url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
-
-        $response = $this->http()->post($url, $data);
+        if (data_get($data, 'id')) {
+            $url = self::$url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$data['id']}";
+            $response = $this->http()->put($url, $data);
+        } else {
+            $url = self::$url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
+            $response = $this->http()->post($url, $data);
+        }
         if (data_get($response->json(), 'success') !== true) {
             $this->exception('Update failed', ['url' => $url, 'data' => $data], $response->json());
         }
 
-        return $response->json()['data'];
+        if (data_get($data, 'id')) {
+            return $response->json()['data']['id'];
+        } else {
+            return $response->json()['data'];
+        }
     }
 
     public function membershipsOf($memberId): Collection {

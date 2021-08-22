@@ -158,7 +158,19 @@ class Member extends Model {
             'gruppierungId' => $data['group_id'],
             'taetigkeitId' => $data['activity_id'],
             'untergliederungId' => $data['subactivity_id'],
-            'aktivVon' => $data['created_at']->format('Y-m-d').'T00:00:00',
+            'aktivVon' => $data['starts_at']->format('Y-m-d').'T00:00:00',
+        ]);
+    }
+
+    public function deleteMembership(int $id): int
+    {
+        $membership = $this->membership($id);
+
+        return Nami::putMembership($this->id, [
+            'gruppierungId' => $membership->group_id,
+            'aktivVon' => $membership->starts_at.'T00:00:00',
+            'aktivBis' => now()->format('Y-m-d').'T00:00:00',
+            'id' => $membership->id,
         ]);
     }
 
