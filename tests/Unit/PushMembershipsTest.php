@@ -27,6 +27,7 @@ class PushMembershipsTest extends TestCase
             'group_id' => 150,
             'activity_id' => 56,
             'subactivity_id' => 89,
+            'starts_at' => now(),
         ]);
         $this->assertEquals(65, $id);
 
