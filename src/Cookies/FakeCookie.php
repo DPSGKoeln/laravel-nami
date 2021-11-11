@@ -18,4 +18,9 @@ class FakeCookie {
         return $this->loggedIn;        
     }
 
+    public function isExpired(): bool
+    {
+        return false;
+    }
+
 }
