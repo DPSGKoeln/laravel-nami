@@ -2,8 +2,8 @@
 
 namespace Zoomyboy\LaravelNami;
 
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 trait AuthenticatesNamiUsers {
     
