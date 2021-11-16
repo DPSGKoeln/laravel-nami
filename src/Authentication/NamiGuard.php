@@ -102,7 +102,10 @@ class NamiGuard {
         $this->setUser(null);
     }
 
-    private function resolveCache(): ?string
+    /**
+     * @return array<string, string>
+     */
+    private function resolveCache(): ?array
     {
         return $this->cache->get('namiauth-'.$this->session->get($this->getName()));
     }
