@@ -7,13 +7,13 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Zoomyboy\LaravelNami\Fakes\Fake;
+use Zoomyboy\LaravelNami\Fakes\FakeInstance;
+use Zoomyboy\LaravelNami\Fakes\LoginFake;
 
 class FakeBackend {
 
-    private $members;
-    private $passwords;
-    public $groups = [];
-    public $loggedInAs = null;
+    public ?array $loggedIn = null;
 
     public function __construct() {
         $this->members = collect([]);
@@ -25,8 +25,7 @@ class FakeBackend {
     }
 
     public function init($cookie) {
-        $this->cookie = $cookie;
-        return $this;
+        return Http::withOptions(['cookies' => $cookie->forBackend()]);
     }
 
     public function put($url, $data) {
@@ -135,24 +134,6 @@ class FakeBackend {
         ]);
     }
 
-    public function post($url, $data) {
-        if ($url === 'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup') {
-            if (!data_get($data, 'username') || !data_get($data, 'password')) {
-                return $this->wrongLoginResponse();
-            }
-
-            if ($this->passwords[data_get($data, 'username')] === data_get($data, 'password')) {
-                $this->loggedInAs = data_get($data, 'username');
-                $this->cookie->set($data['username'], 'rZMBv1McDAJ-KukQ6BboJBTq.srv-nami06');
-                return $this->response([
-                    "statusCode" => 0,
-                ]);
-            }
-        }
-
-        $this->urlNotFoundException($url);
-    }
-
     private function wrongLoginResponse() {
         return $this->response([
             "servicePrefix" => null,
@@ -181,9 +162,21 @@ class FakeBackend {
         return new Response(new GuzzleResponse(200, [], json_encode($data)));
     }
 
-    public function fakeNamiPassword($mglnr, $password, $groups) {
-        $this->passwords[$mglnr] = $password;
-        $this->groups[$mglnr] = $groups;
+    /**
+     * @param string $mglnr
+     * @param array<int, array> $groups
+     */
+    public function fakeLogin(string $mglnr, array $groups): void
+    {
+        app(LoginFake::class)->succeeds($mglnr);
+        foreach ($groups as $group) {
+            GroupFake::addGroup($group);
+        }
+    }
+
+    public function fakeFailedLogin(string $mglnr): void
+    {
+        app(LoginFake::class)->fails($mglnr);
     }
 
     public function asForm() {

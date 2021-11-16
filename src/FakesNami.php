@@ -25,8 +25,4 @@ trait FakesNami {
         }
     }
 
-    public function fakeNamiPassword($mglnr, $password, $groups) {
-        Backend::fakeNamiPassword($mglnr, $password, $groups);
-    }
-
 }

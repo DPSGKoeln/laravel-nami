@@ -2,8 +2,8 @@
 
 namespace Zoomyboy\LaravelNami\Cookies;
 
-use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Cookie\SetCookie;
+use Illuminate\Support\Facades\Cache;
 
 class CacheCookie {
 
