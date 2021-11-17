@@ -7,6 +7,7 @@ use App\Nami\Exceptions\TooManyLoginAttemptsException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Log;
 use Zoomyboy\LaravelNami\Backend\Backend;
@@ -44,21 +45,27 @@ class Api {
 
     /**
      * @param array<string, mixed> $payload
-     * @return Collection<int, Member>
+     * @return LazyCollection<int, Member>
      */
-    public function search(array $payload): Collection
+    public function search(array $payload): LazyCollection
     {
-        $url = self::$url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode($payload) ?: '[]').'&page=1&start=0&limit=10';
-        $response = $this->http()->get($url);
-
-        if ($response->json()['success'] !== true) {
-            $this->exception('Search failed', ['url' => $url], $response->json());
-        }
-
-        return collect($response->json()['data'])->map(function($member) {
-            return Member::fromNami(collect($member)->mapWithKeys(function($value, $key) {
-                return [ str_replace('entries_', '', (string) $key) => $value ];
-            }));
+        return LazyCollection::make(function() use ($payload) {
+            $page = 1;
+            while (!isset ($totalEntries) || ($page-1) * 100 + 1 <= $totalEntries) {
+                $start = ($page-1) * 100;
+                $url = self::$url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode((object) $payload) ?: '{}').'&page='.$page.'&start='.$start.'&limit=100';
+                $response = $this->http()->get($url);
+                $totalEntries = $response->json()['totalEntries'];
+                if ($response->json()['success'] !== true) {
+                    $this->exception('Search failed', ['url' => $url], $response->json());
+                }
+                foreach ($response->json()['data'] as $member) {
+                    yield Member::fromNami(collect($member)->mapWithKeys(function($value, $key) {
+                        return [ str_replace('entries_', '', (string) $key) => $value ];
+                    }));
+                }
+                $page++;
+            }
         });
     }
 

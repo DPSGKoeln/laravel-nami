@@ -170,7 +170,7 @@ class FakeBackend {
     public function addSearch(int $mitgliedsNr, array $data): self
     {
         Http::fake(function($request) use ($data, $mitgliedsNr) {
-            if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode(['mitgliedsNummber' => $mitgliedsNr]) ?: '{}').'&page=1&start=0&limit=10') {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode(['mitgliedsNummber' => $mitgliedsNr]) ?: '{}').'&page=1&start=0&limit=100') {
                 $content = [
                     'success' => true,
                     'data' => [$data],
@@ -203,24 +203,37 @@ class FakeBackend {
      */
     public function fakeMember(array $data): self
     {
+        return $this->fakeMembers([$data]);
+    }
+
+    /**
+     * @param array<int, array<string, string>> $data
+     */
+    public function fakeMembers(array $data): self
+    {
         Http::fake(function($request) use ($data) {
-            if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode('[]').'&page=1&start=0&limit=10') {
-                return Http::response(json_encode([
-                    'success' => true,
-                    'data' => [[
-                        'entries_id' => $data['id'],
-                        'entries_gruppierungId' => $data['gruppierungId'],
-                    ]]
-                ]) ?: '{}', 200);
+            foreach ($data as $member) {
+                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$member['gruppierungId']}/{$member['id']}") {
+                    $content = [
+                        'success' => true,
+                        'data' => $member,
+                    ];
+
+                    return Http::response(json_encode($content) ?: '{}', 200);
+                }
             }
 
-            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$data['gruppierungId']}/{$data['id']}") {
-                $content = [
-                    'success' => true,
-                    'data' => $data,
-                ];
-
-                return Http::response(json_encode($content) ?: '{}', 200);
+            foreach (collect($data)->chunk(100) as $i => $chunk) {
+                if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode('{}').'&page='.($i+1).'&start='.($i*100).'&limit=100') {
+                    return Http::response(json_encode([
+                        'success' => true,
+                        'totalEntries' => count($data),
+                        'data' => collect($chunk)->map(fn ($member) => [
+                            'entries_id' => $member['id'],
+                            'entries_gruppierungId' => $member['gruppierungId'],
+                        ])->toArray(),
+                    ]) ?: '{}', 200);
+                }
             }
         });
 
