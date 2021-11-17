@@ -55,7 +55,7 @@ class NamiUser implements Authenticatable {
     }
 
     public function getLastname() {
-        return $this->firstname;
+        return $this->lastname;
     }
 
     public function getAuthIdentifier() {
