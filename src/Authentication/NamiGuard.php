@@ -69,9 +69,13 @@ class NamiGuard {
     {
         try {
             $api = Nami::login($credentials['mglnr'], $credentials['password']);
+            $user = $api->findNr($credentials['mglnr']);
 
             $payload = [
-                'credentials' => $credentials
+                'credentials' => $credentials,
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'group_id' => $user->group_id,
             ];
 
             $this->setUser(NamiUser::fromPayload($payload));

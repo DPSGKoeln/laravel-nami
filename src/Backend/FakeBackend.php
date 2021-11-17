@@ -2,6 +2,7 @@
 
 namespace Zoomyboy\LaravelNami\Backend;
 
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
@@ -148,30 +149,185 @@ class FakeBackend {
         ]);
     }
 
-    private function notAuthorizedResponse() {
-        return $this->response([
-            'success' => true,
-            'data' => null,
-            'responseType' => 'ERROR',
-            'message' => 'Session expired',
-            'title' => 'Exception',
-        ]);
-    }
-
     public function response($data) {
         return new Response(new GuzzleResponse(200, [], json_encode($data)));
     }
 
     /**
      * @param string $mglnr
-     * @param array<int, array> $groups
      */
-    public function fakeLogin(string $mglnr, array $groups): void
+    public function fakeLogin(string $mglnr): self
     {
         app(LoginFake::class)->succeeds($mglnr);
-        foreach ($groups as $group) {
-            GroupFake::addGroup($group);
-        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $mitgliedsNr
+     * @param array <string, mixed> $data
+     */
+    public function addSearch(int $mitgliedsNr, array $data): self
+    {
+        Http::fake(function($request) use ($data, $mitgliedsNr) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode(['mitgliedsNummber' => $mitgliedsNr]) ?: '{}').'&page=1&start=0&limit=10') {
+                $content = [
+                    'success' => true,
+                    'data' => [$data],
+                    'responseType' => 'OK',
+                    'totalEntries' => 1,
+                ];
+                return Http::response(json_encode($content) ?: '{}', 200);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeNationalities(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/staatsangehoerigkeit') {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param array<string, string> $data
+     */
+    public function fakeMember(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode('[]').'&page=1&start=0&limit=10') {
+                return Http::response(json_encode([
+                    'success' => true,
+                    'data' => [[
+                        'entries_id' => $data['id'],
+                        'entries_gruppierungId' => $data['gruppierungId'],
+                    ]]
+                ]) ?: '{}', 200);
+            }
+
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$data['gruppierungId']}/{$data['id']}") {
+                $content = [
+                    'success' => true,
+                    'data' => $data,
+                ];
+
+                return Http::response(json_encode($content) ?: '{}', 200);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeCountries(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/land') {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeGenders(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/geschlecht') {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeRegions(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/region') {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param int $groupId
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeActivities(int $groupId, array $data): self
+    {
+        Http::fake(function($request) use ($data, $groupId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/{$groupId}") {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param int $groupId
+     * @param array<int, array<int, array{name: string, id: int}>> $data
+     */
+    public function fakeSubactivities($matches): self
+    {
+        Http::fake(function($request) use ($matches) {
+            foreach ($matches as $activityId => $data) {
+                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/{$activityId}") {
+                    return $this->dataResponse($data);
+                }
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param int $groupId
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeFees(int $groupId, array $data): self
+    {
+        Http::fake(function($request) use ($data, $groupId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupId}") {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeConfessions(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/baseadmin/konfession") {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
     }
 
     public function fakeFailedLogin(string $mglnr): void
@@ -179,12 +335,28 @@ class FakeBackend {
         app(LoginFake::class)->fails($mglnr);
     }
 
-    public function asForm() {
+    public function asForm(): self
+    {
         return $this;
     }
 
     public function urlNotFoundException($url) {
         throw new \Exception('no handler found for URL '.$url);
+    }
+
+    /**
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    private function dataResponse(array $data): FulfilledPromise
+    {
+        $content = [
+            'success' => true,
+            'data' => collect($data)->map(fn ($item) => ['descriptor' => $item['name'], 'id' => $item['id'], 'name' => ''])->toArray(),
+            'responseType' => 'OK',
+            'totalEntries' => count ($data),
+        ];
+
+        return Http::response(json_encode($content) ?: '{}', 200);
     }
 
 }

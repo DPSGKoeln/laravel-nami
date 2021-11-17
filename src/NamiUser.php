@@ -2,24 +2,33 @@
 
 namespace Zoomyboy\LaravelNami;
 
+use Cache;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
-use Cache;
 
 class NamiUser implements Authenticatable {
 
     public $mglnr;
     public $password;
+    public string $firstname;
+    public string $lastname;
+    public int $group_id;
 
     public function __construct($attributes) {
         $this->mglnr = $attributes['mglnr'];
         $this->password = $attributes['password'];
+        $this->firstname = $attributes['firstname'];
+        $this->lastname = $attributes['lastname'];
+        $this->group_id = $attributes['group_id'];
     }
 
     public static function fromPayload($payload) {
         $user = new static([
             'mglnr' => data_get($payload, 'credentials.mglnr'),
             'password' => data_get($payload, 'credentials.password'),
+            'firstname' => data_get($payload, 'firstname'),
+            'lastname' => data_get($payload, 'lastname'),
+            'group_id' => data_get($payload, 'group_id'),
         ]);
 
         return $user;
@@ -30,7 +39,7 @@ class NamiUser implements Authenticatable {
     }
 
     public function getNamiGroupId() {
-        return $this->api()->findNr($this->mglnr)->group_id;
+        return $this->group_id;
     }
 
     public function getAuthIdentifierName() {
@@ -42,15 +51,11 @@ class NamiUser implements Authenticatable {
     }
 
     public function getFirstname() {
-        return Cache::remember('member-'.$this->mglnr.'-firstname', 3600, function() {
-            return $this->api()->findNr($this->mglnr)->firstname;
-        });
+        return $this->firstname;
     }
 
     public function getLastname() {
-        return Cache::remember('member-'.$this->mglnr.'-lastname', 3600, function() {
-            return $this->api()->findNr($this->mglnr)->lastname;
-        });
+        return $this->firstname;
     }
 
     public function getAuthIdentifier() {

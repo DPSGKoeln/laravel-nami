@@ -29,27 +29,37 @@ class Api {
         return Backend::init($this->cookie);
     }
 
-    public function findNr($nr) {
-        return $this->search(['mitgliedsNummber' => $nr]);
+    public function findNr(int $nr): Member
+    {
+        return $this->find(['mitgliedsNummber' => $nr]);
     }
 
-    public function search($payload) {
-        $url = self::$url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode($payload)).'&page=1&start=0&limit=10';
+    /**
+     * @param array<string, mixed> $payload
+     */
+    public function find(array $payload): ?Member
+    {
+        return $this->search($payload)->first();
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return Collection<int, Member>
+     */
+    public function search(array $payload): Collection
+    {
+        $url = self::$url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode($payload) ?: '[]').'&page=1&start=0&limit=10';
         $response = $this->http()->get($url);
 
-        if ($response->json()['success'] === true) {
-
-            if (!count($response->json()['data'])) {
-                return null;
-            }
-            $data = collect($response->json()['data'][0])->mapWithKeys(function($value, $key) {
-                return [ str_replace('entries_', '', $key) => $value ];
-            });
-
-            return Member::fromNami($data);
+        if ($response->json()['success'] !== true) {
+            $this->exception('Search failed', ['url' => $url], $response->json());
         }
 
-        $this->exception('Search failed', ['url' => $url], $response->json());
+        return collect($response->json()['data'])->map(function($member) {
+            return Member::fromNami(collect($member)->mapWithKeys(function($value, $key) {
+                return [ str_replace('entries_', '', (string) $key) => $value ];
+            }));
+        });
     }
 
     protected function loggedInAlready(): bool {
