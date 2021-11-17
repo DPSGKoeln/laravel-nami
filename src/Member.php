@@ -48,6 +48,7 @@ class Member extends Model {
         'landId' => 'country_id',
         'beitragsartId' => 'fee_id',
         'version' => 'version',
+        'gruppierung' => 'group_name',
     ];
 
     protected $casts = [];
