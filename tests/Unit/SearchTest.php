@@ -2,15 +2,15 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
-use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\Tests\TestCase;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Config;
-use Zoomyboy\LaravelNami\NamiServiceProvider;
-use Zoomyboy\LaravelNami\LoginException;
-use Zoomyboy\LaravelNami\Group;
-use Zoomyboy\LaravelNami\Member;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Group;
+use Zoomyboy\LaravelNami\LoginException;
+use Zoomyboy\LaravelNami\Member;
+use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\NamiServiceProvider;
+use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class SearchTest extends TestCase
 {
@@ -62,7 +62,7 @@ class SearchTest extends TestCase
 
     private function url($payload) {
         $payload = rawurlencode(json_encode($payload));
-        return "https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues={$payload}&page=1&start=0&limit=10";
+        return "https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues={$payload}&page=1&start=0&limit=100";
     }
 
 }
