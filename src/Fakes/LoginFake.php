@@ -23,7 +23,7 @@ class LoginFake extends Fake {
         });
     }
 
-    public function fails(string $mglnr): void
+    public function fails(): void
     {
         Http::fake(function($request) {
             if ($request->url() === 'https://nami.dpsg.de/ica/pages/login.jsp') {
