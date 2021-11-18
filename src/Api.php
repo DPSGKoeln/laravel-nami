@@ -194,6 +194,26 @@ class Api {
         return $response->json()['data'];
     }
 
+    public function courses(): Collection
+    {
+        $url = self::$url.'/ica/rest/module/baustein';
+        $response = $this->http()->get($url);
+
+        return collect($response->json()['data'])->map(function($course) {
+            return (object) ['name' => $course['descriptor'], 'id' => $course['id']];
+        });
+    }
+
+    public function coursesFor(int $memberId): Collection
+    {
+        $url = self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist";
+        $response = $this->http()->get($url);
+
+        return collect($response->json()['data'])->map(function($course) {
+            return (object) ['id' => $course['id'], 'organizer' => $course['veranstalter'], 'course_id' => $course['bausteinId'], 'event_name' => $course['vstgName'], 'completed_at' => $course['vstgTag']];
+        });
+    }
+
     public function member($groupId, $memberId) {
         $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);

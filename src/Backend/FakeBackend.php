@@ -235,6 +235,16 @@ class FakeBackend {
                     ]) ?: '{}', 200);
                 }
             }
+
+            foreach ($data as $member) {
+                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$member['id']}/flist") {
+                    return Http::response(json_encode([
+                        'success' => true,
+                        'totalEntries' => count($member['courses'] ?? []),
+                        'data' => collect($member['courses'] ?? [])
+                    ]) ?: '{}', 200);
+                }
+            }
         });
 
         return $this;
@@ -247,6 +257,20 @@ class FakeBackend {
     {
         Http::fake(function($request) use ($data) {
             if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/land') {
+                return $this->dataResponse($data);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, array{name: string, id: int}> $data
+     */
+    public function fakeCourses(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/module/baustein') {
                 return $this->dataResponse($data);
             }
         });
