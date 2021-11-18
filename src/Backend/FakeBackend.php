@@ -241,8 +241,17 @@ class FakeBackend {
                     return Http::response(json_encode([
                         'success' => true,
                         'totalEntries' => count($member['courses'] ?? []),
-                        'data' => collect($member['courses'] ?? [])
+                        'data' => collect($member['courses'])->map(fn ($course) => ['id' => $course['id']]),
                     ]) ?: '{}', 200);
+                }
+
+                foreach ($member['courses'] ?? [] as $course) {
+                    if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$member['id']}/{$course['id']}") {
+                        return Http::response(json_encode([
+                            'success' => true,
+                            'data' => $course,
+                        ]) ?: '{}', 200);
+                    }
                 }
             }
         });

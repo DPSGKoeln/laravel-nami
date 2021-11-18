@@ -209,13 +209,15 @@ class Api {
         $url = self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist";
         $response = $this->http()->get($url);
 
-        return collect($response->json()['data'])->map(function($course) {
+        return collect($response->json()['data'])->map(function($course) use ($memberId) {
+            $single = $this->http()->get(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}")['data'];
+
             return (object) [
-                'id' => $course['entries_id'],
-                'organizer' => $course['entries_veranstalter'],
-                'course_name' => $course['entries_baustein'],
-                'event_name' => $course['entries_vstgName'],
-                'completed_at' => $course['entries_vstgTag'],
+                'id' => $single['id'],
+                'organizer' => $single['veranstalter'],
+                'course_id' => $single['bausteinId'],
+                'event_name' => $single['vstgName'],
+                'completed_at' => $single['vstgTag'],
             ];
         });
     }
