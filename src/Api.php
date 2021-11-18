@@ -210,7 +210,13 @@ class Api {
         $response = $this->http()->get($url);
 
         return collect($response->json()['data'])->map(function($course) {
-            return (object) ['id' => $course['id'], 'organizer' => $course['veranstalter'], 'course_id' => $course['bausteinId'], 'event_name' => $course['vstgName'], 'completed_at' => $course['vstgTag']];
+            return (object) [
+                'id' => $course['entries_id'],
+                'organizer' => $course['entries_veranstalter'],
+                'course_name' => $course['entries_baustein'],
+                'event_name' => $course['entries_vstgName'],
+                'completed_at' => $course['entries_vstgTag'],
+            ];
         });
     }
 
