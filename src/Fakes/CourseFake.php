@@ -31,7 +31,7 @@ class CourseFake extends Fake {
                 && $request->method() === 'POST'
                 && data_get($request, 'bausteinId') === $payload['bausteinId']
                 && data_get($request, 'veranstalter') === $payload['veranstalter']
-                // && data_get($request, 'vstgName') === $payload['vstgName']
+                && data_get($request, 'vstgName') === $payload['vstgName']
                 && data_get($request, 'vstgTag') === $payload['vstgTag'];
         });
     }
