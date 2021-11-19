@@ -244,6 +244,26 @@ class Api {
         return $response['data'];
     }
 
+    /**
+     * @param int $memberId
+     * @param int $courseId
+     * @param array<string, mixed> $payload
+     * @return void
+     */
+    public function updateCourse(int $memberId, int $courseId, array $payload): void
+    {
+        $response = $this->http()->put(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", [
+            'bausteinId' => $payload['course_id'],
+            'vstgName' => $payload['event_name'],
+            'vstgTag' => Carbon::parse($payload['completed_at'])->format('Y-m-d').'T00:00:00',
+            'veranstalter' => $payload['organizer'],
+        ]);
+
+        if (data_get($response->json(), 'success') !== true) {
+            $this->exception('Course creation failed', $payload, $response->json());
+        }
+    }
+
     public function member($groupId, $memberId) {
         $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);
