@@ -20,6 +20,15 @@ class CourseFake extends Fake {
         });
     }
 
+    public function doesntCreateWithError(int $memberId): void
+    {
+        Http::fake(function($request) use ($memberId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}") {
+                return Http::response('{"success":false,"data":null,"responseType":"EXCEPTION","message":"Unexpected Error javax.ejb.EJBException","title":null}', 200);
+            }
+        });
+    }
+
     /**
      * @param int $memberId
      * @param array<string, mixed> $payload
