@@ -4,6 +4,7 @@ namespace Zoomyboy\LaravelNami;
 
 use App\Conf;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -220,6 +221,27 @@ class Api {
                 'completed_at' => $single['vstgTag'],
             ];
         });
+    }
+
+    /**
+     * @param int $memberId
+     * @param array<string, mixed> $payload
+     * @return int
+     */
+    public function createCourse(int $memberId, array $payload): int
+    {
+        $response = $this->http()->post(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}", [
+            'bausteinId' => $payload['course_id'],
+            'vstgName' => $payload['event_name'],
+            'vstgTag' => Carbon::parse($payload['completed_at'])->format('Y-m-d').'T00:00:00',
+            'veranstalter' => $payload['organizer'],
+        ]);
+
+        if (data_get($response->json(), 'success') !== true) {
+            $this->exception('Course creation failed', $payload, $response->json());
+        }
+
+        return $response['data'];
     }
 
     public function member($groupId, $memberId) {
