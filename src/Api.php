@@ -268,7 +268,7 @@ class Api {
     {
         $response = $this->http()->delete(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}");
 
-        if (data_get($response->json(), 'success') !== true) {
+        if ($response->json() !== null && data_get($response->json(), 'success') !== true) {
             $this->exception('Course deletion failed', [], $response->json());
         }
     }
