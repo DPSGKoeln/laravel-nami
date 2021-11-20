@@ -33,6 +33,32 @@ class CourseFake extends Fake {
         });
     }
 
+    public function deleteSuccessful(int $memberId, int $courseId): void
+    {
+        Http::fake(function($request) use ($memberId, $courseId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}" && $request->method() === 'DELETE') {
+                return Http::response([
+                    'data' => null,
+                    'responseType' => 'OK',
+                    'success' => true,
+                ], 200);
+            }
+        });
+    }
+
+    public function deleteFailed(int $memberId, int $courseId): void
+    {
+        Http::fake(function($request) use ($memberId, $courseId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}" && $request->method() === 'DELETE') {
+                return Http::response([
+                    'data' => null,
+                    'responseType' => 'NOK',
+                    'success' => false,
+                ], 200);
+            }
+        });
+    }
+
     public function doesntCreateWithError(int $memberId): void
     {
         Http::fake(function($request) use ($memberId) {
@@ -81,6 +107,14 @@ class CourseFake extends Fake {
                 && data_get($request, 'veranstalter') === $payload['veranstalter']
                 && data_get($request, 'vstgName') === $payload['vstgName']
                 && data_get($request, 'vstgTag') === $payload['vstgTag'];
+        });
+    }
+
+    public function assertDeleted(int $memberId, int $courseId): void
+    {
+        Http::assertSent(function($request) use ($memberId, $courseId) {
+            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/${courseId}"
+                && $request->method() === 'DELETE';
         });
     }
 

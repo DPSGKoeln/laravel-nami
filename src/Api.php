@@ -260,7 +260,16 @@ class Api {
         ]);
 
         if (data_get($response->json(), 'success') !== true) {
-            $this->exception('Course creation failed', $payload, $response->json());
+            $this->exception('Course update failed', $payload, $response->json());
+        }
+    }
+
+    public function deleteCourse(int $memberId, int $courseId): void
+    {
+        $response = $this->http()->delete(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}");
+
+        if (data_get($response->json(), 'success') !== true) {
+            $this->exception('Course deletion failed', [], $response->json());
         }
     }
 
