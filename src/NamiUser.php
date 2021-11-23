@@ -6,7 +6,7 @@ use Cache;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 
-class NamiUser implements Authenticatable {
+class NamiUser {
 
     public $mglnr;
     public $password;
@@ -42,10 +42,6 @@ class NamiUser implements Authenticatable {
         return $this->group_id;
     }
 
-    public function getAuthIdentifierName() {
-        return 'mglnr';
-    }
-
     public function getMglnr() {
         return $this->mglnr;
     }
@@ -56,24 +52,6 @@ class NamiUser implements Authenticatable {
 
     public function getLastname() {
         return $this->lastname;
-    }
-
-    public function getAuthIdentifier() {
-        return $this->{$this->getAuthIdentifierName()}.'-'.$this->groupid;
-    }
-
-    public function getAuthPassword() {
-        return null;
-    }
-
-    public function getRememberToken() {
-        return null;
-    }
-
-    public function setRememberToken($value) {}
-
-    public function getRememberTokenName() {
-        return null;
     }
 
 }

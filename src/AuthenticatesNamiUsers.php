@@ -12,7 +12,8 @@ trait AuthenticatesNamiUsers {
     protected function validateLogin(Request $request)
     {
         $request->validate([
-            $this->username() => 'required|numeric',
+            'mglnr' => 'required_if:provider,nami',
+            'email' => 'required_if:provider,database',
             'password' => 'required|string',
         ]);
     }
@@ -20,6 +21,17 @@ trait AuthenticatesNamiUsers {
     public function username()
     {
         return 'mglnr';
+    }
+
+    /**
+     * Get the needed authorization credentials from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function credentials(Request $request)
+    {
+        return $request->only($this->username(), 'email', 'password', 'provider');
     }
 
 }

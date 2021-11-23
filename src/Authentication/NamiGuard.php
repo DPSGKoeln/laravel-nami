@@ -8,7 +8,9 @@ use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Foundation\Auth\User as AuthenticatableUser;
 use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -22,8 +24,11 @@ class NamiGuard {
 
     protected CacheRepository $cache;
 
-    /** @var <int, callback> $loginCallbacks */
+    /** @var array<int, callable> $loginCallbacks */
     public static array $loginCallbacks = [];
+
+    /** @var array<int, string> */
+    public array $fallbacks;
 
     /**
      * The currently authenticated user.
@@ -40,17 +45,27 @@ class NamiGuard {
     }
 
     /**
+     * @param array<int, string> $fallbacks
+     */
+    public function setFallbacks(array $fallbacks): self
+    {
+        $this->fallbacks = $fallbacks;
+
+        return $this;
+    }
+
+    /**
      * Set the current user.
      *
-     * @param  NamiUser|null $user
+     * @param  NamiUser|AuthenticatableUser|null $user
      * @return void
      */
-    public function setUser(?NamiUser $user): void
+    public function setUser($user): void
     {
         $this->user = $user;
     }
 
-    public function user(): ?NamiUser
+    public function user()
     {
         if (! is_null($this->user)) {
             return $this->user;
@@ -71,6 +86,14 @@ class NamiGuard {
      */
     public function attempt(array $credentials = [], bool $remember = false): bool
     {
+        if (in_array($credentials['provider'], $this->fallbacks) && $this->loginFallback($credentials['provider'], $credentials)) {
+            return true;
+        }
+
+        if (data_get($credentials, 'provider', '') !== 'nami') {
+            return false;
+        }
+
         $beforeResult = static::runBeforeLogin($credentials, $remember);
 
         if (!is_null($beforeResult)) {
@@ -78,7 +101,7 @@ class NamiGuard {
         }
 
         try {
-            return $this->login($credentials);
+            return $this->loginNami($credentials);
         } catch (LoginException $e) {
             return false;
         }
@@ -87,7 +110,35 @@ class NamiGuard {
     /**
      * @param array<string, string> $credentials
      */
-    public function login(array $credentials): bool
+    public function loginFallback(string $provider, array $credentials): bool
+    {
+        $provider = auth()->createUserProvider($provider);
+        $user = $user = $provider->retrieveByCredentials(Arr::except($credentials, ['provider']));
+
+        if (!$user) {
+            return false;
+        }
+
+        if (!$provider->validateCredentials($user, $credentials)) {
+            return false;
+        }
+
+        $payload = [
+            'id' => $user->id,
+        ];
+
+        $this->setUser($user);
+        $key = $this->newCacheKey();
+        Cache::forever("namiauth-{$key}", $payload);
+        $this->updateSession($key);
+
+        return true;
+    }
+
+    /**
+     * @param array<string, string> $credentials
+     */
+    public function loginNami(array $credentials): bool
     {
         $api = Nami::login($credentials['mglnr'], $credentials['password']);
         $user = $api->findNr((int) $credentials['mglnr']);
