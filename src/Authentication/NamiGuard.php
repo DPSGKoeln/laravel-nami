@@ -136,7 +136,7 @@ class NamiGuard {
     }
 
     /**
-     * @param array<string, string> $credentials
+     * @param array<string, int|string> $credentials
      */
     public function loginNami(array $credentials): bool
     {
