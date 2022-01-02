@@ -82,6 +82,24 @@ class FakeBackend {
 
                     return Http::response(json_encode($content) ?: '{}', 200);
                 }
+
+                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$member['id']}/flist") {
+                    $content = [
+                        'success' => true,
+                        'data' => array_map(function($membership) {
+                            return (object) [
+                                'entries_aktivVon' => $membership['aktivVon'],
+                                'entries_aktivBis' => $membership['aktivBis'],
+                                'entries_gruppierung' => $membership['gruppierung'],
+                                'id' => $membership['id'],
+                                'entries_taetigkeit' => $membership['taetigkeit'],
+                                'entries_untergliederung' => $membership['untergliederung'],
+                            ];
+                        }, $member['memberships'] ?? [])
+                    ];
+
+                    return Http::response(json_encode($content) ?: '{}', 200);
+                }
             }
 
             foreach (collect($data)->chunk(100) as $i => $chunk) {
