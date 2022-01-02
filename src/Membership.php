@@ -40,10 +40,6 @@ class Membership extends Model {
         return (new self($item));
     }
 
-    public function __construct($membership) {
-        parent::__construct($membership);
-    }
-
     public function setAttribute($key, $value) {
         if (in_array($key, $this->nullable) && $value === '') {
             return parent::setAttribute($key, null);

@@ -2,10 +2,10 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
-use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\Tests\TestCase;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\LoginException;
+use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class LoginTest extends TestCase
 {

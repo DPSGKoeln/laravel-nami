@@ -105,10 +105,6 @@ class Member extends Model {
         ];
     }
 
-    public function __construct($member) {
-        parent::__construct($member);
-    }
-
     public function getBirthdayAttribute() {
         return Carbon::parse($this->attributes['birthday'])->format('Y-m-d');
     }
