@@ -138,6 +138,22 @@ class FakeBackend {
         return $this;
     }
 
+    public function fakeSingleMembership(int $memberId, int $membershipId, array $data) {
+        Http::fake(function($request) use ($data, $memberId, $membershipId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membershipId}") {
+                $content = [
+                    'success' => true,
+                    'data' => $data,
+                    'responseType' => 'OK',
+                ];
+
+                return Http::response(json_encode($content) ?: '{}', 200);
+            }
+        });
+
+        return $this;
+    }
+
     /**
      * @param array<int, array{name: string, id: int}> $data
      */
