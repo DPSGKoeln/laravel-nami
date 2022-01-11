@@ -210,6 +210,10 @@ class Api {
         $url = self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist";
         $response = $this->http()->get($url);
 
+        if (!$response->ok() || $response->json()['success'] === false) {
+            throw new RightException('Getting courses for member '.$memberId.' failed');
+        }
+
         return collect($response->json()['data'])->map(function($course) use ($memberId) {
             $single = $this->http()->get(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}")['data'];
 
