@@ -2,20 +2,20 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
-use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\Tests\TestCase;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
-use Zoomyboy\LaravelNami\NamiServiceProvider;
-use Zoomyboy\LaravelNami\LoginException;
+use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Group;
+use Zoomyboy\LaravelNami\LoginException;
+use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\NamiServiceProvider;
+use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PullMemberTest extends TestCase
 {
-    public $groupsResponse = '{"success":true,"data":[{"descriptor":"Group","name":"","representedClass":"de.iconcept.nami.entity.org.Gruppierung","id":103}],"responseType":"OK"}';
-    public $unauthorizedResponse = '{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}';
+    public string $groupsResponse = '{"success":true,"data":[{"descriptor":"Group","name":"","representedClass":"de.iconcept.nami.entity.org.Gruppierung","id":103}],"responseType":"OK"}';
+    public string $unauthorizedResponse = '{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}';
 
-    public function dataProvider() {
+    public function dataProvider(): array {
         return [
             'firstname' => ['firstname', ['Max', 'Jane']],
             'lastname' => ['lastname', ['Nach1', 'Nach2']],
@@ -46,7 +46,7 @@ class PullMemberTest extends TestCase
         ];
     }
 
-    public function overviewDataProvider() {
+    public function overviewDataProvider(): array {
         return [
             'firstname' => ['firstname', ['Max', 'Jane']],
             'lastname' => ['lastname', ['Nach1', 'Nach2']],
@@ -67,7 +67,7 @@ class PullMemberTest extends TestCase
         ];
     }
 
-    public function relationProvider() {
+    public function relationProvider(): array {
         return [
             'firstname' => ['firstname', ['Max', 'Jane']],
         ];
@@ -76,7 +76,8 @@ class PullMemberTest extends TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function test_get_a_single_member($key, $values) {
+    public function test_get_a_single_member(string $key, array $values): void
+    {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->fakeJson('member-16.json'), 200),
@@ -98,7 +99,8 @@ class PullMemberTest extends TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function test_get_attribute_of_member_collection($key, $values) {
+    public function test_get_attribute_of_member_collection(string $key, array $values): void
+    {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/flist' => Http::response($this->fakeJson('member_overview.json'), 200),
@@ -121,7 +123,8 @@ class PullMemberTest extends TestCase
     /**
      * @dataProvider overviewDataProvider
      */
-    public function test_get_attribute_of_member_overview($key, $values) {
+    public function test_get_attribute_of_member_overview(string $key, array $values): void
+    {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/flist' => Http::response($this->fakeJson('member_overview.json'), 200)
@@ -142,7 +145,8 @@ class PullMemberTest extends TestCase
     /**
      * @dataProvider relationProvider
      */
-    public function test_set_relations($key, $values) {
+    public function test_set_relations(string $key, array $values): void
+    {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/flist' => Http::response($this->fakeJson('member_overview.json'), 200),
@@ -165,7 +169,8 @@ class PullMemberTest extends TestCase
     /**
      * @dataProvider overviewDataProvider
      */
-    public function test_get_a_member_from_overview_with_no_rights($key, $values) {
+    public function test_get_a_member_from_overview_with_no_rights(string $key, array $values): void
+    {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->unauthorizedResponse, 200),
