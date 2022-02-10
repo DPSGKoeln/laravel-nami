@@ -17,13 +17,8 @@ class LoginTest extends TestCase
      */
     public function test_first_successful_login()
     {
-        Http::fake([
-            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::response('<html></html>', 200),
-            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::response($this->successJson, 200)
-        ]);
-
+        Http::fake($this->login());
         $this->setCredentials();
-
         Nami::login();
 
         Http::assertSent(function($request) {
