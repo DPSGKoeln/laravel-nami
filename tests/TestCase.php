@@ -4,10 +4,10 @@ namespace Zoomyboy\LaravelNami\Tests;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Zoomyboy\LaravelNami\Tests\Stub\Member;
-use Zoomyboy\LaravelNami\Providers\NamiServiceProvider;
 use Zoomyboy\LaravelNami\Cookies\Cookie;
 use Zoomyboy\LaravelNami\Cookies\FakeCookie;
+use Zoomyboy\LaravelNami\Providers\NamiServiceProvider;
+use Zoomyboy\LaravelNami\Tests\Stub\Member;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -43,8 +43,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
         ];
     }
 
-    public function fakeJson($file) {
-        return file_get_contents(__DIR__.'/json/'.$file);
+    public function fakeJson(string $file, array $data = []): string {
+        ob_start();
+        include(__DIR__.'/json/'.$file);
+        return ob_get_clean();
     }
 
     public function fakeGenders() {

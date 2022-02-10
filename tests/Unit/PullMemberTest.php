@@ -17,32 +17,40 @@ class PullMemberTest extends TestCase
 
     public function dataProvider(): array {
         return [
-            'firstname' => ['firstname', ['Max', 'Jane']],
-            'lastname' => ['lastname', ['Nach1', 'Nach2']],
-            'nickname' => ['nickname', ['spitz1', null]],
-            'other_country' => ['other_country', ['deutsch', null]],
-            'address' => ['address', ['straße 1', 'straße 2']],
-            'further_address' => ['further_address', ['addrz', null]],
-            'zip' => ['zip', ['12345', '5555']],
-            'location' => ['location', ['SG', 'Köln']],
-            'main_phone' => ['main_phone', ['+49888', '+49668']],
-            'mobile_phone' => ['mobile_phone', ['+49176', '+49172']],
-            'work_phone' => ['work_phone', ['+11111', '+22222']],
-            'fax' => ['fax', ['+55111', '+55222']],
-            'email' => ['email', ['test@example.com', 'test2@example.com']],
-            'email_parents' => ['email_parents', ['testp@example.com', 'test2p@example.com']],
-            'gender_id' => ['gender_id', [19, null]],
-            'nationality_id' => ['nationality_id', [1054, null]],
-            'confession_id' => ['confession_id', [1, null]],
-            'birthday' => ['birthday', ['1991-06-20', '1984-01-17']],
-            'joined_at' => ['joined_at', ['2005-05-01', null]],
-            'group_id' => ['group_id', [103, 103]],
-            'mitgliedsnr' => ['mitgliedsnr', [12345, null]],
-            'updated_at' => ['updated_at', ['2020-06-28 02:15:24', '2015-02-03 15:20:07']],
-            'send_newspaper' => ['send_newspaper', [true, false]],
-            'region_id' => ['region_id', [10, null]],
-            'country_id' => ['country_id', [100, 101]],
-            'fee_id' => ['fee_id', [1, 15]],
+            'firstname' => [ ['vorname' => 'Max'], ['firstname' => 'Max' ] ],
+            'lastname' => [ ['nachname' => 'Nach'], ['lastname' => 'Nach' ] ],
+            'nickname' => [ ['spitzname' => 'spitz1'], ['nickname' => 'spitz1'] ],
+            'nicknameEmpty' => [ ['spitzname' => null], ['nickname' => null] ],
+            'other_country' => [ ['staatsangehoerigkeitText' => 'deutsch'], ['other_country' => 'deutsch'] ],
+            'other_countryEmpty' => [ ['staatsangehoerigkeitText' => ''], ['other_country' => null] ],
+            'address' => [ ['strasse' => 'Straße 1'], ['address' => 'Straße 1'] ],
+            'further_address' => [ ['nameZusatz' => 'addrz'], ['further_address' => 'addrz'] ],
+            'further_addressEmpty' => [ ['nameZusatz' => ''], ['further_address' => null] ],
+            'zip' => [ ['plz' => '12345'], ['zip' => '12345'] ],
+            'location' => [ ['ort' => 'Köln'], ['location' => 'Köln'] ],
+            'main_phone' => [ ['telefon1' => '+49888'], ['main_phone' => '+49888'] ],
+            'mobile_phone' => [ ['telefon2' => '+49176'], ['mobile_phone' => '+49176'] ],
+            'work_phone' => [ ['telefon3' => '+49177'], ['work_phone' => '+49177'] ],
+            'fax' => [ ['telefax' => '+55111'], ['fax' => '+55111'] ],
+            'email' => [ ['email' => 'a@b.de'], ['email' => 'a@b.de'] ],
+            'email_parents' => [ ['emailVertretungsberechtigter' => 'v@b.de'], ['email_parents' => 'v@b.de'] ],
+            'gender_id' => [ ['geschlechtId' => 19], ['gender_id' => 19] ],
+            'gender_idEmpty' => [ ['geschlechtId' => 23], ['gender_id' => null] ],
+            'nationality_id' => [ ['staatsangehoerigkeitId' => 1054], ['nationality_id' => 1054] ],
+            'nationality_idEmpty' => [ ['staatsangehoerigkeitId' => null], ['nationality_id' => null] ],
+            'confession_id' => [ ['konfessionId' => 1], ['confession_id' => 1] ],
+            'confession_idEmpty' => [ ['konfessionId' => null], ['confession_id' => null] ],
+            'birthday' => [ ['geburtsDatum' => "1991-06-20 00:00:00"], ['birthday' => "1991-06-20"] ],
+            'joined_at' => [ ['eintrittsdatum' => "2005-05-01 00:00:00"], ['joined_at' => "2005-05-01"] ],
+            'group_id' => [ ['gruppierungId' => 103], ['group_id' => 103] ],
+            'mitgliedsnr' => [ ['mitgliedsNummer' => 12345], ['mitgliedsnr' => 12345] ],
+            'mitgliedsnrEmpty' => [ ['mitgliedsNummer' => null], ['mitgliedsnr' => null] ],
+            'updated_at' => [ ['lastUpdated' => "2020-06-28 02:15:24"], ['updated_at' => '2020-06-28 02:15:24'] ],
+            'send_newspaper' => [ ['zeitschriftenversand' => true], ['send_newspaper' => true] ],
+            'region_id' => [ ['regionId' => 10], ['region_id' => 10] ],
+            'region_idEmpty' => [ ['regionId' => null], ['region_id' => null] ],
+            'country_id' => [ ['landId' => 100], ['country_id' => 100] ],
+            'fee_id' => [ ['beitragsartId' => 1], ['fee_id' => 1] ],
         ];
     }
 
@@ -76,48 +84,43 @@ class PullMemberTest extends TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function test_get_a_single_member(string $key, array $values): void
+    public function test_get_a_single_member(array $input, array $check): void
     {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->fakeJson('member-16.json'), 200),
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/17' => Http::response($this->fakeJson('member-17.json'), 200)
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->fakeJson('member-16.json', ['data' => $input]), 200),
         ]));
-
         $this->setCredentials();
-
         Nami::login();
 
         $group = Nami::group(103);
 
-        $this->assertSame($values[0], $group->member(16)->toArray()[$key]);
-        $this->assertSame($values[1], $group->member(17)->toArray()[$key]);
+        foreach ($check as $key => $value) {
+            $this->assertSame($value, $group->member(16)->toArray()[$key]);
+        }
 
-        Http::assertSentCount(5);
+        Http::assertSentCount(4);
     }
 
     /**
      * @dataProvider dataProvider
      */
-    public function test_get_attribute_of_member_collection(string $key, array $values): void
+    public function test_get_attribute_of_member_collection(array $input, array $check): void
     {
         Http::fake(array_merge($this->login(), [
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/flist' => Http::response($this->fakeJson('member_overview.json'), 200),
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->fakeJson('member-16.json'), 200),
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/17' => Http::response($this->fakeJson('member-17.json'), 200)
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->fakeJson('member-16.json', ['data' => $input]), 200),
         ]));
-
         $this->setCredentials();
-
         Nami::login();
 
-        $members = Nami::group(103)->members();
-        foreach ($members as $i => $m) {
-            $this->assertSame($values[$i], $m->toArray()[$key]);
-        }
+        $member = Nami::group(103)->members()->first();
 
-        Http::assertSentCount(6);
+        foreach ($check as $key => $value) {
+            $this->assertSame($value, $member->toArray()[$key]);
+        }
+        Http::assertSentCount(5);
     }
 
     /**
