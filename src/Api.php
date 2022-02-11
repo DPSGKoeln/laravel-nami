@@ -127,9 +127,11 @@ class Api {
         $member = Member::fromAttributes($attributes);
         $existing = $this->member($member->group_id, $member->id);
         if (data_get($attributes, 'id')) {
+            $payload = array_merge($existing, $member->toNami());
+            $payload['kontoverbindung'] = json_encode($payload['kontoverbindung']);
             $response = $this->http()->put(
                 self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id,
-                array_merge($existing, $member->toNami())
+                $payload
             );
             if (data_get($response->json(), 'success') !== true) {
                 $this->exception('Update failed', $member->toNami(), $response->json());
