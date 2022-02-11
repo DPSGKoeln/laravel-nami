@@ -128,7 +128,7 @@ class Api {
         $existing = $this->member($member->group_id, $member->id);
         if (data_get($attributes, 'id')) {
             $payload = array_merge($existing, $member->toNami());
-            $payload['kontoverbindung'] = json_encode($payload['kontoverbindung']);
+            $payload['kontoverbindung'] = json_encode(data_get($payload, 'kontoverbindung', []));
             $response = $this->http()->put(
                 self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id,
                 $payload
