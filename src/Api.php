@@ -125,8 +125,12 @@ class Api {
 
     public function putMember(array $attributes) {
         $member = Member::fromAttributes($attributes);
+        $existing = $this->member($member->group_id, $member->id);
         if (data_get($attributes, 'id')) {
-            $response = $this->http()->put(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id, $member->toNami());
+            $response = $this->http()->put(
+                self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id,
+                array_merge($existing, $member->toNami())
+            );
             if (data_get($response->json(), 'success') !== true) {
                 $this->exception('Update failed', $member->toNami(), $response->json());
             }

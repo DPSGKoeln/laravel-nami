@@ -58,7 +58,7 @@ class PushMemberTest extends TestCase
         $this->assertEquals(16, $res['id']);
 
         Http::assertSent(function($request) use ($check) {
-            if ($request->url() != 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16') {
+            if ($request->url() != 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' || $request->method() !== 'PUT') {
                 return false;
             }
 
@@ -71,7 +71,7 @@ class PushMemberTest extends TestCase
             return $request->method() === 'PUT';
         });
 
-        Http::assertSentCount(1);
+        Http::assertSentCount(2);
     }
 
 }

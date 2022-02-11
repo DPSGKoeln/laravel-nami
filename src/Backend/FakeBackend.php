@@ -67,6 +67,11 @@ class FakeBackend {
         return $this->fakeMembers([$data]);
     }
 
+    public function singleMemberUrl(int $gruppierungId, int $memberId): string
+    {
+        return "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$gruppierungId}/{$memberId}";
+    }
+
     /**
      * @param array<int, array<string, mixed>> $data
      */
@@ -74,7 +79,7 @@ class FakeBackend {
     {
         Http::fake(function($request) use ($data) {
             foreach ($data as $member) {
-                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$member['gruppierungId']}/{$member['id']}") {
+                if ($request->url() === $this->singleMemberUrl($member['gruppierungId'], $member['id']) && $request->method() === 'GET') {
                     $content = [
                         'success' => true,
                         'data' => $member,
