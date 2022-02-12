@@ -57,7 +57,8 @@ class Member extends Model {
 
     protected $guarded = [];
 
-    public static function fromNami($item) {
+    public static function fromNami($item): self
+    {
         $item = collect($item)
             ->only(array_keys(static::$overviewAttributes))
             ->mapWithKeys(function($item, $key) {
@@ -67,11 +68,13 @@ class Member extends Model {
         return (new self($item));
     }
 
-    public static function fromAttributes($attributes) {
+    public static function fromAttributes(array $attributes): self
+    {
         return new self($attributes);
     }
 
-    public function toNami() {
+    public function toNami(): array
+    {
         return [
             'vorname' => $this->firstname,
             'nachname' => $this->lastname,
@@ -105,11 +108,13 @@ class Member extends Model {
         ];
     }
 
-    public function getBirthdayAttribute() {
+    public function getBirthdayAttribute(): ?string
+    {
         return Carbon::parse($this->attributes['birthday'])->format('Y-m-d');
     }
 
-    public function getJoinedAtAttribute() {
+    public function getJoinedAtAttribute(): ?string
+    {
         $date = $this->attributes['joined_at'];
 
         return empty($date)
@@ -117,7 +122,8 @@ class Member extends Model {
             : Carbon::parse($date)->format('Y-m-d');
     }
 
-    public function getGenderIdAttribute() {
+    public function getGenderIdAttribute(): ?int
+    {
         return $this->attributes['gender_id'] == Gender::getNullValue() ? null : $this->attributes['gender_id'];
     }
 
