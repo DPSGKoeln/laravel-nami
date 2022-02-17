@@ -2,26 +2,47 @@
 
 namespace Zoomyboy\LaravelNami;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
-use Illuminate\Contracts\Support\Arrayable;
 
 class Group implements Arrayable {
 
-    public $name;
-    public $id;
+    public string $name;
+    public int $id;
+    public ?int $parentId;
 
-    public static function fromResponse($response, $parent) {
-        $group = new self();
-        $group->name = $response['descriptor'];
-        $group->id = $response['id'];
-        $group->parent_id = $parent;
+    public static function fromResponse(array $response, ?int $parent): self
+    {
+        return (new self())
+            ->setName($response['descriptor'])
+            ->setId($response['id'])
+            ->setParentId($parent);
+    }
 
-        return $group;
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function setParentId(?int $parentId = null): self
+    {
+        $this->parentId = $parentId;
+
+        return $this;
     }
 
     public function toArray() {
-        return [ 'id' => $this->id, 'name' => $this->name, 'parent_id' => $this->parent_id ];
+        return [ 'id' => $this->id, 'name' => $this->name, 'parent_id' => $this->parentId ];
     }
 
     public function subgroups() {
@@ -45,11 +66,12 @@ class Group implements Arrayable {
         }));
     }
 
-    public function member($id): Member {
+    public function member(int $id): Member {
         return Member::fromNami(Nami::member($this->id, $id));
     }
 
-    public function memberOverview() {
+    public function memberOverview(): Collection
+    {
         return Nami::memberOverviewOf($this->id)->map(function($member) {
             return Member::fromNami($member);
         });

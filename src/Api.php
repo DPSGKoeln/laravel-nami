@@ -374,7 +374,8 @@ class Api {
         });
     }
 
-    public function memberOverviewOf($groupId) {
+    public function memberOverviewOf(int $groupId): Collection
+    {
         $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
         $response = $this->http()->get($url);
 
