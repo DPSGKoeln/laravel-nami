@@ -5,30 +5,31 @@ namespace Zoomyboy\LaravelNami;
 use App\Conf;
 use App\Nami\Exceptions\TooManyLoginAttemptsException;
 use Carbon\Carbon;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Log;
+use Zoomyboy\LaravelNami\Authentication\Cookie;
 use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
-use Zoomyboy\LaravelNami\Cookies\Cookie;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\NamiException;
 
 class Api {
 
-    private $cookie;
-    public $loggedIn = null;
-    public static $url = 'https://nami.dpsg.de';
+    public string $url = 'https://nami.dpsg.de';
+    private Cookie $cookie;
 
-    public function __construct($cookieStore) {
-        $this->cookie = $cookieStore;
+    public function __construct(Cookie $cookie)
+    {
+        $this->cookie = $cookie;
     }
 
-    public function http() {
-        return Backend::init($this->cookie);
+    public function http(): PendingRequest {
+        return Http::withOptions(['cookies' => $this->cookie->load()]);
     }
 
     public function findNr(int $nr): Member
@@ -54,7 +55,7 @@ class Api {
             $page = 1;
             while (!isset ($totalEntries) || ($page-1) * 100 + 1 <= $totalEntries) {
                 $start = ($page-1) * 100;
-                $url = self::$url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode((object) $payload) ?: '{}').'&page='.$page.'&start='.$start.'&limit=100';
+                $url = $this->url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode((object) $payload) ?: '{}').'&page='.$page.'&start='.$start.'&limit=100';
                 $response = $this->http()->get($url);
                 $totalEntries = $response->json()['totalEntries'];
                 if ($response->json()['success'] !== true) {
@@ -70,12 +71,8 @@ class Api {
         });
     }
 
-    protected function loggedInAlready(): bool {
-        return $this->loggedIn !== null;
-    }
-
     public function deleteMember($id) {
-        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/mglschaft-beenden';
+        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/mglschaft-beenden';
         $payload = [
             'id' => $id,
             'isConfirmed' => 'true',
@@ -88,19 +85,18 @@ class Api {
         }
     }
 
-    public function login($mglnr = null, $password = null, $groupid = null): self {
-        $resolved = $this->cookie->resolve($mglnr);
-
-        if ($resolved && !$this->cookie->isExpired()) {
+    public function login($mglnr = null, $password = null): self {
+        if ($this->cookie->isLoggedIn()) {
             return $this;
         }
 
+        $this->cookie->beforeLogin();
+
         $mglnr = $mglnr ?: config('nami.auth.mglnr');
         $password = $password ?: config('nami.auth.password');
-        $groupid = $groupid ?: config('nami.auth.groupid');
 
-        $this->http()->get(self::$url.'/ica/pages/login.jsp');
-        $response = $this->http()->asForm()->post(self::$url.'/ica/rest/nami/auth/manual/sessionStartup', [
+        $this->http()->get($this->url.'/ica/pages/login.jsp');
+        $response = $this->http()->asForm()->post($this->url.'/ica/rest/nami/auth/manual/sessionStartup', [
             'Login' => 'API',
             'redirectTo' => './app.jsp',
             'username' => $mglnr,
@@ -113,14 +109,14 @@ class Api {
             throw $e;
         }
 
-        $this->cookie->store($mglnr);
         $this->loggedIn = $mglnr;
+        $this->cookie->afterLogin();
 
         return $this;
     }
 
     public function membersOf($groupId): Collection {
-        return collect($this->http()->get(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist')->json()['data']);
+        return collect($this->http()->get($this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist')->json()['data']);
     }
 
     public function putMember(array $attributes) {
@@ -130,14 +126,14 @@ class Api {
             $payload = array_merge($existing, $member->toNami());
             $payload['kontoverbindung'] = json_encode(data_get($payload, 'kontoverbindung', []));
             $response = $this->http()->put(
-                self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id,
+                $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id,
                 $payload
             );
             if (data_get($response->json(), 'success') !== true) {
                 $this->exception('Update failed', $member->toNami(), $response->json());
             }
         } else {
-            $response = $this->http()->post(self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id, $member->toNami());
+            $response = $this->http()->post($this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id, $member->toNami());
             if (data_get($response->json(), 'success') !== true) {
                 $this->exception('Update failed', $member->toNami(), $response->json());
             }
@@ -151,10 +147,10 @@ class Api {
     public function putMembership(int $memberId, array $data): int
     {
         if (data_get($data, 'id')) {
-            $url = self::$url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$data['id']}";
+            $url = $this->url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$data['id']}";
             $response = $this->http()->put($url, $data);
         } else {
-            $url = self::$url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
+            $url = $this->url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
             $response = $this->http()->post($url, $data);
         }
         if (data_get($response->json(), 'success') !== true) {
@@ -169,7 +165,7 @@ class Api {
     }
 
     public function membershipsOf($memberId): Collection {
-        $url = self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
+        $url = $this->url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
 
         $r = $this->http()->get($url);
 
@@ -183,13 +179,13 @@ class Api {
     }
 
     public function subactivitiesOf($activityId) {
-        return collect($this->http()->get(self::$url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId)->json()['data'])->map(function($subactivity) {
+        return collect($this->http()->get($this->url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId)->json()['data'])->map(function($subactivity) {
             return Subactivity::fromNami($subactivity);
         });;
     }
 
     public function membership($memberId, $membershipId) {
-        $url = self::$url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
+        $url = $this->url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
         $response = $this->http()->get($url);
 
         Logger::http($url, $response, 'Single Membership '.$membershipId.' from '.$memberId, ['memberId' => $memberId]);
@@ -203,7 +199,7 @@ class Api {
 
     public function courses(): Collection
     {
-        $url = self::$url.'/ica/rest/module/baustein';
+        $url = $this->url.'/ica/rest/module/baustein';
         $response = $this->http()->get($url);
 
         return collect($response->json()['data'])->map(function($course) {
@@ -213,7 +209,7 @@ class Api {
 
     public function coursesFor(int $memberId): Collection
     {
-        $url = self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist";
+        $url = $this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist";
         $response = $this->http()->get($url);
 
         if (!$response->ok() || $response->json()['success'] === false) {
@@ -221,7 +217,7 @@ class Api {
         }
 
         return collect($response->json()['data'])->map(function($course) use ($memberId) {
-            $single = $this->http()->get(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}")['data'];
+            $single = $this->http()->get($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}")['data'];
 
             return (object) [
                 'id' => $single['id'],
@@ -240,7 +236,7 @@ class Api {
      */
     public function createCourse(int $memberId, array $payload): int
     {
-        $response = $this->http()->post(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}", [
+        $response = $this->http()->post($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}", [
             'bausteinId' => $payload['course_id'],
             'vstgName' => $payload['event_name'],
             'vstgTag' => Carbon::parse($payload['completed_at'])->format('Y-m-d').'T00:00:00',
@@ -262,7 +258,7 @@ class Api {
      */
     public function updateCourse(int $memberId, int $courseId, array $payload): void
     {
-        $response = $this->http()->put(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", [
+        $response = $this->http()->put($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", [
             'bausteinId' => $payload['course_id'],
             'vstgName' => $payload['event_name'],
             'vstgTag' => Carbon::parse($payload['completed_at'])->format('Y-m-d').'T00:00:00',
@@ -276,7 +272,7 @@ class Api {
 
     public function deleteCourse(int $memberId, int $courseId): void
     {
-        $response = $this->http()->delete(self::$url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}");
+        $response = $this->http()->delete($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}");
 
         if ($response->json() !== null && data_get($response->json(), 'success') !== true) {
             $this->exception('Course deletion failed', [], $response->json());
@@ -284,7 +280,7 @@ class Api {
     }
 
     public function member($groupId, $memberId) {
-        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
+        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);
 
         Logger::http($url, $response, 'Show member '.$memberId, ['memberId' => $memberId]);
@@ -316,7 +312,7 @@ class Api {
     }
 
     public function groups($parentGroupId = null): Collection {
-        return collect($this->http()->get(self::$url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroupId ?: 'root'))->json()['data'])->map(function($group) use ($parentGroupId) {
+        return collect($this->http()->get($this->url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroupId ?: 'root'))->json()['data'])->map(function($group) use ($parentGroupId) {
             return Group::fromResponse($group, $parentGroupId);
         });
     }
@@ -332,51 +328,51 @@ class Api {
     }
 
     public function genders(): Collection {
-        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/geschlecht")['data'])->map(function($gender) {
+        return collect($this->http()->get($this->url."/ica/rest/baseadmin/geschlecht")['data'])->map(function($gender) {
             return Gender::fromNami($gender);
         })->filter(fn($gender) => !$gender->isNull);
     }
 
     public function nationalities(): Collection {
-        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/staatsangehoerigkeit")['data'])->map(function($gender) {
+        return collect($this->http()->get($this->url."/ica/rest/baseadmin/staatsangehoerigkeit")['data'])->map(function($gender) {
             return Nationality::fromNami($gender);
         });
     }
 
     public function countries() {
-        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/land")['data'])->map(function($country) {
+        return collect($this->http()->get($this->url."/ica/rest/baseadmin/land")['data'])->map(function($country) {
             return Country::fromNami($country);
         });
     }
 
     public function regions() {
-        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/region")['data'])->map(function($region) {
+        return collect($this->http()->get($this->url."/ica/rest/baseadmin/region")['data'])->map(function($region) {
             return Region::fromNami($region);
         });
     }
 
 
     public function feesOf($groupid) {
-        return collect($this->http()->get(self::$url."/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupid}")['data'])->map(function($fee) {
+        return collect($this->http()->get($this->url."/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupid}")['data'])->map(function($fee) {
             return Fee::fromNami($fee);
         });
     }
 
     public function confessions(): Collection {
-        return collect($this->http()->get(self::$url."/ica/rest/baseadmin/konfession")['data'])->map(function($gender) {
+        return collect($this->http()->get($this->url."/ica/rest/baseadmin/konfession")['data'])->map(function($gender) {
             return Confession::fromNami($gender);
         });
     }
 
     public function activities($groupId) {
-        return collect($this->http()->get(self::$url."/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/".$groupId)['data'])->map(function($activity) {
+        return collect($this->http()->get($this->url."/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/".$groupId)['data'])->map(function($activity) {
             return Activity::fromNami($activity);
         });
     }
 
     public function memberOverviewOf(int $groupId): Collection
     {
-        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
+        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
         $response = $this->http()->get($url);
 
         return collect($response['data'])->map(function($member) use ($groupId) {
@@ -390,7 +386,7 @@ class Api {
     }
 
     private function singleMemberFallback($groupId, $memberId) {
-        $url = self::$url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
+        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
         $response = $this->http()->get($url);
 
         $member = collect($response['data'])->first(function($member) use ($memberId) {

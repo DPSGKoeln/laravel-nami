@@ -3,3 +3,5 @@
 *.swo
 *.swm
 tags
+.cookies
+/.phpunit.result.cache

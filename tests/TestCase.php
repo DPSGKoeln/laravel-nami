@@ -18,7 +18,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void {
         parent::setUp();
 
-        Cookie::swap(new FakeCookie());
+        $this->clearCookies();
     }
 
     protected function getPackageProviders($app)
@@ -28,19 +28,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     public function getAnnotations(): array {
         return [];
-    }
-
-    protected function setCredentials() {
-        Config::set('nami.auth.mglnr', '11223');
-        Config::set('nami.auth.password', 'secret');
-        Config::set('nami.auth.groupid', '55555');
-    }
-
-    public function login() {
-        return [
-            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::response('<html></html>', 200),
-            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::response($this->successJson, 200)
-        ];
     }
 
     public function fakeJson(string $file, array $data = []): string {
@@ -53,6 +40,13 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return [
             'https://nami.dpsg.de/ica/rest/baseadmin/geschlecht' => Http::response($this->fakeJson('genders.json'), 200)
         ];
+    }
+
+    private function clearCookies(): void
+    {
+        foreach (glob(__DIR__.'/../.cookies/*') as $file) {
+            unlink($file);
+        }
     }
 
 }

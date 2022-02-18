@@ -3,6 +3,7 @@
 namespace Zoomyboy\LaravelNami\Providers;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Zoomyboy\LaravelNami\Api;
@@ -21,14 +22,8 @@ class NamiServiceProvider extends ServiceProvider
     }
 
     public function register() {
-        $this->app->singleton('nami.api', function() {
-            return new Api($this->app['nami.cookie']);
-        });
-        $this->app->bind('nami.backend', function() {
-            return new LiveBackend();
-        });
-        $this->app->singleton('nami.cookie', function() {
-            return new CacheCookie();
+        $this->app->bind('nami.api', function() {
+            return app(Api::class);
         });
     }
 }

@@ -10,80 +10,106 @@ use Zoomyboy\LaravelNami\Tests\TestCase;
 class LoginTest extends TestCase
 {
 
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
-    public function test_first_successful_login()
+    public function test_first_successful_login(): void
     {
-        Http::fake($this->login());
-        $this->setCredentials();
-        Nami::login();
+        Http::fake($this->fakeSuccessfulLogin());
 
-        Http::assertSent(function($request) {
-            return $request->url() == 'https://nami.dpsg.de/ica/pages/login.jsp';
-        });
-        Http::assertSent(function($request) {
-            return $request->url() == 'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup'
-                && $request['username'] == '11223' && $request['password'] == 'secret' && $request['redirectTo'] == './app.jsp' && $request['Login'] == 'API';
-        });
+        Nami::login(12345, 'secret');
+
         Http::assertSentCount(2);
+        Http::assertSent(fn ($request) => $request->url() == 'https://nami.dpsg.de/ica/pages/login.jsp');
+        Http::assertSent(fn ($request) => $request->url() == 'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup'
+            && $request['username'] == '12345' && $request['password'] == 'secret'
+            && $request['redirectTo'] == './app.jsp' && $request['Login'] == 'API'
+        );
     }
 
-    public function test_first_login_fails_because_of_bruteforce_protection()
+    public function test_it_throws_exception_when_login_failed(): void
     {
-        Http::fake([
-            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::response('<html></html>', 200),
-            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::response($this->bruteJson, 200)
-        ]);
-
-        $this->setCredentials();
+        Http::fake($this->fakeFailedLogin());
 
         try {
-            Nami::login();
-        } catch(LoginException $e) {
+            Nami::login(12345, 'wrongpassword');
+        } catch (LoginException $e) {
+            $this->assertEquals(LoginException::WRONG_CREDENTIALS, $e->reason);
+        }
+    }
+
+    public function test_first_login_fails_because_of_bruteforce_protection(): void
+    {
+        Http::fake($this->fakeBruteforceFailure());
+
+        try {
+            Nami::login(12345, 'secret');
+        } catch (LoginException $e) {
             $this->assertEquals(LoginException::TOO_MANY_FAILED_LOGINS, $e->reason);
         }
     }
 
-    public function test_login_once_on_second_login()
+    public function test_store_cookie_after_login(): void
     {
-        Http::fake([
-            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::response('<html></html>', 200),
-            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::response($this->successJson, 200)
-        ]);
+        Http::fake($this->fakeSuccessfulLogin());
 
-        $this->setCredentials();
+        Nami::login(12345, 'secret');
 
-        Nami::login();
-        Nami::login();
+        $this->assertFileExists(__DIR__.'/../../.cookies/'.time().'.txt');
+    }
 
-        Http::assertSent(function($request) {
-            return $request->url() == 'https://nami.dpsg.de/ica/pages/login.jsp';
-        });
-        Http::assertSent(function($request) {
-            return $request->url() == 'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup'
-                && $request['username'] == '11223' && $request['password'] == 'secret' && $request['redirectTo'] == './app.jsp' && $request['Login'] == 'API';
-        });
+    public function test_dont_login_if_cookie_exists(): void
+    {
+        touch(__DIR__.'/../../.cookies/'.time().'.txt');
+
+        Nami::login(12345, 'secret');
+
+        Http::assertSentCount(0);
+    }
+
+    public function test_delete_expired_cookie_before_login(): void
+    {
+        $lastLogin = now()->subHour(2)->timestamp;
+        touch(__DIR__."/../../.cookies/{$lastLogin}.txt");
+        Http::fake($this->fakeSuccessfulLogin());
+
+        Nami::login(12345, 'secret');
+
+        Http::assertSentCount(2);
+        $this->assertFileDoesNotExist(__DIR__."/../../.cookies/{$lastLogin}.txt");
+    }
+
+    public function test_login_once_if_cookie_is_expired(): void
+    {
+        $lastLogin = now()->subHour()->subMinutes(10)->timestamp;
+        touch(__DIR__."/../../.cookies/{$lastLogin}.txt");
+        Http::fake($this->fakeSuccessfulLogin());
+
+        Nami::login(12345, 'secret');
+        Nami::login(12345, 'secret');
+
         Http::assertSentCount(2);
     }
 
-    public function test_login_check()
+    private function fakeSuccessfulLogin(): array
     {
-        Http::fake([
-            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::response('<html></html>', 200),
+        return [
+            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::sequence()->push('<html></html>', 200),
+            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::sequence()->push($this->successJson, 200),
+        ];
+    }
+
+    private function fakeFailedLogin(): array
+    {
+        return [
+            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::sequence()->push('<html></html>', 200),
             'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::sequence()->push($this->wrongCredentialsJson, 200)
-        ]);
-
-        $this->setCredentials();
-
-        try {
-            Nami::login();
-        } catch(LoginException $e) {
-            $this->assertEquals(LoginException::WRONG_CREDENTIALS, $e->reason);
-        }
-
-        Http::assertSentCount(2);
+        ];
     }
+
+    private function fakeBruteforceFailure(): array
+    {
+        return [
+            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::sequence()->push('<html></html>', 200),
+            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::sequence()->push($this->bruteJson, 200)
+        ];
+    }
+
 }
