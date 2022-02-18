@@ -50,9 +50,9 @@ class PushMemberTest extends TestCase
      * @dataProvider dataProvider
      */
     public function test_push_a_single_member(array $overwrites, array $check): void {
-        Http::fake(array_merge([
+        Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('{"success": true, "data": {"id": 16}}', 200),
-        ]));
+        ]);
 
         $res = Nami::putMember(array_merge($this->attributes[0], $overwrites));
         $this->assertEquals(16, $res['id']);

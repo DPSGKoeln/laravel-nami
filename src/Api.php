@@ -85,15 +85,13 @@ class Api {
         }
     }
 
-    public function login($mglnr = null, $password = null): self {
+    public function login(int $mglnr, string $password): self
+    {
         if ($this->cookie->isLoggedIn()) {
             return $this;
         }
 
         $this->cookie->beforeLogin();
-
-        $mglnr = $mglnr ?: config('nami.auth.mglnr');
-        $password = $password ?: config('nami.auth.password');
 
         $this->http()->get($this->url.'/ica/pages/login.jsp');
         $response = $this->http()->asForm()->post($this->url.'/ica/rest/nami/auth/manual/sessionStartup', [
@@ -109,7 +107,6 @@ class Api {
             throw $e;
         }
 
-        $this->loggedIn = $mglnr;
         $this->cookie->afterLogin();
 
         return $this;

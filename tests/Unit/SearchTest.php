@@ -14,10 +14,8 @@ use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class SearchTest extends TestCase
 {
-    public $groupsResponse = '{"success":true,"data":[{"descriptor":"Group","name":"","representedClass":"de.iconcept.nami.entity.org.Gruppierung","id":103}],"responseType":"OK"}';
-    public $unauthorizedResponse = '{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}';
 
-    public $attributes = [
+    public array $attributes = [
         [
             'firstname' => 'Max',
             'lastname' => 'Nach1',
@@ -35,33 +33,34 @@ class SearchTest extends TestCase
         ]
     ];
 
-    public function dataProvider() {
+    public function dataProvider(): array
+    {
         return [
             'firstname' => ['vorname', ['Max', 'Jane']],
         ];
     }
 
-    public function test_find_a_member_by_mglnr() {
-        Http::fake(array_merge($this->login(), [
+    public function test_find_a_member_by_mglnr(): void
+    {
+        Http::fake([
             $this->url(['mitgliedsNummber' => 150]) => Http::response($this->fakeJson('searchResponse.json'), 200),
-        ]));
+        ]);
 
-        $this->setCredentials();
-        Nami::login();
+        $member = $this->login()->findNr(150);
 
-        $member = Nami::findNr(150);
         $this->assertEquals('Philipp', $member->firstname);
-
         Http::assertSent(function($request) {
             return $request->url() == $this->url(['mitgliedsNummber' => 150])
                 && $request->method() == 'GET';
         });
 
-        Http::assertSentCount(3);
+        Http::assertSentCount(1);
     }
 
-    private function url($payload) {
+    private function url(array $payload): string
+    {
         $payload = rawurlencode(json_encode($payload));
+
         return "https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues={$payload}&page=1&start=0&limit=100";
     }
 

@@ -11,16 +11,14 @@ use Zoomyboy\LaravelNami\Tests\TestCase;
 class PushMembershipsTest extends TestCase
 {
 
-    public function test_create_a_membership() {
+    public function test_create_a_membership(): void
+    {
         Carbon::setTestNow(Carbon::parse('2021-02-03 06:00:00'));
-        Http::fake(array_merge($this->login(), [
+        Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/flist' => Http::response($this->fakeJson('membership-overview.json'), 200),
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16' => Http::response($this->fakeJson('membership-create.json'), 200),
-        ]));
+        ]);
 
-        $this->setCredentials();
-
-        Nami::login();
         $member = new Member(['id' => 16]);
         $id = $member->putMembership([
             'created_at' => now(),
@@ -31,7 +29,7 @@ class PushMembershipsTest extends TestCase
         ]);
         $this->assertEquals(65, $id);
 
-        Http::assertSentCount(3);
+        Http::assertSentCount(1);
 
         Http::assertSent(fn ($request) => $request->method() === 'POST'
             && $request->url() === 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16'

@@ -4,8 +4,10 @@ namespace Zoomyboy\LaravelNami\Tests;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Api;
 use Zoomyboy\LaravelNami\Cookies\Cookie;
 use Zoomyboy\LaravelNami\Cookies\FakeCookie;
+use Zoomyboy\LaravelNami\Nami;
 use Zoomyboy\LaravelNami\Providers\NamiServiceProvider;
 use Zoomyboy\LaravelNami\Tests\Stub\Member;
 
@@ -36,10 +38,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return ob_get_clean();
     }
 
-    public function fakeGenders() {
-        return [
-            'https://nami.dpsg.de/ica/rest/baseadmin/geschlecht' => Http::response($this->fakeJson('genders.json'), 200)
-        ];
+    public function login(): Api
+    {
+        touch (__DIR__.'/../.cookies/'.time().'.txt');
+
+        return Nami::login(123, 'secret');
     }
 
     private function clearCookies(): void

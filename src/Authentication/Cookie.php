@@ -12,7 +12,7 @@ class Cookie {
 
     /**
      * Loads the cookie for a new request
-     * 
+     *
      * @return FileCookieJar
      */
     public function load(): FileCookieJar
@@ -55,7 +55,7 @@ class Cookie {
 
     private function newFileName(): string
     {
-        return $this->path.'/'.time().'.txt';   
+        return $this->path.'/'.time().'.txt';
     }
 
     private function isExpired(): bool

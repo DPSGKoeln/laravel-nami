@@ -66,7 +66,7 @@ class LoginTest extends TestCase
 
     public function test_delete_expired_cookie_before_login(): void
     {
-        $lastLogin = now()->subHour(2)->timestamp;
+        $lastLogin = now()->subHours(2)->timestamp;
         touch(__DIR__."/../../.cookies/{$lastLogin}.txt");
         Http::fake($this->fakeSuccessfulLogin());
 

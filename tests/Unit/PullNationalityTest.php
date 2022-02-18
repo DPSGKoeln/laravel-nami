@@ -2,31 +2,30 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
-use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\Tests\TestCase;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
-use Zoomyboy\LaravelNami\NamiServiceProvider;
-use Zoomyboy\LaravelNami\LoginException;
+use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Group;
+use Zoomyboy\LaravelNami\LoginException;
+use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\NamiServiceProvider;
+use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PullNationalityTest extends TestCase
 {
 
-    public function test_get_all_nationalities() {
-        Http::fake(array_merge($this->login(), [
+    public function test_get_all_nationalities(): void
+    {
+        Http::fake([
             'https://nami.dpsg.de/ica/rest/baseadmin/staatsangehoerigkeit' => Http::response($this->fakeJson('nationalities.json'))
-        ]));
+        ]);
 
-        $this->setCredentials();
-
-        Nami::login();
+        $nationalities = $this->login()->nationalities();
 
         $this->assertEquals([
             ['name' => 'deutsch', 'id' => 1054]
-        ], Nami::nationalities()->toArray());
+        ], $nationalities->toArray());
 
-        Http::assertSentCount(3);
+        Http::assertSentCount(1);
     }
 
 }

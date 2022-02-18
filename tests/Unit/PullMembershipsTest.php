@@ -9,17 +9,17 @@ use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PullMembershipsTest extends TestCase
 {
-    public $groupsResponse = '{"success":true,"data":[{"descriptor":"Group","name":"","representedClass":"de.iconcept.nami.entity.org.Gruppierung","id":103}],"responseType":"OK"}';
-    public $unauthorizedResponse = '';
 
-    public function errorProvider() {
+    public function errorProvider(): array
+    {
         return [
             'unauth' => ['{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}'],
             'noright' => ['{"success":false,"responseType":"EXCEPTION","message":"Sicherheitsverletzung: Zugriff auf Rechte Recht (n:2001002 o:2) fehlgeschlagen"}']
         ];
     }
 
-    public function dataProvider() {
+    public function dataProvider(): array
+    {
         return [
             'id' => ['id', [68, 69]],
             'group_id' => ['group_id', [103,104]],
@@ -35,16 +35,14 @@ class PullMembershipsTest extends TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function test_get_all_memberships_of_a_member($key, $values) {
-        Http::fake(array_merge($this->login(), [
+    public function test_get_all_memberships_of_a_member(string $key, array $values): void
+    {
+        Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/flist' => Http::response($this->fakeJson('membership-overview.json'), 200),
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/68' => Http::response($this->fakeJson('membership-68.json'), 200),
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/69' => Http::response($this->fakeJson('membership-69.json'), 200)
-        ]));
+        ]);
 
-        $this->setCredentials();
-
-        Nami::login();
         $member = new Member(['id' => 16]);
 
         $memberships = $member->memberships();
@@ -53,25 +51,23 @@ class PullMembershipsTest extends TestCase
             $this->assertSame($values[$i], $m->toArray()[$key]);
         }
 
-        Http::assertSentCount(5);
+        Http::assertSentCount(3);
     }
 
     /**
      * @dataProvider errorProvider
      */
-    public function test_it_gets_no_memberships_with_no_rights($error) {
-        Http::fake(array_merge($this->login(), [
+    public function test_it_gets_no_memberships_with_no_rights(string $error): void
+    {
+        Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/flist' => Http::response($error, 200)
-        ]));
+        ]);
 
-        $this->setCredentials();
-
-        Nami::login();
         $member = new Member(['id' => 16]);
 
         $memberships = $member->memberships();
         $this->assertSame([], $member->memberships()->toArray());
 
-        Http::assertSentCount(4);
+        Http::assertSentCount(2);
     }
 }
