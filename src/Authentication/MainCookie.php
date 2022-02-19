@@ -93,7 +93,7 @@ class MainCookie extends Authenticator {
     {
         $cookieFile = $this->file() ?: $this->newFileName();
 
-        return $this->cookie = new FileCookieJar($cookieFile);
+        return $this->cookie = new FileCookieJar($cookieFile, true);
     }
 
 }
