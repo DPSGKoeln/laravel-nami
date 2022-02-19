@@ -43,18 +43,18 @@ class MainCookie extends Authenticator {
         return $this;
     }
 
-    public function http(): PendingRequest
-    {
-        return Http::withOptions(['cookies' => $this->load()]);
-    }
-
-    private function isLoggedIn(): bool
+    public function isLoggedIn(): bool
     {
         if ($this->file() === null) {
             return false;
         }
 
         return ! $this->isExpired();
+    }
+
+    public function http(): PendingRequest
+    {
+        return Http::withOptions(['cookies' => $this->load()]);
     }
 
     private function newFileName(): string

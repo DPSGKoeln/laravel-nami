@@ -15,6 +15,7 @@ use Log;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
+use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\NamiException;
 
@@ -90,6 +91,11 @@ class Api {
         $this->authenticator->login($mglnr, $password);
 
         return $this;
+    }
+
+    public function isLoggedIn(): bool
+    {
+        return $this->authenticator->isLoggedIn();
     }
 
     public function membersOf($groupId): Collection {
@@ -186,6 +192,7 @@ class Api {
 
     public function coursesFor(int $memberId): Collection
     {
+        $this->assertLoggedIn();
         $url = $this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist";
         $response = $this->http()->get($url);
 
@@ -380,6 +387,13 @@ class Api {
 
     private function exception($message, $request, $response) {
         throw (new NamiException($message))->response($response)->request($request);
+    }
+
+    private function assertLoggedIn(): void
+    {
+        if (!$this->isLoggedIn()) {
+            throw new NotAuthenticatedException('You need to login first');
+        }
     }
 
 }

@@ -119,6 +119,17 @@ class LoginTest extends TestCase
         Auth::assertNotLoggedIn();
     }
 
+    public function test_it_fakes_login_state(): void
+    {
+        Auth::fake();
+        Auth::success(12345, 'secret');
+        $this->assertFalse(Nami::isLoggedIn());
+
+        Nami::login(12345, 'secret');
+
+        $this->assertTrue(Nami::isLoggedIn());
+    }
+
     private function fakeSuccessfulLogin(): array
     {
         return [

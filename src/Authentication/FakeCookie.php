@@ -33,6 +33,11 @@ class FakeCookie extends Authenticator {
         return $this;
     }
 
+    public function isLoggedIn(): bool
+    {
+        return $this->authenticated !== null;
+    }
+
     public function http(): PendingRequest
     {
         return Http::withOptions([]);
@@ -82,15 +87,15 @@ class FakeCookie extends Authenticator {
 
     public function assertNotLoggedIn(): void
     {
-        Assert::assertNull(
-            $this->authenticated,
+        Assert::assertFalse(
+            $this->isLoggedIn(),
             'Failed asserting that noone is logged in. Found login with '.data_get($this->authenticated, 'mglnr')
         );
     }
 
     public function assertLoggedIn(): void
     {
-        
+        Assert::assertTrue($this->isLoggedIn());
     }
 
 }

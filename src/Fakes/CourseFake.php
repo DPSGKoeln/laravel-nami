@@ -7,6 +7,28 @@ use Illuminate\Support\Facades\Http;
 
 class CourseFake extends Fake {
 
+    public function forMember(int $memberId, array $data): void
+    {
+        Http::fake(function($request) use ($memberId, $data) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist") {
+                return Http::response(json_encode([
+                    'success' => true,
+                    'totalEntries' => collect($data)->count(),
+                    'data' => collect($data)->map(fn ($course) => ['id' => $course['id']]),
+                ]) ?: '{}', 200);
+            }
+
+            foreach ($data as $course) {
+                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}") {
+                    return Http::response(json_encode([
+                        'success' => true,
+                        'data' => $course,
+                    ]) ?: '{}', 200);
+                }
+            }
+        });
+    }
+
     public function createsSuccessful(int $memberId, int $courseId): void
     {
         Http::fake(function($request) use ($memberId, $courseId) {

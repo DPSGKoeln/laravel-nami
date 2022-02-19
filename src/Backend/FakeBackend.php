@@ -8,18 +8,12 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Zoomyboy\LaravelNami\Fakes\CourseFake;
 use Zoomyboy\LaravelNami\Fakes\Fake;
 use Zoomyboy\LaravelNami\Fakes\FakeInstance;
 use Zoomyboy\LaravelNami\Fakes\LoginFake;
 
 class FakeBackend {
-
-    public function fakeLogin(string $mglnr): self
-    {
-        app(LoginFake::class)->succeeds($mglnr);
-
-        return $this;
-    }
 
     /**
      * @param int $mitgliedsNr
@@ -116,26 +110,11 @@ class FakeBackend {
                     ]) ?: '{}', 200);
                 }
             }
-
-            foreach ($data as $member) {
-                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$member['id']}/flist") {
-                    return Http::response(json_encode([
-                        'success' => true,
-                        'totalEntries' => collect($member['courses'] ?? [])->count(),
-                        'data' => collect($member['courses'] ?? [])->map(fn ($course) => ['id' => $course['id']]),
-                    ]) ?: '{}', 200);
-                }
-
-                foreach ($member['courses'] ?? [] as $course) {
-                    if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$member['id']}/{$course['id']}") {
-                        return Http::response(json_encode([
-                            'success' => true,
-                            'data' => $course,
-                        ]) ?: '{}', 200);
-                    }
-                }
-            }
         });
+
+        foreach ($data as $member) {
+            app(CourseFake::class)->forMember($member['id'], $member['courses'] ?? []);
+        }
 
         return $this;
     }
