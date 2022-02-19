@@ -47,9 +47,6 @@ class CourseTest extends TestCase
 
     public function test_it_needs_login_to_get_courses(): void
     {
-        app(CourseFake::class)->forMember(11111, [
-            ['bausteinId' => 506, 'id' => 788, 'veranstalter' => 'KJA', 'vstgName' => 'eventname', 'vstgTag' => '2021-11-12 00:00:00']
-        ]);
         $this->expectException(NotAuthenticatedException::class);
 
         Nami::coursesFor(11111);
