@@ -3,6 +3,7 @@
 namespace Zoomyboy\LaravelNami;
 
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class NamiException extends \Exception {
 
@@ -28,5 +29,15 @@ class NamiException extends \Exception {
         $this->response = $response;
 
         return $this;
+    }
+
+    public function report(): void
+    {
+        \Log::error($this->getMessage(), [
+            'request' => $this->request,
+            'response' => $this->response
+        ]);
+
+        throw ValidationException::withMessages(['id' => 'Unbekannter Fehler']);
     }
 }

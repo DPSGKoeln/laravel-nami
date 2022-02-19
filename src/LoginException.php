@@ -3,6 +3,7 @@
 namespace Zoomyboy\LaravelNami;
 
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class LoginException extends \Exception {
 
@@ -22,6 +23,11 @@ class LoginException extends \Exception {
         }
 
         $this->response = $response;
+    }
+
+    public function report(): void
+    {
+        throw ValidationException::withMessages(['nami' => 'NaMi Login fehlgeschlagen.']);
     }
 
     public function setReason($reason) {
