@@ -91,7 +91,7 @@ class CourseTest extends TestCase
     {
         $this->expectException(NotAuthenticatedException::class);
 
-        $courses = Nami::coursesFor(11111);
+        Nami::coursesFor(11111);
     }
 
     public function test_parses_failed_login(): void

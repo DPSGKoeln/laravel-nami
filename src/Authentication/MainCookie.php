@@ -12,12 +12,17 @@ class MainCookie extends Authenticator {
 
     private FileCookieJar $cookie;
     private string $url = 'https://nami.dpsg.de';
+    private ?int $mglnr = null;
+    private ?string $password = null;
 
     public function login(int $mglnr, string $password): self
     {
         if ($this->isLoggedIn()) {
             return $this;
         }
+
+        $this->mglnr = $mglnr;
+        $this->password = $password;
 
         while ($file = $this->file()) {
             unlink($file);
@@ -50,6 +55,13 @@ class MainCookie extends Authenticator {
         }
 
         return ! $this->isExpired();
+    }
+
+    public function refresh(): void
+    {
+        if ($this->mglnr && $this->password) {
+            $this->login($this->mglnr, $this->password);
+        }
     }
 
     public function http(): PendingRequest

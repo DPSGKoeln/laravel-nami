@@ -85,6 +85,11 @@ class FakeCookie extends Authenticator {
         );
     }
 
+    public function refresh(): void
+    {
+        //
+    }
+
     public function assertNotLoggedIn(): void
     {
         Assert::assertFalse(

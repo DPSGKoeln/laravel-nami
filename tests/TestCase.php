@@ -44,13 +44,17 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return Nami::login(123, 'secret');
     }
 
-    private function setupCookies(): void
+    protected function clearCookies(): void
     {
-        Authenticator::setPath(__DIR__.'/../.cookies_test');
-
         foreach (glob(__DIR__.'/../.cookies_test/*') as $file) {
             unlink($file);
         }
+    }
+
+    private function setupCookies(): void
+    {
+        Authenticator::setPath(__DIR__.'/../.cookies_test');
+        $this->clearCookies();
     }
 
 }

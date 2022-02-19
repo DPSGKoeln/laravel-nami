@@ -438,6 +438,8 @@ class Api {
 
     private function assertLoggedIn(): void
     {
+        $this->authenticator->refresh();
+
         if (!$this->isLoggedIn()) {
             throw new NotAuthenticatedException('You need to login first');
         }

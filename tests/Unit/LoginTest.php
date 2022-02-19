@@ -4,6 +4,7 @@ namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Authentication\Auth;
+use Zoomyboy\LaravelNami\Fakes\CourseFake;
 use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Nami;
 use Zoomyboy\LaravelNami\Tests\TestCase;
@@ -93,6 +94,19 @@ class LoginTest extends TestCase
         Http::assertSentCount(2);
     }
 
+    public function test_it_refreshes_login_when_a_cookie_of_an_existing_api_is_expired(): void
+    {
+        app(CourseFake::class)->forMember(11111, []);
+        Http::fake($this->fakeSuccessfulLoginForever());
+        $api = Nami::login(12345, 'secret');
+        $this->clearCookies();
+        $lastLogin = now()->subHours(2)->timestamp;
+        touch(__DIR__."/../../.cookies_test/{$lastLogin}.txt");
+
+        $courses = $api->coursesFor(11111);
+        $this->assertCount(0, $courses);
+    }
+
     public function test_it_fakes_login(): void
     {
         Auth::fake();
@@ -135,6 +149,14 @@ class LoginTest extends TestCase
         return [
             'https://nami.dpsg.de/ica/pages/login.jsp' => Http::sequence()->push('<html></html>', 200),
             'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::sequence()->push($this->successJson, 200),
+        ];
+    }
+
+    private function fakeSuccessfulLoginForever(): array
+    {
+        return [
+            'https://nami.dpsg.de/ica/pages/login.jsp' => Http::response('<html></html>', 200),
+            'https://nami.dpsg.de/ica/rest/nami/auth/manual/sessionStartup' => Http::response($this->successJson, 200),
         ];
     }
 
