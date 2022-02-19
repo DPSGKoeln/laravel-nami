@@ -272,11 +272,6 @@ class FakeBackend {
         return $this;
     }
 
-    public function fakeFailedLogin(): void
-    {
-        app(LoginFake::class)->fails();
-    }
-
     /**
      * @param array<int, array{name: string, id: int}> $data
      */
