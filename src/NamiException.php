@@ -2,6 +2,7 @@
 
 namespace Zoomyboy\LaravelNami;
 
+use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -47,5 +48,12 @@ class NamiException extends \Exception {
         ]);
 
         throw ValidationException::withMessages(['id' => 'Unbekannter Fehler']);
+    }
+
+    public function outputToConsole(Command $command): void
+    {
+        $command->info("Request URL: ".$this->requestUrl);
+        $command->info("response: ".json_encode($this->response));
+        $command->info($this->getMessage());
     }
 }
