@@ -339,9 +339,21 @@ class Api {
 
     public function nationalities(): Collection {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url."/ica/rest/baseadmin/staatsangehoerigkeit")['data'])->map(function($gender) {
-            return Nationality::fromNami($gender);
-        });
+        $url = $this->url."/ica/rest/baseadmin/staatsangehoerigkeit";
+        $response = $this->http()->get($url);
+
+        if ($response->json()['success'] === true) {
+            return collect($response['data'])->map(function($nationality) {
+                return Nationality::fromNami($nationality);
+            });
+        } else {
+            $e = new NamiException('Fetch von Nationalität fehlgeschlagen');
+            $e->setData([
+                'response' => $response->body(),
+                'url' => $url
+            ]);
+            throw $e;
+        }
     }
 
     public function countries() {
