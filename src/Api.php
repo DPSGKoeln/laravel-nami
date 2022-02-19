@@ -13,7 +13,6 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Log;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
-use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
@@ -169,11 +168,19 @@ class Api {
         return collect($r->json()['data']);
     }
 
-    public function subactivitiesOf($activityId) {
+    public function subactivitiesOf(int $activityId): Collection
+    {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId)->json()['data'])->map(function($subactivity) {
+        $url = $this->url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId;
+        $response = $this->http()->get($url);
+
+        if ($response['success'] === false) {
+            $this->exception('Getting subactivities failed', $url, $response->json());
+        }
+
+        return collect($response['data'])->map(function($subactivity) {
             return Subactivity::fromNami($subactivity);
-        });;
+        });
     }
 
     public function membership($memberId, $membershipId) {
@@ -232,15 +239,17 @@ class Api {
     public function createCourse(int $memberId, array $payload): int
     {
         $this->assertLoggedIn();
-        $response = $this->http()->post($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}", [
+        $url = $this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}";
+        $payload = [
             'bausteinId' => $payload['course_id'],
             'vstgName' => $payload['event_name'],
             'vstgTag' => Carbon::parse($payload['completed_at'])->format('Y-m-d').'T00:00:00',
             'veranstalter' => $payload['organizer'],
-        ]);
+        ];
+        $response = $this->http()->post($url, $payload);
 
         if (data_get($response->json(), 'success') !== true) {
-            $this->exception('Course creation failed', $payload, $response->json());
+            $this->exception('Course creation failed', $url, $response->json(), $payload);
         }
 
         return $response['data'];
@@ -255,25 +264,28 @@ class Api {
     public function updateCourse(int $memberId, int $courseId, array $payload): void
     {
         $this->assertLoggedIn();
-        $response = $this->http()->put($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", [
+        $url = $this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}";
+        $payload = [
             'bausteinId' => $payload['course_id'],
             'vstgName' => $payload['event_name'],
             'vstgTag' => Carbon::parse($payload['completed_at'])->format('Y-m-d').'T00:00:00',
             'veranstalter' => $payload['organizer'],
-        ]);
+        ];
+        $response = $this->http()->put($url, $payload);
 
         if (data_get($response->json(), 'success') !== true) {
-            $this->exception('Course update failed', $payload, $response->json());
+            $this->exception('Course update failed', $url, $response->json(), $payload);
         }
     }
 
     public function deleteCourse(int $memberId, int $courseId): void
     {
         $this->assertLoggedIn();
-        $response = $this->http()->delete($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}");
+        $url = $this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}";
+        $response = $this->http()->delete($url);
 
         if ($response->json() !== null && data_get($response->json(), 'success') !== true) {
-            $this->exception('Course deletion failed', [], $response->json());
+            $this->exception('Course deletion failed', $url, $response->json());
         }
     }
 
@@ -292,16 +304,11 @@ class Api {
             return $this->singleMemberFallback($groupId, $memberId);
         }
 
-        if ($response->json()['success'] === true) {
-            return $response->json()['data'];
-        } else {
-            $e = new NamiException('Fetch von Mitglied fehlgeschlagen');
-            $e->setData([
-                'response' => $response->body(),
-                'url' => $url
-            ]);
-            throw $e;
+        if ($response->json()['success'] !== true) {
+            $this->exception('Fetching member failed', $url, $response->json());
         }
+
+        return $response->json()['data'];
     }
 
     public function hasGroup($groupId): bool {
@@ -342,18 +349,13 @@ class Api {
         $url = $this->url."/ica/rest/baseadmin/staatsangehoerigkeit";
         $response = $this->http()->get($url);
 
-        if ($response->json()['success'] === true) {
-            return collect($response['data'])->map(function($nationality) {
-                return Nationality::fromNami($nationality);
-            });
-        } else {
-            $e = new NamiException('Fetch von Nationalität fehlgeschlagen');
-            $e->setData([
-                'response' => $response->body(),
-                'url' => $url
-            ]);
-            throw $e;
+        if ($response->json()['success'] !== true) {
+            $this->exception("Fetch von Nationalität fehlgeschlagen", $url, $response->json());
         }
+
+        return collect($response['data'])->map(function($nationality) {
+            return Nationality::fromNami($nationality);
+        });
     }
 
     public function countries() {
@@ -416,7 +418,7 @@ class Api {
         $member = collect($response['data'])->first(function($member) use ($memberId) {
             return $member['id'] == $memberId;
         });
-        
+
         $member = collect($member)->mapWithKeys(function($value, $key) {
             return [ str_replace('entries_', '', $key) => $value ];
         });
@@ -425,8 +427,9 @@ class Api {
         return $member->toArray();
     }
 
-    private function exception($message, $request, $response) {
-        throw (new NamiException($message))->response($response)->request($request);
+    private function exception(string $message, string $url, array $response, array $requestData = []): void
+    {
+        throw (new NamiException($message))->response($response)->request($url, $requestData);
     }
 
     private function assertLoggedIn(): void

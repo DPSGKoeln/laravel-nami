@@ -7,25 +7,32 @@ use Illuminate\Validation\ValidationException;
 
 class NamiException extends \Exception {
 
-    private $data;
-    public $response;
-    public $request;
+    private array $data;
+    private array $response;
+    private string $requestUrl;
 
-    public function setData($data) {
+    public function setData(array $data): self
+    {
         $this->data = $data;
-    }
-
-    public function getData() {
-        return $this->data;
-    }
-
-    public function request($request) {
-        $this->request = $request;
 
         return $this;
     }
 
-    public function response($response) {
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function request(string $url, ?array $data = []): self
+    {
+        $this->requestUrl = $url;
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function response(array $response): self
+    {
         $this->response = $response;
 
         return $this;
@@ -34,8 +41,9 @@ class NamiException extends \Exception {
     public function report(): void
     {
         \Log::error($this->getMessage(), [
-            'request' => $this->request,
-            'response' => $this->response
+            'requestUrl' => $this->requestUrl,
+            'data' => $this->data,
+            'response' => json_encode($this->response),
         ]);
 
         throw ValidationException::withMessages(['id' => 'Unbekannter Fehler']);

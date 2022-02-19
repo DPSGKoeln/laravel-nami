@@ -8,6 +8,7 @@ use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Fakes\CourseFake;
 use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class CourseTest extends TestCase
@@ -99,6 +100,21 @@ class CourseTest extends TestCase
         $this->expectException(LoginException::class);
 
         Nami::login(12345, 'secret')->coursesFor(11111);
+    }
+
+    public function test_throw_exception_when_storing_failed(): void
+    {
+        $this->expectException(NamiException::class);
+        Auth::success(12345, 'secret');
+        app(CourseFake::class)->createFailed(123);
+        Nami::login(12345, 'secret');
+
+        Nami::createCourse(123, [
+            'event_name' => '::event::',
+            'completed_at' => '2021-01-02 00:00:00',
+            'organizer' => '::org::',
+            'course_id' => 456
+        ]);
     }
 
 }
