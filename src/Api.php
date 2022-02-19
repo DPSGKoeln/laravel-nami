@@ -174,7 +174,11 @@ class Api {
         $url = $this->url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId;
         $response = $this->http()->get($url);
 
-        if ($response['success'] === false) {
+        if ($response->json() === null) {
+            return collect([]);
+        }
+
+        if (data_get($response, 'success') === false) {
             $this->exception('Getting subactivities failed', $url, $response->json());
         }
 

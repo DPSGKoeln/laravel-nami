@@ -54,17 +54,17 @@ class PullActivitiesTest extends TestCase
     {
         $this->expectException(NamiException::class);
         app(SubactivityFake::class)->fetchFails(4, 'sorry dude');
-        Http::fake([
-            'https://nami.dpsg.de/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/4' => Http::response($this->fakeJson('subactivities-4.json'), 200)
-        ]);
+
+        $subactivities = $this->login()->subactivitiesOf(4);
+    }
+
+    public function test_continue_if_subactivities_request_returns_html(): void
+    {
+        app(SubactivityFake::class)->fetchFailsWithoutJson(4);
 
         $subactivities = $this->login()->subactivitiesOf(4);
 
-        $this->assertSame([
-            [ 'name' => 'Biber', 'id' => 40 ],
-            [ 'name' => 'Wölfling', 'id' => 30 ]
-        ], $subactivities->toArray());
-        Http::assertSentCount(3);
+        $this->assertCount(0, $subactivities);
     }
 
 }

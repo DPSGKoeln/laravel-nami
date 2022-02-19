@@ -15,4 +15,9 @@ abstract class Fake {
         ]));
     }
 
+    public function htmlResponse(): PromiseInterface
+    {
+        return Http::response('<html></html>');
+    }
+
 }

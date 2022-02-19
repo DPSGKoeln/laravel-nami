@@ -16,4 +16,13 @@ class SubactivityFake extends Fake {
         });
     }
 
+    public function fetchFailsWithoutJson(int $activityId): void
+    {
+        Http::fake(function($request) use ($activityId) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId) {
+                return $this->htmlResponse();
+            }
+        });
+    }
+
 }
