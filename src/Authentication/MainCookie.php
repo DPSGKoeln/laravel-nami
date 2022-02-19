@@ -23,6 +23,7 @@ class MainCookie extends Authenticator {
             unlink($file);
         }
 
+        $cookieFile = $this->newFileName();
         $this->http()->get($this->url.'/ica/pages/login.jsp');
         $response = $this->http()->asForm()->post($this->url.'/ica/rest/nami/auth/manual/sessionStartup', [
             'Login' => 'API',
@@ -37,7 +38,7 @@ class MainCookie extends Authenticator {
             throw $e;
         }
 
-        $this->cookie->save($this->newFileName());
+        $this->cookie->save($cookieFile);
 
         return $this;
     }
