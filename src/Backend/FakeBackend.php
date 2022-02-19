@@ -37,6 +37,27 @@ class FakeBackend {
     }
 
     /**
+     * @param array $data
+     */
+    public function fakeGroups(array $data): self
+    {
+        Http::fake(function($request) use ($data) {
+            if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root') {
+                $data = collect($data)->mapWithKeys(fn ($group, $id) => 
+                $content = [
+                    'success' => true,
+                    'data' => $data,
+                    'responseType' => 'OK',
+                    'totalEntries' => 1,
+                ];
+                return Http::response(json_encode($content) ?: '{}', 200);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
      * @param array<int, array{name: string, id: int}> $data
      */
     public function fakeNationalities(array $data): self

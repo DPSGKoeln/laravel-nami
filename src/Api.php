@@ -319,6 +319,7 @@ class Api {
     }
 
     public function nationalities(): Collection {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url."/ica/rest/baseadmin/staatsangehoerigkeit")['data'])->map(function($gender) {
             return Nationality::fromNami($gender);
         });
