@@ -42,6 +42,7 @@ class PullMembershipsTest extends TestCase
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/68' => Http::response($this->fakeJson('membership-68.json'), 200),
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/69' => Http::response($this->fakeJson('membership-69.json'), 200)
         ]);
+        $this->login();
 
         $member = new Member(['id' => 16]);
 
@@ -62,6 +63,7 @@ class PullMembershipsTest extends TestCase
         Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/flist' => Http::response($error, 200)
         ]);
+        $this->login();
 
         $member = new Member(['id' => 16]);
 

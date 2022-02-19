@@ -18,6 +18,7 @@ class PushMembershipsTest extends TestCase
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16/flist' => Http::response($this->fakeJson('membership-overview.json'), 200),
             'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/16' => Http::response($this->fakeJson('membership-create.json'), 200),
         ]);
+        $this->login();
 
         $member = new Member(['id' => 16]);
         $id = $member->putMembership([

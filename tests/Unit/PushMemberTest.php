@@ -53,6 +53,7 @@ class PushMemberTest extends TestCase
         Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('{"success": true, "data": {"id": 16}}', 200),
         ]);
+        $this->login();
 
         $res = Nami::putMember(array_merge($this->attributes[0], $overwrites));
         $this->assertEquals(16, $res['id']);

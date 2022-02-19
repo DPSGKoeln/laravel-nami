@@ -35,6 +35,7 @@ class Api {
 
     public function findNr(int $nr): Member
     {
+        $this->assertLoggedIn();
         return $this->find(['mitgliedsNummber' => $nr]);
     }
 
@@ -43,6 +44,7 @@ class Api {
      */
     public function find(array $payload): ?Member
     {
+        $this->assertLoggedIn();
         return $this->search($payload)->first();
     }
 
@@ -52,6 +54,7 @@ class Api {
      */
     public function search(array $payload): LazyCollection
     {
+        $this->assertLoggedIn();
         return LazyCollection::make(function() use ($payload) {
             $page = 1;
             while (!isset ($totalEntries) || ($page-1) * 100 + 1 <= $totalEntries) {
@@ -73,6 +76,7 @@ class Api {
     }
 
     public function deleteMember($id) {
+        $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/mglschaft-beenden';
         $payload = [
             'id' => $id,
@@ -99,10 +103,12 @@ class Api {
     }
 
     public function membersOf($groupId): Collection {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist')->json()['data']);
     }
 
     public function putMember(array $attributes) {
+        $this->assertLoggedIn();
         $member = Member::fromAttributes($attributes);
         $existing = $this->member($member->group_id, $member->id);
         if (data_get($attributes, 'id')) {
@@ -129,6 +135,7 @@ class Api {
 
     public function putMembership(int $memberId, array $data): int
     {
+        $this->assertLoggedIn();
         if (data_get($data, 'id')) {
             $url = $this->url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$data['id']}";
             $response = $this->http()->put($url, $data);
@@ -148,6 +155,7 @@ class Api {
     }
 
     public function membershipsOf($memberId): Collection {
+        $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
 
         $r = $this->http()->get($url);
@@ -162,12 +170,14 @@ class Api {
     }
 
     public function subactivitiesOf($activityId) {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId)->json()['data'])->map(function($subactivity) {
             return Subactivity::fromNami($subactivity);
         });;
     }
 
     public function membership($memberId, $membershipId) {
+        $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
         $response = $this->http()->get($url);
 
@@ -182,6 +192,7 @@ class Api {
 
     public function courses(): Collection
     {
+        $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/module/baustein';
         $response = $this->http()->get($url);
 
@@ -243,6 +254,7 @@ class Api {
      */
     public function updateCourse(int $memberId, int $courseId, array $payload): void
     {
+        $this->assertLoggedIn();
         $response = $this->http()->put($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", [
             'bausteinId' => $payload['course_id'],
             'vstgName' => $payload['event_name'],
@@ -257,6 +269,7 @@ class Api {
 
     public function deleteCourse(int $memberId, int $courseId): void
     {
+        $this->assertLoggedIn();
         $response = $this->http()->delete($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}");
 
         if ($response->json() !== null && data_get($response->json(), 'success') !== true) {
@@ -265,6 +278,7 @@ class Api {
     }
 
     public function member($groupId, $memberId) {
+        $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);
 
@@ -291,28 +305,33 @@ class Api {
     }
 
     public function hasGroup($groupId): bool {
+        $this->assertLoggedIn();
         return $this->groups()->search(function($group) use ($groupId) {
             return $group->id == $groupId;
         }) !== false;
     }
 
     public function groups($parentGroupId = null): Collection {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroupId ?: 'root'))->json()['data'])->map(function($group) use ($parentGroupId) {
             return Group::fromResponse($group, $parentGroupId);
         });
     }
 
     public function group($groupId): Group {
+        $this->assertLoggedIn();
         return $this->groups()->first(function($group) use ($groupId) {
             return $group->id == $groupId;
         });
     }
 
     public function subgroupsOf($groupId) {
+        $this->assertLoggedIn();
         return $this->groups($groupId);
     }
 
     public function genders(): Collection {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url."/ica/rest/baseadmin/geschlecht")['data'])->map(function($gender) {
             return Gender::fromNami($gender);
         })->filter(fn($gender) => !$gender->isNull);
@@ -326,12 +345,14 @@ class Api {
     }
 
     public function countries() {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url."/ica/rest/baseadmin/land")['data'])->map(function($country) {
             return Country::fromNami($country);
         });
     }
 
     public function regions() {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url."/ica/rest/baseadmin/region")['data'])->map(function($region) {
             return Region::fromNami($region);
         });
@@ -339,18 +360,21 @@ class Api {
 
 
     public function feesOf($groupid) {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url."/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupid}")['data'])->map(function($fee) {
             return Fee::fromNami($fee);
         });
     }
 
     public function confessions(): Collection {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url."/ica/rest/baseadmin/konfession")['data'])->map(function($gender) {
             return Confession::fromNami($gender);
         });
     }
 
     public function activities($groupId) {
+        $this->assertLoggedIn();
         return collect($this->http()->get($this->url."/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/".$groupId)['data'])->map(function($activity) {
             return Activity::fromNami($activity);
         });
@@ -358,6 +382,7 @@ class Api {
 
     public function memberOverviewOf(int $groupId): Collection
     {
+        $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
         $response = $this->http()->get($url);
 
@@ -372,6 +397,7 @@ class Api {
     }
 
     private function singleMemberFallback($groupId, $memberId) {
+        $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
         $response = $this->http()->get($url);
 
