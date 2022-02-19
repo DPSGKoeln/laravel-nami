@@ -53,7 +53,7 @@ class PullActivitiesTest extends TestCase
     public function test_throw_error_when_subactivities_request_fails(): void
     {
         $this->expectException(NamiException::class);
-        app(SubactivityFake::class)->fetchFailed(4, 'sorry dude');
+        app(SubactivityFake::class)->fetchFails(4, 'sorry dude');
         Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/4' => Http::response($this->fakeJson('subactivities-4.json'), 200)
         ]);

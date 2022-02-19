@@ -4,9 +4,11 @@ namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Fakes\MemberFake;
 use Zoomyboy\LaravelNami\Group;
 use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\NamiServiceProvider;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
@@ -175,6 +177,14 @@ class PullMemberTest extends TestCase
         $this->assertSame($values[0], $member->toArray()[$key]);
 
         Http::assertSentCount(3);
+    }
+
+    public function test_member_fetch_can_fail(): void
+    {
+        $this->expectException(NamiException::class);
+        app(MemberFake::class)->fetchFails(103, 16);
+
+        $this->login()->member(103, 16);
     }
 
 }
