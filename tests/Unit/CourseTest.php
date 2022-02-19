@@ -44,6 +44,48 @@ class CourseTest extends TestCase
         Http::assertSentCount(2);
     }
 
+    public function test_it_needs_login_to_get_courses(): void
+    {
+        app(CourseFake::class)->forMember(11111, [
+            ['bausteinId' => 506, 'id' => 788, 'veranstalter' => 'KJA', 'vstgName' => 'eventname', 'vstgTag' => '2021-11-12 00:00:00']
+        ]);
+        $this->expectException(NotAuthenticatedException::class);
+
+        Nami::coursesFor(11111);
+    }
+
+    public function test_store_a_course(): void
+    {
+        Auth::success(12345, 'secret');
+        app(CourseFake::class)->createsSuccessful(123, 999);
+        Nami::login(12345, 'secret');
+
+        Nami::createCourse(123, [
+            'event_name' => '::event::',
+            'completed_at' => '2021-01-02 00:00:00',
+            'organizer' => '::org::',
+            'course_id' => 456
+        ]);
+
+        app(CourseFake::class)->assertCreated(123, [
+            'bausteinId' => 456,
+            'veranstalter' => '::org::',
+            'vstgName' => '::event::',
+            'vstgTag' => '2021-01-02T00:00:00',
+        ]);
+    }
+
+    public function test_needs_login_to_store_a_course(): void
+    {
+        $this->expectException(NotAuthenticatedException::class);
+        Nami::createCourse(123, [
+            'event_name' => '::event::',
+            'completed_at' => '2021-01-02 00:00:00',
+            'organizer' => '::org::',
+            'course_id' => 456
+        ]);
+    }
+
     public function test_needs_login(): void
     {
         $this->expectException(NotAuthenticatedException::class);

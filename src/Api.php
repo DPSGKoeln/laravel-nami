@@ -220,6 +220,7 @@ class Api {
      */
     public function createCourse(int $memberId, array $payload): int
     {
+        $this->assertLoggedIn();
         $response = $this->http()->post($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}", [
             'bausteinId' => $payload['course_id'],
             'vstgName' => $payload['event_name'],
