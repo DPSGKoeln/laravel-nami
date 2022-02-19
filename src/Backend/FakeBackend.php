@@ -14,9 +14,6 @@ use Zoomyboy\LaravelNami\Fakes\LoginFake;
 
 class FakeBackend {
 
-    /**
-     * @param string $mglnr
-     */
     public function fakeLogin(string $mglnr): self
     {
         app(LoginFake::class)->succeeds($mglnr);

@@ -3,12 +3,17 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Authentication\Auth;
 use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Nami;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class LoginTest extends TestCase
 {
+
+    public string $successJson = '{"servicePrefix":null,"methodCall":null,"response":null,"statusCode":0,"statusMessage":"","apiSessionName":"JSESSIONID","apiSessionToken":"ILBY--L4pZEjSKa39tCemens","minorNumber":2,"majorNumber":1}';
+    public string $bruteJson = '{"servicePrefix":null,"methodCall":null,"response":null,"statusCode":3000,"statusMessage":"Die höchste Anzahl von Login-Versuchen wurde erreicht. Ihr Konto ist für 15 Minuten gesperrt worden. Nach Ablauf dieser Zeitspanne wird ihr Zugang wieder freigegeben.","apiSessionName":"JSESSIONID","apiSessionToken":"tGlSpMMij9ruHfeiUYjO7SD2","minorNumber":0,"majorNumber":0}';
+    public string $wrongCredentialsJson = '{"servicePrefix":null,"methodCall":null,"response":null,"statusCode":3000,"statusMessage":"Benutzer nicht gefunden oder Passwort falsch.","apiSessionName":"JSESSIONID","apiSessionToken":"v7lrjgPBbXInJR57qJzVIJ05","minorNumber":0,"majorNumber":0}';
 
     public function test_first_successful_login(): void
     {
@@ -86,6 +91,32 @@ class LoginTest extends TestCase
         Nami::login(12345, 'secret');
 
         Http::assertSentCount(2);
+    }
+
+    public function test_it_fakes_login(): void
+    {
+        Auth::fake();
+        Auth::success(12345, 'secret');
+        Auth::assertNotLoggedIn();
+
+        Nami::login(12345, 'secret');
+
+        Auth::assertLoggedInWith(12345, 'secret');
+        Auth::assertLoggedIn();
+        Auth::assertNotLoggedInWith(12345, 'wrong');
+        Http::assertSentCount(0);
+    }
+
+    public function test_it_fakes_failed_login(): void
+    {
+        Auth::fake();
+        Auth::failed(12345, 'wrong');
+        $this->expectException(LoginException::class);
+
+        Nami::login(12345, 'wrong');
+
+        Http::assertSentCount(0);
+        Auth::assertNotLoggedIn();
     }
 
     private function fakeSuccessfulLogin(): array

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Log;
-use Zoomyboy\LaravelNami\Authentication\Cookie;
+use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Backend\Backend;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
@@ -21,15 +21,15 @@ use Zoomyboy\LaravelNami\NamiException;
 class Api {
 
     public string $url = 'https://nami.dpsg.de';
-    private Cookie $cookie;
+    private Authenticator $authenticator;
 
-    public function __construct(Cookie $cookie)
+    public function __construct(Authenticator $authenticator)
     {
-        $this->cookie = $cookie;
+        $this->authenticator = $authenticator;
     }
 
     public function http(): PendingRequest {
-        return Http::withOptions(['cookies' => $this->cookie->load()]);
+        return $this->authenticator->http();
     }
 
     public function findNr(int $nr): Member
@@ -87,27 +87,7 @@ class Api {
 
     public function login(int $mglnr, string $password): self
     {
-        if ($this->cookie->isLoggedIn()) {
-            return $this;
-        }
-
-        $this->cookie->beforeLogin();
-
-        $this->http()->get($this->url.'/ica/pages/login.jsp');
-        $response = $this->http()->asForm()->post($this->url.'/ica/rest/nami/auth/manual/sessionStartup', [
-            'Login' => 'API',
-            'redirectTo' => './app.jsp',
-            'username' => $mglnr,
-            'password' => $password
-        ]);
-
-        if ($response->json()['statusCode'] !== 0) {
-            $e = new LoginException();
-            $e->setResponse($response->json());
-            throw $e;
-        }
-
-        $this->cookie->afterLogin();
+        $this->authenticator->login($mglnr, $password);
 
         return $this;
     }

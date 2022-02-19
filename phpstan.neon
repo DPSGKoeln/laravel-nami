@@ -10,9 +10,4 @@ parameters:
     # The level 8 is the highest level
     level: 6
 
-    ignoreErrors:
-        - '#Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable::api\(\)#'
-        - '#Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable::getNamiGroupId\(\)#'
-        - '#Illuminate\\Contracts\\Auth\\Authenticatable\|null given#'
-
     checkMissingIterableValueType: false

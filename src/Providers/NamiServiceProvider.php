@@ -7,6 +7,8 @@ use GuzzleHttp\Cookie\CookieJarInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Zoomyboy\LaravelNami\Api;
+use Zoomyboy\LaravelNami\Authentication\Authenticator;
+use Zoomyboy\LaravelNami\Authentication\MainCookie;
 use Zoomyboy\LaravelNami\Authentication\NamiGuard;
 use Zoomyboy\LaravelNami\Backend\LiveBackend;
 use Zoomyboy\LaravelNami\Cookies\CacheCookie;
@@ -22,6 +24,9 @@ class NamiServiceProvider extends ServiceProvider
     }
 
     public function register() {
+        $this->app->bind(Authenticator::class, function() {
+            return app(MainCookie::class);
+        });
         $this->app->bind('nami.api', function() {
             return app(Api::class);
         });
