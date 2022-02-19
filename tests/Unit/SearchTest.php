@@ -5,10 +5,12 @@ namespace Zoomyboy\LaravelNami\Tests\Unit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Fakes\SearchFake;
 use Zoomyboy\LaravelNami\Group;
 use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Member;
 use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\NamiServiceProvider;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
@@ -55,6 +57,14 @@ class SearchTest extends TestCase
         });
 
         Http::assertSentCount(1);
+    }
+
+    public function test_it_throws_exception_when_search_fails(): void
+    {
+        $this->withoutExceptionHandling()->expectException(NamiException::class);
+        app(SearchFake::class)->fetchFails($page = 1, $start = 0, 'unknown error');
+
+        $this->login()->search([])->first();
     }
 
     private function url(array $payload): string

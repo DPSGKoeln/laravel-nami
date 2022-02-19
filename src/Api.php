@@ -60,10 +60,10 @@ class Api {
                 $start = ($page-1) * 100;
                 $url = $this->url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode((object) $payload) ?: '{}').'&page='.$page.'&start='.$start.'&limit=100';
                 $response = $this->http()->get($url);
-                $totalEntries = $response->json()['totalEntries'];
                 if ($response->json()['success'] !== true) {
-                    $this->exception('Search failed', ['url' => $url], $response->json());
+                    $this->exception('Search failed', $url, $response->json(), ['page' => $page, 'start' => $start]);
                 }
+                $totalEntries = $response->json()['totalEntries'];
                 foreach ($response->json()['data'] as $member) {
                     yield Member::fromNami(collect($member)->mapWithKeys(function($value, $key) {
                         return [ str_replace('entries_', '', (string) $key) => $value ];
