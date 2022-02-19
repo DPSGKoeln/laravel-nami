@@ -10,7 +10,6 @@ use Zoomyboy\LaravelNami\LoginException;
 
 class MainCookie extends Authenticator {
 
-    private string $path = __DIR__.'/../../.cookies';
     private FileCookieJar $cookie;
     private string $url = 'https://nami.dpsg.de';
 
@@ -59,7 +58,7 @@ class MainCookie extends Authenticator {
 
     private function newFileName(): string
     {
-        return $this->path.'/'.time().'.txt';
+        return parent::$path.'/'.time().'.txt';
     }
 
     private function isExpired(): bool
@@ -76,7 +75,7 @@ class MainCookie extends Authenticator {
      */
     private function file(): ?string
     {
-        $files = glob($this->path.'/*');
+        $files = glob(parent::$path.'/*');
 
         if (!count($files)) {
             return null;

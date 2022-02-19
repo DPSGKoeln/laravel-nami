@@ -57,12 +57,12 @@ class LoginTest extends TestCase
 
         Nami::login(12345, 'secret');
 
-        $this->assertFileExists(__DIR__.'/../../.cookies/'.time().'.txt');
+        $this->assertFileExists(__DIR__.'/../../.cookies_test/'.time().'.txt');
     }
 
     public function test_dont_login_if_cookie_exists(): void
     {
-        touch(__DIR__.'/../../.cookies/'.time().'.txt');
+        touch(__DIR__.'/../../.cookies_test/'.time().'.txt');
 
         Nami::login(12345, 'secret');
 
@@ -72,19 +72,19 @@ class LoginTest extends TestCase
     public function test_delete_expired_cookie_before_login(): void
     {
         $lastLogin = now()->subHours(2)->timestamp;
-        touch(__DIR__."/../../.cookies/{$lastLogin}.txt");
+        touch(__DIR__."/../../.cookies_test/{$lastLogin}.txt");
         Http::fake($this->fakeSuccessfulLogin());
 
         Nami::login(12345, 'secret');
 
         Http::assertSentCount(2);
-        $this->assertFileDoesNotExist(__DIR__."/../../.cookies/{$lastLogin}.txt");
+        $this->assertFileDoesNotExist(__DIR__."/../../.cookies_test/{$lastLogin}.txt");
     }
 
     public function test_login_once_if_cookie_is_expired(): void
     {
         $lastLogin = now()->subHour()->subMinutes(10)->timestamp;
-        touch(__DIR__."/../../.cookies/{$lastLogin}.txt");
+        touch(__DIR__."/../../.cookies_test/{$lastLogin}.txt");
         Http::fake($this->fakeSuccessfulLogin());
 
         Nami::login(12345, 'secret');

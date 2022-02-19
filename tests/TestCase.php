@@ -4,7 +4,9 @@ namespace Zoomyboy\LaravelNami\Tests;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Zoomyboy\LaravelNami\Api;
+use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Cookies\Cookie;
 use Zoomyboy\LaravelNami\Cookies\FakeCookie;
 use Zoomyboy\LaravelNami\Nami;
@@ -17,7 +19,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->clearCookies();
+        $this->setupCookies();
     }
 
     protected function getPackageProviders($app)
@@ -37,14 +39,16 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     public function login(): Api
     {
-        touch (__DIR__.'/../.cookies/'.time().'.txt');
+        touch (__DIR__.'/../.cookies_test/'.time().'.txt');
 
         return Nami::login(123, 'secret');
     }
 
-    private function clearCookies(): void
+    private function setupCookies(): void
     {
-        foreach (glob(__DIR__.'/../.cookies/*') as $file) {
+        Authenticator::setPath(__DIR__.'/../.cookies_test');
+
+        foreach (glob(__DIR__.'/../.cookies_test/*') as $file) {
             unlink($file);
         }
     }
