@@ -74,7 +74,8 @@ class Api {
         });
     }
 
-    public function deleteMember($id) {
+    public function deleteMember(int $id): void
+    {
         $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/mglschaft-beenden';
         $payload = [
@@ -85,7 +86,7 @@ class Api {
         $response = $this->http()->asForm()->post($url, $payload);
 
         if ($response['success'] !== true) {
-            $this->exception('Deleting member failed', ['url' => $url, 'post' => $payload], $response->json());
+            $this->exception('Deleting member failed', $url, $response->json(), $payload);
         }
     }
 
@@ -101,12 +102,17 @@ class Api {
         return $this->authenticator->isLoggedIn();
     }
 
-    public function membersOf($groupId): Collection {
+    public function membersOf(int $groupId): Collection
+    {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist')->json()['data']);
+        return $this->fetchCollection(
+            '/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist',
+            'Member fetch failed'
+        );
     }
 
-    public function putMember(array $attributes) {
+    public function putMember(array $attributes): array
+    {
         $this->assertLoggedIn();
         $member = Member::fromAttributes($attributes);
         $existing = $this->member($member->group_id, $member->id);
@@ -153,38 +159,24 @@ class Api {
         }
     }
 
-    public function membershipsOf($memberId): Collection {
+    public function membershipsOf(int $memberId): Collection
+    {
         $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
-
-        $r = $this->http()->get($url);
-
-        Logger::http($url, $r, 'Memberships from '.$memberId, ['memberId' => $memberId]);
-
-        if (!isset($r->json()['data'])) {
-            return collect([]);
-        }
-
-        return collect($r->json()['data']);
+        
+        return $this->fetchCollection(
+            '/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist',
+            'Membership fetch failed'
+        );
     }
 
     public function subactivitiesOf(int $activityId): Collection
     {
         $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId;
-        $response = $this->http()->get($url);
 
-        if ($response->json() === null) {
-            return collect([]);
-        }
-
-        if (data_get($response, 'success') === false) {
-            $this->exception('Getting subactivities failed', $url, $response->json());
-        }
-
-        return collect($response['data'])->map(function($subactivity) {
-            return Subactivity::fromNami($subactivity);
-        });
+        return $this->fetchCollection(
+            '/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId,
+            'Fetch subactivities failed'
+        )->map(fn ($subactivity) => Subactivity::fromNami($subactivity));
     }
 
     public function membership($memberId, $membershipId) {
@@ -204,25 +196,19 @@ class Api {
     public function courses(): Collection
     {
         $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/module/baustein';
-        $response = $this->http()->get($url);
 
-        return collect($response->json()['data'])->map(function($course) {
-            return (object) ['name' => $course['descriptor'], 'id' => $course['id']];
-        });
+        return $this->fetchCollection('/ica/rest/module/baustein', 'Fetch courses failed')
+            ->map(fn ($course) => (object) ['name' => $course['descriptor'], 'id' => $course['id']]);
     }
 
     public function coursesFor(int $memberId): Collection
     {
         $this->assertLoggedIn();
-        $url = $this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist";
-        $response = $this->http()->get($url);
 
-        if (!$response->ok() || $response->json()['success'] === false) {
-            throw new RightException('Getting courses for member '.$memberId.' failed');
-        }
-
-        return collect($response->json()['data'])->map(function($course) use ($memberId) {
+        return $this->fetchCollection(
+            "/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist",
+            'Courses fetch failed'
+        )->map(function ($course) use ($memberId) {
             $single = $this->http()->get($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}")['data'];
 
             return (object) [
@@ -315,111 +301,110 @@ class Api {
         return $response->json()['data'];
     }
 
-    public function hasGroup($groupId): bool {
+    public function hasGroup(int $groupId): bool
+    {
         $this->assertLoggedIn();
-        return $this->groups()->search(function($group) use ($groupId) {
-            return $group->id == $groupId;
-        }) !== false;
+        return $this->groups()->search(fn ($group) => $group->id == $groupId) !== false;
     }
 
-    public function groups($parentGroupId = null): Collection {
+    public function groups(int $parentGroupId = null): Collection
+    {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url.'/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroupId ?: 'root'))->json()['data'])->map(function($group) use ($parentGroupId) {
-            return Group::fromResponse($group, $parentGroupId);
-        });
+       
+        return $this->fetchCollection(
+            '/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroupId ?: 'root'),
+            'Group fetch failed'
+        )->map(fn ($group) => Group::fromResponse($group, $parentGroupId));
     }
 
-    public function group($groupId): Group {
+    public function group(int $groupId): ?Group {
         $this->assertLoggedIn();
-        return $this->groups()->first(function($group) use ($groupId) {
-            return $group->id == $groupId;
-        });
+
+        return $this->groups()->first(fn ($group) => $group->id == $groupId);
     }
 
-    public function subgroupsOf($groupId) {
+    public function subgroupsOf(int $groupId): Collection
+    {
         $this->assertLoggedIn();
         return $this->groups($groupId);
     }
 
-    public function genders(): Collection {
+    public function genders(): Collection
+    {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url."/ica/rest/baseadmin/geschlecht")['data'])->map(function($gender) {
-            return Gender::fromNami($gender);
-        })->filter(fn($gender) => !$gender->isNull);
+
+        return $this
+            ->fetchCollection('/ica/rest/baseadmin/geschlecht', 'Gender fetch failed')
+            ->map(fn($gender) => Gender::fromNami($gender))
+            ->filter(fn($gender) => !$gender->isNull);
     }
 
-    public function nationalities(): Collection {
+    public function nationalities(): Collection
+    {
         $this->assertLoggedIn();
-        $url = $this->url."/ica/rest/baseadmin/staatsangehoerigkeit";
-        $response = $this->http()->get($url);
 
-        if ($response->json()['success'] !== true) {
-            $this->exception("Fetch von Nationalität fehlgeschlagen", $url, $response->json());
-        }
-
-        return collect($response['data'])->map(function($nationality) {
-            return Nationality::fromNami($nationality);
-        });
+        return $this->fetchCollection('/ica/rest/baseadmin/staatsangehoerigkeit', 'Fetch nationalities failed')
+            ->map(fn ($nationality) => Nationality::fromNami($nationality));
     }
 
-    public function countries() {
+    public function countries(): Collection
+    {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url."/ica/rest/baseadmin/land")['data'])->map(function($country) {
-            return Country::fromNami($country);
-        });
+
+        return $this->fetchCollection('/ica/rest/baseadmin/land', 'Fetch countries failed')
+            ->map(fn ($country) => Country::fromNami($country));
     }
 
-    public function regions() {
+    public function regions(): Collection
+    {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url."/ica/rest/baseadmin/region")['data'])->map(function($region) {
-            return Region::fromNami($region);
-        });
+
+        return $this->fetchCollection('/ica/rest/baseadmin/region', 'Fetch regions failed')
+            ->map(fn ($region) => Region::fromNami($region));
     }
 
 
-    public function feesOf($groupid) {
+    public function feesOf(int $groupid): Collection
+    {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url."/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupid}")['data'])->map(function($fee) {
-            return Fee::fromNami($fee);
-        });
+
+        return $this->fetchCollection("/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupid}", 'Fetch fees failed')
+            ->map(fn ($fee) => Fee::fromNami($fee));
     }
 
     public function confessions(): Collection {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url."/ica/rest/baseadmin/konfession")['data'])->map(function($gender) {
-            return Confession::fromNami($gender);
-        });
+
+        return $this->fetchCollection("/ica/rest/baseadmin/konfession", 'Fetch confessions failed')
+            ->map(fn ($confession) => Confession::fromNami($confession));
     }
 
     public function activities($groupId) {
         $this->assertLoggedIn();
-        return collect($this->http()->get($this->url."/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/".$groupId)['data'])->map(function($activity) {
-            return Activity::fromNami($activity);
-        });
+
+        return $this->fetchCollection("/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/{$groupId}", 'Fetch activities failed')
+            ->map(fn ($activity) => Activity::fromNami($activity));
     }
 
     public function memberOverviewOf(int $groupId): Collection
     {
         $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
-        $response = $this->http()->get($url);
+        return $this->fetchCollection('/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist', 'Fetch membership overview failed')
+            ->map(function($member) use ($groupId) {
+                $member = collect($member)->mapWithKeys(function($value, $key) {
+                    return [ str_replace('entries_', '', $key) => $value ];
+                });
+                $member['gruppierungId'] = $groupId;
 
-        return collect($response['data'])->map(function($member) use ($groupId) {
-            $member = collect($member)->mapWithKeys(function($value, $key) {
-                return [ str_replace('entries_', '', $key) => $value ];
+                return $member;
             });
-            $member['gruppierungId'] = $groupId;
-
-            return $member;
-        });
     }
 
-    private function singleMemberFallback($groupId, $memberId) {
+    private function singleMemberFallback(int $groupId, int $memberId): array
+    {
         $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist';
-        $response = $this->http()->get($url);
 
-        $member = collect($response['data'])->first(function($member) use ($memberId) {
+        $member = $this->fetchCollection('/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist', 'Fetch single member fallback failed')->first(function($member) use ($memberId) {
             return $member['id'] == $memberId;
         });
 
@@ -443,6 +428,29 @@ class Api {
         if (!$this->isLoggedIn()) {
             throw new NotAuthenticatedException('You need to login first');
         }
+    }
+
+    private function fetchCollection(string $url, string $error): Collection
+    {
+        $response = $this->http()->get($this->url.$url);
+
+        if ($response->json() === null) {
+            return collect([]);
+        }
+
+        if (data_get($response, 'message') && Str::contains($response['message'], 'no right')) {
+            return collect([]);
+        }
+
+        if (data_get($response, 'message') && Str::contains($response['message'], 'Sicherheitsverletzung')) {
+            return collect([]);
+        }
+
+        if ($response['success'] === false) {
+            $this->exception($error, $url, $response->json());
+        }
+
+        return collect($response['data']);
     }
 
 }

@@ -7,9 +7,31 @@ use Illuminate\Support\Facades\Http;
 
 class GroupFake extends Fake {
 
-    public function get(array $data): void
+    public function fetches(?int $parent = null, array $data): self
     {
-        $this->fakeResponse(null, $data);
+        $this->fakeResponse($parent, $data);
+
+        return $this;
+    }
+
+    public function failsToFetch(int $parentId = null, ?string $error = 'wrong message'): void
+    {
+        $url = 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentId ?: 'root');
+        Http::fake(function($request) use ($url, $error) {
+            if ($request->url() === $url) {
+                return $this->errorResponse($error);
+            }
+        });
+    }
+
+    public function failsToFetchWithoutJson(int $parentId = null, ?string $error = 'wrong message'): void
+    {
+        $url = 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentId ?: 'root');
+        Http::fake(function($request) use ($url, $error) {
+            if ($request->url() === $url) {
+                return $this->htmlResponse();
+            }
+        });
     }
 
     private function fakeResponse(?int $parentId = null, array $data): void
@@ -24,10 +46,6 @@ class GroupFake extends Fake {
                 ]) ?: '{}', 200);
             }
         });
-
-        foreach ($data as $id => $group) {
-            $this->fakeResponse($id, data_get($group, 'children', []));
-        }
     }
 
     public function assertRootFetched(): void
