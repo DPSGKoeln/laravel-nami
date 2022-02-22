@@ -36,7 +36,7 @@ class MembershipFake extends Fake {
         Http::fake(function($request) use ($memberId, $data) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$data['id'];
             if ($request->url() === $url && $request->method() === 'GET') {
-                return $this->data(array_merge([
+                return $this->dataResponse(array_merge([
                     "id" => 68,
                     "gruppierung" => "Diözesanleitung Köln 100000",
                     "gruppierungId" => 103,

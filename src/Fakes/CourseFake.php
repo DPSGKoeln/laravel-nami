@@ -7,42 +7,90 @@ use Illuminate\Support\Facades\Http;
 
 class CourseFake extends Fake {
 
-    public function forMember(int $memberId, array $data): void
-    {
-        Http::fake(function($request) use ($memberId, $data) {
-            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist") {
-                return Http::response(json_encode([
-                    'success' => true,
-                    'totalEntries' => collect($data)->count(),
-                    'data' => collect($data)->map(fn ($course) => ['id' => $course['id']]),
-                ]) ?: '{}', 200);
-            }
+    private array $defaults = [
+        'bausteinId' => 506,
+        'veranstalter' => 'KJA',
+        'vstgName' => 'eventname',
+        'vstgTag' => '2021-11-12 00:00:00'
+    ];
 
-            foreach ($data as $course) {
-                if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}") {
-                    return Http::response(json_encode([
-                        'success' => true,
-                        'data' => $course,
-                    ]) ?: '{}', 200);
-                }
+    /**
+     * @param int $memberId
+     * @param array<int> $ids
+     *
+     * @return self
+     */
+    public function fetches(int $memberId, array $ids): self
+    {
+        Http::fake(function($request) use ($memberId, $ids) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist") {
+                return $this->collection(collect($ids)->map(fn ($id) => ['id' => $id]));
             }
         });
+
+        return $this;
     }
 
-    public function createsSuccessful(int $memberId, int $courseId): void
+    public function fetchesWithHtml(int $memberId): self
+    {
+        Http::fake(function($request) use ($memberId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist") {
+                return $this->htmlResponse();
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param int $memberId
+     * @param array<string, mixed> $data
+     *
+     * @return self
+     */
+    public function fetchesSingle(int $memberId, array $data): self
+    {
+        Http::fake(function($request) use ($memberId, $data) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$data['id']}") {
+                return $this->dataResponse(array_merge($this->defaults, $data));
+            }
+        });
+
+        return $this;
+    }
+
+    public function failsFetchingSingle(int $memberId, int $courseId, string $error = 'Error'): self
+    {
+        Http::fake(function($request) use ($memberId, $courseId, $error) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}") {
+                return $this->errorResponse($error);
+            }
+        });
+
+        return $this;
+    }
+
+    public function fetchesSingleWithHtml(int $memberId, int $courseId): self
+    {
+        Http::fake(function($request) use ($memberId, $courseId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}") {
+                return $this->htmlResponse();
+            }
+        });
+
+        return $this;
+    }
+
+    public function createsSuccessfully(int $memberId, int $courseId): void
     {
         Http::fake(function($request) use ($memberId, $courseId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}" && $request->method() === 'POST') {
-                return Http::response([
-                    'data' => $courseId,
-                    'responseType' => 'OK',
-                    'success' => true,
-                ], 200);
+                return $this->idResponse($courseId);
             }
         });
     }
 
-    public function updatesSuccessful(int $memberId, int $courseId): void
+    public function updatesSuccessfully(int $memberId, int $courseId): void
     {
         Http::fake(function($request) use ($memberId, $courseId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}" && $request->method() === 'PUT') {
@@ -81,10 +129,7 @@ class CourseFake extends Fake {
         });
     }
 
-    /**
-     * @todo migrate this to parent errorResponse
-     */
-    public function createFailed(int $memberId): void
+    public function createFails(int $memberId): void
     {
         Http::fake(function($request) use ($memberId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}") {
@@ -93,11 +138,11 @@ class CourseFake extends Fake {
         });
     }
 
-    public function doesntUpdateWithError(int $memberId, int $courseId): void
+    public function doesntUpdateWithError(int $memberId, int $courseId, string $error = "Error"): void
     {
-        Http::fake(function($request) use ($memberId, $courseId) {
+        Http::fake(function($request) use ($memberId, $courseId, $error) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}" && $request->method() === 'PUT') {
-                return Http::response('{"success":false,"data":null,"responseType":"EXCEPTION","message":"Unexpected Error javax.ejb.EJBException","title":null}', 200);
+                return $this->errorResponse($error);
             }
         });
     }
@@ -140,6 +185,22 @@ class CourseFake extends Fake {
         Http::assertSent(function($request) use ($memberId, $courseId) {
             return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/${courseId}"
                 && $request->method() === 'DELETE';
+        });
+    }
+
+    public function assertFetched(int $memberId): void
+    {
+        Http::assertSent(function($request) use ($memberId) {
+            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist"
+                && $request->method() === 'GET';
+        });
+    }
+
+    public function assertFetchedSingle(int $memberId, int $courseId): void
+    {
+        Http::assertSent(function($request) use ($memberId, $courseId) {
+            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}"
+                && $request->method() === 'GET';
         });
     }
 

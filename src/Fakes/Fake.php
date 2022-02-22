@@ -20,15 +20,24 @@ abstract class Fake {
     {
         return Http::response(json_encode([
             'success' => true,
+            'totalEntries' => $collection->count(),
             'data' => $collection->toArray(),
         ]));
     }
 
-    public function data(array $data): PromiseInterface
+    public function dataResponse(array $data): PromiseInterface
     {
         return Http::response(json_encode([
             'success' => true,
             'data' => $data,
+        ]));
+    }
+
+    public function idResponse(int $id): PromiseInterface
+    {
+        return Http::response(json_encode([
+            'success' => true,
+            'data' => $id,
         ]));
     }
 

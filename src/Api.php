@@ -209,16 +209,16 @@ class Api {
             "/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist",
             'Courses fetch failed'
         )->map(function ($course) use ($memberId) {
-            $single = $this->http()->get($this->url."/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}")['data'];
+            $single = $this->fetchData("/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}", "Error fetching single course");
 
-            return (object) [
+            return $single ? (object) [
                 'id' => $single['id'],
                 'organizer' => $single['veranstalter'],
                 'course_id' => $single['bausteinId'],
                 'event_name' => $single['vstgName'],
                 'completed_at' => $single['vstgTag'],
-            ];
-        });
+            ] : null;
+        })->filter(fn ($course) => $course !== null);
     }
 
     /**
@@ -451,6 +451,29 @@ class Api {
         }
 
         return collect($response['data']);
+    }
+
+    private function fetchData(string $url, string $error): ?array
+    {
+        $response = $this->http()->get($this->url.$url);
+
+        if ($response->json() === null) {
+            return null;
+        }
+
+        if (data_get($response, 'message') && Str::contains($response['message'], 'no right')) {
+            return null;
+        }
+
+        if (data_get($response, 'message') && Str::contains($response['message'], 'Sicherheitsverletzung')) {
+            return null;
+        }
+
+        if ($response['success'] === false) {
+            $this->exception($error, $url, $response->json());
+        }
+
+        return $response['data'];
     }
 
 }
