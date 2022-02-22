@@ -3,14 +3,14 @@
 namespace Zoomyboy\LaravelNami\Authentication;
 
 use Carbon\Carbon;
-use GuzzleHttp\Cookie\FileCookieJar;
+use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\LoginException;
 
 class MainCookie extends Authenticator {
 
-    private FileCookieJar $cookie;
+    private CookieJar $cookie;
     private string $url = 'https://nami.dpsg.de';
     private ?int $mglnr = null;
     private ?string $password = null;
@@ -28,7 +28,6 @@ class MainCookie extends Authenticator {
             unlink($file);
         }
 
-        $cookieFile = $this->newFileName();
         $this->http()->get($this->url.'/ica/pages/login.jsp');
         $response = $this->http()->asForm()->post($this->url.'/ica/rest/nami/auth/manual/sessionStartup', [
             'Login' => 'API',
@@ -43,7 +42,7 @@ class MainCookie extends Authenticator {
             throw $e;
         }
 
-        $this->cookie->save($cookieFile);
+        file_put_contents($this->newFileName(), $this->cookie->getCookieByName('JSESSIONID')->getValue());
 
         return $this;
     }
@@ -78,7 +77,7 @@ class MainCookie extends Authenticator {
     {
         $lastLoginTime = Carbon::createFromTimestamp(pathinfo($this->file(), PATHINFO_FILENAME));
 
-        return $lastLoginTime->addMinutes(50)->isPast();
+        return $lastLoginTime->addMinutes(3)->isPast();
     }
 
     /**
@@ -100,13 +99,19 @@ class MainCookie extends Authenticator {
     /**
      * Loads the cookie for a new request
      *
-     * @return FileCookieJar
+     * @return CookieJar
      */
-    private function load(): FileCookieJar
+    private function load(): CookieJar
     {
-        $cookieFile = $this->file() ?: $this->newFileName();
+        if ($this->file()) {
+            $data = file_get_contents($this->file());
 
-        return $this->cookie = new FileCookieJar($cookieFile, true);
+            return $this->cookie = CookieJar::fromArray([
+                'JSESSIONID' => $data,
+            ], 'nami.dpsg.de');
+        }
+
+        return $this->cookie = new CookieJar();
     }
 
 }
