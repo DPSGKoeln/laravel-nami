@@ -31,7 +31,7 @@ class CourseFake extends Fake {
         return $this;
     }
 
-    public function fetchesWithHtml(int $memberId): self
+    public function failsFetchingWithHtml(int $memberId): self
     {
         Http::fake(function($request) use ($memberId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist") {
@@ -70,7 +70,7 @@ class CourseFake extends Fake {
         return $this;
     }
 
-    public function fetchesSingleWithHtml(int $memberId, int $courseId): self
+    public function failsFetchingSingleWithHtml(int $memberId, int $courseId): self
     {
         Http::fake(function($request) use ($memberId, $courseId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}") {
@@ -103,7 +103,7 @@ class CourseFake extends Fake {
         });
     }
 
-    public function deleteSuccessful(int $memberId, int $courseId): void
+    public function deletesSuccessfully(int $memberId, int $courseId): void
     {
         Http::fake(function($request) use ($memberId, $courseId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}" && $request->method() === 'DELETE') {
@@ -116,7 +116,7 @@ class CourseFake extends Fake {
         });
     }
 
-    public function deleteFailed(int $memberId, int $courseId): void
+    public function failsDeleting(int $memberId, int $courseId): void
     {
         Http::fake(function($request) use ($memberId, $courseId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}" && $request->method() === 'DELETE') {
@@ -129,7 +129,7 @@ class CourseFake extends Fake {
         });
     }
 
-    public function createFails(int $memberId): void
+    public function failsCreating(int $memberId): void
     {
         Http::fake(function($request) use ($memberId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}") {
@@ -138,7 +138,7 @@ class CourseFake extends Fake {
         });
     }
 
-    public function doesntUpdateWithError(int $memberId, int $courseId, string $error = "Error"): void
+    public function failsUpdating(int $memberId, int $courseId, string $error = "Error"): void
     {
         Http::fake(function($request) use ($memberId, $courseId, $error) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}" && $request->method() === 'PUT') {

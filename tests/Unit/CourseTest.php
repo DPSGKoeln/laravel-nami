@@ -64,7 +64,7 @@ class CourseTest extends TestCase
         Auth::success(12345, 'secret');
         app(CourseFake::class)
             ->fetches(11111, [788, 789])
-            ->fetchesSingleWithHtml(11111, 788)
+            ->failsFetchingSingleWithHtml(11111, 788)
             ->fetchesSingle(11111, ['id' => 789]);
 
         $courses = Nami::login(12345, 'secret')->coursesFor(11111);
@@ -75,7 +75,7 @@ class CourseTest extends TestCase
     public function test_return_empty_when_course_index_returns_html(): void
     {
         Auth::success(12345, 'secret');
-        app(CourseFake::class)->fetchesWithHtml(11111);
+        app(CourseFake::class)->failsFetchingWithHtml(11111);
 
         $courses = Nami::login(12345, 'secret')->coursesFor(11111);
 
@@ -145,7 +145,7 @@ class CourseTest extends TestCase
     {
         $this->expectException(NamiException::class);
         Auth::success(12345, 'secret');
-        app(CourseFake::class)->doesntUpdateWithError(123, 999);
+        app(CourseFake::class)->failsUpdating(123, 999);
 
         Nami::login(12345, 'secret')->updateCourse(123, 999, [
             'event_name' => '::event::',
@@ -180,7 +180,7 @@ class CourseTest extends TestCase
     {
         $this->expectException(NamiException::class);
         Auth::success(12345, 'secret');
-        app(CourseFake::class)->createFails(123);
+        app(CourseFake::class)->failsCreating(123);
         Nami::login(12345, 'secret');
 
         Nami::createCourse(123, [
@@ -189,6 +189,25 @@ class CourseTest extends TestCase
             'organizer' => '::org::',
             'course_id' => 456
         ]);
+    }
+
+    public function test_delete_a_course(): void
+    {
+        Auth::success(12345, 'secret');
+        app(CourseFake::class)->deletesSuccessfully(123, 999);
+
+        Nami::login(12345, 'secret')->deleteCourse(123, 999);
+
+        app(CourseFake::class)->assertDeleted(123, 999);
+    }
+
+    public function test_shrow_exception_when_deleting_failed(): void
+    {
+        $this->expectException(NamiException::class);
+        Auth::success(12345, 'secret');
+        app(CourseFake::class)->failsDeleting(123, 999);
+
+        Nami::login(12345, 'secret')->deleteCourse(123, 999);
     }
 
 }
