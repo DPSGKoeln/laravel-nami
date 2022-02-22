@@ -77,7 +77,7 @@ class MainCookie extends Authenticator {
     {
         $lastLoginTime = Carbon::createFromTimestamp(pathinfo($this->file(), PATHINFO_FILENAME));
 
-        return $lastLoginTime->addMinutes(3)->isPast();
+        return $lastLoginTime->addMinutes(50)->isPast();
     }
 
     /**
