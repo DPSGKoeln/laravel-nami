@@ -53,4 +53,16 @@ class MembershipFake extends Fake {
         return $this;
     }
 
+    public function failsToShow(int $memberId, int $membershipId, string $error): self
+    {
+        Http::fake(function($request) use ($memberId, $membershipId, $error) {
+            $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
+            if ($request->url() === $url && $request->method() === 'GET') {
+                return $this->errorResponse($error);
+            }
+        });
+
+        return $this;
+    }
+
 }
