@@ -39,4 +39,5 @@ class MemberTest extends TestCase
 
         $this->assertSame([], $member->memberships()->toArray());
     }
+
 }
