@@ -38,9 +38,9 @@ class CourseTest extends TestCase
 
         $this->assertEquals(788, $course->id);
         $this->assertEquals('KJA', $course->organizer);
-        $this->assertEquals(506, $course->course_id);
-        $this->assertEquals('eventname', $course->event_name);
-        $this->assertEquals('2021-11-12 00:00:00', $course->completed_at);
+        $this->assertEquals(506, $course->courseId);
+        $this->assertEquals('eventname', $course->eventName);
+        $this->assertEquals('2021-11-12 00:00:00', $course->completedAt);
 
         app(CourseFake::class)->assertFetched(11111);
         app(CourseFake::class)->assertFetchedSingle(11111, 788);

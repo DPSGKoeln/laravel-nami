@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Log;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
+use Zoomyboy\LaravelNami\Data\Course;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\NamiException;
@@ -198,27 +199,26 @@ class Api {
         $this->assertLoggedIn();
 
         return $this->fetchCollection('/ica/rest/module/baustein', 'Fetch courses failed')
-            ->map(fn ($course) => (object) ['name' => $course['descriptor'], 'id' => $course['id']]);
+            ->map(fn ($course) => (object) ['id' => $course['id']]);
     }
 
+    /**
+     * @return Collection<Course>
+     */
     public function coursesFor(int $memberId): Collection
     {
         $this->assertLoggedIn();
 
-        return $this->fetchCollection(
-            "/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist",
-            'Courses fetch failed'
-        )->map(function ($course) use ($memberId) {
-            $single = $this->fetchData("/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$course['id']}", "Error fetching single course");
+        return $this->fetchCollection("/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist", 'Courses fetch failed')
+            ->map(fn ($course) => $this->course($memberId, $course['id']))
+            ->filter(fn ($course) => $course !== null);
+    }
 
-            return $single ? (object) [
-                'id' => $single['id'],
-                'organizer' => $single['veranstalter'],
-                'course_id' => $single['bausteinId'],
-                'event_name' => $single['vstgName'],
-                'completed_at' => $single['vstgTag'],
-            ] : null;
-        })->filter(fn ($course) => $course !== null);
+    public function course(int $memberId, int $courseId): ?Course
+    {
+        $single = $this->fetchData("/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", "Error fetching single course");
+
+        return $single ? new Course($single) : null;
     }
 
     /**
