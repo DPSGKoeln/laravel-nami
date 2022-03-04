@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Log;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
+use Zoomyboy\LaravelNami\Data\Baustein;
 use Zoomyboy\LaravelNami\Data\Course;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
@@ -199,7 +200,7 @@ class Api {
         $this->assertLoggedIn();
 
         return $this->fetchCollection('/ica/rest/module/baustein', 'Fetch courses failed')
-            ->map(fn ($course) => (object) ['id' => $course['id']]);
+            ->map(fn ($course) => new Baustein($course));
     }
 
     /**
