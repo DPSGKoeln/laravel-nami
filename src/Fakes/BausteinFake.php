@@ -24,4 +24,15 @@ class BausteinFake extends Fake {
         return $this;
     }
 
+    public function failsToFetch(): self
+    {
+        Http::fake(function($request) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/module/baustein") {
+                return $this->errorResponse('error');
+            }
+        });
+
+        return $this;
+    }
+
 }

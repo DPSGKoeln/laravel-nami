@@ -35,4 +35,13 @@ class BausteinTest extends TestCase
         $this->assertEquals('abc', $courses->first()->name);
     }
 
+    public function test_throw_exception_when_baustein_fetching_fails(): void
+    {
+        $this->expectException(NamiException::class);
+        Auth::success(12345, 'secret');
+        app(BausteinFake::class)->failsToFetch();
+
+        Nami::login(12345, 'secret')->courses();
+    }
+
 }
