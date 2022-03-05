@@ -141,18 +141,18 @@ class Api {
         return $response->json()['data'];
     }
 
-    public function putMembership(int $memberId, array $data): int
+    public function putMembership(int $memberId, Membership $data): int
     {
         $this->assertLoggedIn();
-        if (data_get($data, 'id')) {
-            $url = $this->url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$data['id']}";
-            $response = $this->http()->put($url, $data);
+        if ($data->id) {
+            $url = $this->url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$data->id}";
+            $response = $this->http()->put($url, $data->toNami());
         } else {
             $url = $this->url."/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
-            $response = $this->http()->post($url, $data);
+            $response = $this->http()->post($url, $data->toNami());
         }
         if (data_get($response->json(), 'success') !== true) {
-            $this->exception('Update failed', ['url' => $url, 'data' => $data], $response->json());
+            $this->exception('Update failed', $url, $response->json(), $data->toArray());
         }
 
         if (data_get($data, 'id')) {

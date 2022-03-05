@@ -11,7 +11,7 @@ use Zoomyboy\LaravelNami\Casters\NullableCarbonCaster;
 
 class Membership extends DataTransferObject {
 
-    public int $id;
+    public ?int $id;
 
     #[MapFrom('gruppierungId')]
     public int $groupId;
@@ -29,6 +29,30 @@ class Membership extends DataTransferObject {
 
     #[MapFrom('untergliederungId')]
     public int $subactivityId;
+
+    public function toNami(): array
+    {
+        return [
+            'gruppierungId' => $this->groupId,
+            'id' => $this->id,
+            'aktivVon' => $this->startsAt->format('Y-m-d').'T00:00:00',
+            'aktivBis' => $this->endsAt ? $this->endsAt->toDateTimeString() : null,
+            'taetigkeitId' => $this->activityId,
+            'untergliederungId' => $this->subactivityId,
+        ];
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self([
+            'gruppierungId' => data_get($data, 'groupId'),
+            'id' => data_get($data, 'id'),
+            'aktivVon' => data_get($data, 'startsAt'),
+            'aktivBis' => data_get($data, 'endsAt'),
+            'taetigkeitId' => data_get($data, 'activityId'),
+            'untergliederungId' => data_get($data, 'subactivityId'),
+        ]);
+    }
 
 }
 

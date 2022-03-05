@@ -149,14 +149,9 @@ class Member extends Model {
         return Nami::membershipsOf($this->id);
     }
 
-    public function putMembership(array $data): int
+    public function putMembership(Membership $membership): int
     {
-        return Nami::putMembership($this->id, [
-            'gruppierungId' => $data['group_id'],
-            'taetigkeitId' => $data['activity_id'],
-            'untergliederungId' => $data['subactivity_id'],
-            'aktivVon' => $data['starts_at']->format('Y-m-d').'T00:00:00',
-        ]);
+        return Nami::putMembership($this->id, $membership);
     }
 
     public function deleteMembership(int $id): int

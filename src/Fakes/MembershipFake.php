@@ -105,4 +105,38 @@ class MembershipFake extends Fake {
         });
     }
 
+    public function createsSuccessfully(int $memberId, int $membershipId): void
+    {
+        Http::fake(function($request) use ($memberId, $membershipId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}" && $request->method() === 'POST') {
+                return $this->idResponse($membershipId);
+            }
+        });
+    }
+
+    public function assertCreated(int $memberId, array $payload): void
+    {
+        $url =  "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
+        Http::assertSent(function ($request) use ($url, $payload) {
+            if ($request->url() !== $url || $request->method() !== 'POST') {
+                return false;
+            }
+
+            if (
+                data_get($request, 'gruppierungId') !== data_get($payload, 'gruppierungId')
+                && data_get($request, 'id') !== data_get($payload, 'id')
+                && data_get($request, 'taetigkeitId') !== data_get($payload, 'taetigkeitId')
+                && data_get($request, 'untergliederungId') !== data_get($payload, 'untergliederungId')
+            ) {
+                return false;
+            }
+
+            if (data_get($request, 'aktivVon') && $request['aktivVon'] !== data_get($payload, 'aktivVon')) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
 }

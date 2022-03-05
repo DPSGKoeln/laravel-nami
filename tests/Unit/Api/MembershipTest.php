@@ -2,6 +2,7 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit\Api;
 
+use Carbon\Carbon;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
@@ -118,6 +119,30 @@ class MembershipTest extends TestCase
         $membership = $this->login()->membership(16, 68);
 
         $this->assertNull($membership);
+    }
+
+    public function testItCanCreateAMembership(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
+        app(MembershipFake::class)->createsSuccessfully(6, 133);
+
+        $membershipId = $this->login()->putMembership(6, Membership::fromArray([
+            'id' => null,
+            'subactivityId' => 3,
+            'activityId' => 2,
+            'groupId' => 1400,
+            'startsAt' => Carbon::parse('2022-02-03 00:00:00'),
+            'endsAt' => null,
+        ]));
+
+        $this->assertEquals(133, $membershipId);
+        app(MembershipFake::class)->assertCreated(6, [
+            'taetigkeitId' => 2,
+            'untergliederungId' => 3,
+            'aktivVon' => '2022-02-03T00:00:00',
+            'aktivBis' => '',
+            'gruppierungId' => 1400,
+        ]);
     }
 
 }
