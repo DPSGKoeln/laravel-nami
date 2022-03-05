@@ -116,7 +116,7 @@ class FakeBackend {
             $courseFake = app(CourseFake::class)
                 ->fetches($member['id'], collect(data_get($member, 'courses', []))->pluck('id')->toArray());
             foreach (data_get($member, 'courses', []) as $course) {
-                $courseFake->fetchesSingle($member['id'], $course);
+                $courseFake->shows($member['id'], $course);
             }
         }
 
