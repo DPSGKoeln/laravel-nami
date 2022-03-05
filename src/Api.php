@@ -284,7 +284,8 @@ class Api {
         }
     }
 
-    public function member($groupId, $memberId) {
+    public function member(int $groupId, int $memberId): array
+    {
         $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);

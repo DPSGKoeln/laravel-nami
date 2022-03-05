@@ -17,4 +17,16 @@ class MemberFake extends Fake {
         });
     }
 
+    public function shows(int $groupId, int $memberId, array $data): void
+    {
+        Http::fake(function($request) use ($groupId, $memberId, $data) {
+            $url = 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
+            if ($request->url() === $url && $request->method() === 'GET') {
+                return $this->dataResponse(array_merge([
+                    
+                ], $data));
+            }
+        });
+    }
+
 }

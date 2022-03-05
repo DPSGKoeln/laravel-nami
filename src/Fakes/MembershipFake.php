@@ -124,9 +124,9 @@ class MembershipFake extends Fake {
 
             if (
                 data_get($request, 'gruppierungId') !== data_get($payload, 'gruppierungId')
-                && data_get($request, 'id') !== data_get($payload, 'id')
-                && data_get($request, 'taetigkeitId') !== data_get($payload, 'taetigkeitId')
-                && data_get($request, 'untergliederungId') !== data_get($payload, 'untergliederungId')
+                || data_get($request, 'id') !== data_get($payload, 'id')
+                || data_get($request, 'taetigkeitId') !== data_get($payload, 'taetigkeitId')
+                || data_get($request, 'untergliederungId') !== data_get($payload, 'untergliederungId')
             ) {
                 return false;
             }
