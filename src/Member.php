@@ -4,7 +4,9 @@ namespace Zoomyboy\LaravelNami;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 
 class Member extends Model {
@@ -139,20 +141,12 @@ class Member extends Model {
         return parent::setAttribute($key, $value);
     }
 
-    public function memberships() {
-        $memberships = Nami::membershipsOf($this->id);
-
-        return LazyCollection::make(function() use ($memberships) {
-            foreach ($memberships as $membership) {
-                $m = $this->membership($membership['id']);
-
-                if ($m === null) {
-                    continue;
-                }
-
-                yield $m;
-            }
-        });
+    /**
+     * @return Collection<Membership>
+     */
+    public function memberships(): Collection
+    {
+        return Nami::membershipsOf($this->id);
     }
 
     public function putMembership(array $data): int

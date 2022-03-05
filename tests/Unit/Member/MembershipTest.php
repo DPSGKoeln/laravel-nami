@@ -1,6 +1,6 @@
 <?php
 
-namespace Zoomyboy\LaravelNami\Tests\Unit;
+namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
 
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
@@ -8,13 +8,13 @@ use Zoomyboy\LaravelNami\Member;
 use Zoomyboy\LaravelNami\Nami;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
-class MemberTest extends TestCase
+class MembershipTest extends TestCase
 {
 
     public function test_get_memberships_of_a_member(): void
     {
         app(MembershipFake::class)
-            ->fetches(16, [68, 69])
+            ->fetches(16, [68])
             ->shows(16, [
                 "id" => 68,
             ]);
@@ -31,13 +31,13 @@ class MemberTest extends TestCase
      */
     public function test_it_gets_no_memberships_with_no_rights(string $error): void
     {
-        app(MembershipFake::class)->fetchFails(16, $error);
+        app(MembershipFake::class)->failsFetching(16, $error);
         $this->login();
         $member = new Member(['id' => 16]);
 
         $memberships = $member->memberships();
 
-        $this->assertSame([], $member->memberships()->toArray());
+        $this->assertSame([], $memberships->toArray());
     }
 
 }

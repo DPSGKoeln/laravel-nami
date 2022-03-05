@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Zoomyboy\LaravelNami\Api;
+use Zoomyboy\LaravelNami\Authentication\Auth;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Cookies\Cookie;
 use Zoomyboy\LaravelNami\Cookies\FakeCookie;
@@ -39,9 +40,18 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     public function login(): Api
     {
-        touch (__DIR__.'/../.cookies_test/'.time().'.txt');
+        Auth::fake();
+        Auth::success(12345, 'secret');
 
-        return Nami::login(123, 'secret');
+        return Nami::login(12345, 'secret');
+    }
+
+    public function loginWithWrongCredentials(): Api
+    {
+        Auth::fake();
+        Auth::failed(12345, 'wrong');
+
+        return Nami::login(12345, 'wrong');
     }
 
     protected function clearCookies(): void

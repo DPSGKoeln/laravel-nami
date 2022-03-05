@@ -16,6 +16,7 @@ use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
 use Zoomyboy\LaravelNami\Data\Baustein;
 use Zoomyboy\LaravelNami\Data\Course;
+use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\NamiException;
@@ -161,14 +162,20 @@ class Api {
         }
     }
 
+    /**
+     * @return Collection<Membership>
+     */
     public function membershipsOf(int $memberId): Collection
     {
         $this->assertLoggedIn();
-        
-        return $this->fetchCollection(
-            '/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist',
-            'Membership fetch failed'
-        );
+
+        return $this
+            ->fetchCollection(
+                '/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist',
+                'Membership fetch failed'
+            )
+            ->map(fn ($membership) => $this->membership($memberId, $membership['id']))
+            ->filter(fn ($membership) => $membership !== null);
     }
 
     public function subactivitiesOf(int $activityId): Collection
@@ -181,18 +188,15 @@ class Api {
         )->map(fn ($subactivity) => Subactivity::fromNami($subactivity));
     }
 
-    public function membership($memberId, $membershipId) {
+    public function membership($memberId, $membershipId): ?Membership
+    {
         $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
-        $response = $this->http()->get($url);
+        $membership = $this->fetchData(
+            "/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membershipId}",
+            "Fails fetching membership {$membershipId} for {$memberId}",
+        );
 
-        Logger::http($url, $response, 'Single Membership '.$membershipId.' from '.$memberId, ['memberId' => $memberId]);
-
-        if($response->json()['success'] === false && Str::startsWith($response['message'], 'Sicherheitsverletzung')) {
-            throw new RightException('');
-        }
-
-        return $response->json()['data'];
+        return $membership ? new Membership($membership) : null;
     }
 
     public function courses(): Collection

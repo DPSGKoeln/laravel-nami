@@ -48,7 +48,7 @@ class CourseFake extends Fake {
      *
      * @return self
      */
-    public function fetchesSingle(int $memberId, array $data): self
+    public function shows(int $memberId, array $data): self
     {
         Http::fake(function($request) use ($memberId, $data) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$data['id']}") {
@@ -59,7 +59,7 @@ class CourseFake extends Fake {
         return $this;
     }
 
-    public function failsFetchingSingle(int $memberId, int $courseId, string $error = 'Error'): self
+    public function failsShowing(int $memberId, int $courseId, string $error = 'Error'): self
     {
         Http::fake(function($request) use ($memberId, $courseId, $error) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}") {
@@ -70,7 +70,7 @@ class CourseFake extends Fake {
         return $this;
     }
 
-    public function failsFetchingSingleWithHtml(int $memberId, int $courseId): self
+    public function failsShowingWithHtml(int $memberId, int $courseId): self
     {
         Http::fake(function($request) use ($memberId, $courseId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}") {

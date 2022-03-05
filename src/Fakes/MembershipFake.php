@@ -19,12 +19,24 @@ class MembershipFake extends Fake {
         return $this;
     }
 
-    public function fetchFails(int $memberId, string $error): self
+    public function failsFetching(int $memberId, string $error = 'Error'): self
     {
         Http::fake(function($request) use ($memberId, $error) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
             if ($request->url() === $url && $request->method() === 'GET') {
                 return $this->errorResponse($error);
+            }
+        });
+
+        return $this;
+    }
+
+    public function failsFetchingWithHtml(int $memberId): self
+    {
+        Http::fake(function($request) use ($memberId) {
+            $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
+            if ($request->url() === $url && $request->method() === 'GET') {
+                return $this->htmlResponse();
             }
         });
 
@@ -53,7 +65,7 @@ class MembershipFake extends Fake {
         return $this;
     }
 
-    public function failsToShow(int $memberId, int $membershipId, string $error): self
+    public function failsShowing(int $memberId, int $membershipId, ?string $error = 'Error'): self
     {
         Http::fake(function($request) use ($memberId, $membershipId, $error) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
@@ -63,6 +75,34 @@ class MembershipFake extends Fake {
         });
 
         return $this;
+    }
+
+    public function failsShowingWithHtml(int $memberId, int $membershipId): self
+    {
+        Http::fake(function($request) use ($memberId, $membershipId) {
+            $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
+            if ($request->url() === $url && $request->method() === 'GET') {
+                return $this->htmlResponse();
+            }
+        });
+
+        return $this;
+    }
+
+    public function assertFetched(int $memberId): void
+    {
+        Http::assertSent(function($request) use ($memberId) {
+            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/flist"
+                && $request->method() === 'GET';
+        });
+    }
+
+    public function assertFetchedSingle(int $memberId, int $membershipId): void
+    {
+        Http::assertSent(function($request) use ($memberId, $membershipId) {
+            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membershipId}"
+                && $request->method() === 'GET';
+        });
     }
 
 }
