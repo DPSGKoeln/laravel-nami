@@ -13,22 +13,9 @@ use Zoomyboy\LaravelNami\Tests\TestCase;
 class MembershipTest extends TestCase
 {
 
-    public function testGetMembershipsCount(): void
-    {
-        app(MembershipFake::class)
-            ->fetches(6, [10, 11])
-            ->shows(6, ['id' => 10])
-            ->shows(6, ['id' => 11]);
-
-        $memberships = $this->login()->membershipsOf(6);
-
-        $this->assertCount(2, $memberships);
-    }
-
     public function testMembershipIsInstanceOfDto(): void
     {
         app(MembershipFake::class)
-            ->fetches(6, [10])
             ->shows(6, [
                 'id' => 10,
                 'aktivBis' => '',
@@ -38,7 +25,7 @@ class MembershipTest extends TestCase
                 'untergliederungId' => 16,
             ]);
 
-        $membership = $this->login()->membershipsOf(6)->first();
+        $membership = $this->login()->membership(6, 10);
 
         $this->assertInstanceOf(Membership::class, $membership);
         $this->assertSame(10, $membership->id);
@@ -51,62 +38,28 @@ class MembershipTest extends TestCase
 
     public function testFetchesMembership(): void
     {
-        app(MembershipFake::class)
-            ->fetches(6, [10])
-            ->shows(6, ['id' => 10]);
+        app(MembershipFake::class)->shows(6, ['id' => 10]);
 
-        $this->login()->membershipsOf(6);
+        $this->login()->membership(6, 10);
 
-        app(MembershipFake::class)->assertFetched(6);
         app(MembershipFake::class)->assertFetchedSingle(6, 10);
     }
 
     public function testThrowExceptionWhenFetchingFails(): void
     {
-        app(MembershipFake::class)->failsFetching(6);
+        app(MembershipFake::class)->failsShowing(6, 11);
         $this->expectException(NamiException::class);
 
-        $this->login()->membershipsOf(6);
+        $this->login()->membership(6, 11);
     }
 
     public function testReturnsNothingWhenFetchingFailsWithHtml(): void
     {
-        app(MembershipFake::class)->failsFetchingWithHtml(6);
+        app(MembershipFake::class)->failsShowingWithHtml(6, 11);
 
-        $memberships = $this->login()->membershipsOf(6);
+        $membership = $this->login()->membership(6, 11);
 
-        $this->assertCount(0, $memberships);
-    }
-
-    public function testThrowExceptionWhenFetchingSingleFails(): void
-    {
-        app(MembershipFake::class)
-            ->fetches(6, [55])
-            ->failsShowing(6, 55);
-        $this->expectException(NamiException::class);
-
-        $this->login()->membershipsOf(6);
-    }
-
-    public function testDontReturnSingleThatReturnsHtml(): void
-    {
-        app(MembershipFake::class)
-            ->fetches(6, [55, 66])
-            ->shows(6, ['id' => 55])
-            ->failsShowingWithHtml(6, 66);
-
-        $memberships = $this->login()->membershipsOf(6);
-
-        $this->assertCount(1, $memberships);
-    }
-
-    public function testItFetchesSingleMembership(): void
-    {
-        app(MembershipFake::class)->shows(16, [ "id" => 68 ]);
-
-        $membership = $this->login()->membership(16, 68);
-
-        $this->assertSame(68, $membership->id);
+        $this->assertNull($membership);
     }
 
     /**

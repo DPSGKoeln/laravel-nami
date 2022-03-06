@@ -17,6 +17,7 @@ use Zoomyboy\LaravelNami\Concerns\IsNamiMember;
 use Zoomyboy\LaravelNami\Data\Baustein;
 use Zoomyboy\LaravelNami\Data\Course;
 use Zoomyboy\LaravelNami\Data\Membership;
+use Zoomyboy\LaravelNami\Data\MembershipEntry;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\NamiException;
@@ -163,7 +164,7 @@ class Api {
     }
 
     /**
-     * @return Collection<Membership>
+     * @return Collection<MembershipEntry>
      */
     public function membershipsOf(int $memberId): Collection
     {
@@ -174,8 +175,7 @@ class Api {
                 '/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist',
                 'Membership fetch failed'
             )
-            ->map(fn ($membership) => $this->membership($memberId, $membership['id']))
-            ->filter(fn ($membership) => $membership !== null);
+            ->map(fn ($membership) => new MembershipEntry($membership));
     }
 
     public function subactivitiesOf(int $activityId): Collection
@@ -188,7 +188,7 @@ class Api {
         )->map(fn ($subactivity) => Subactivity::fromNami($subactivity));
     }
 
-    public function membership($memberId, $membershipId): ?Membership
+    public function membership(int $memberId, int $membershipId): ?Membership
     {
         $this->assertLoggedIn();
         $membership = $this->fetchData(

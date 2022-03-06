@@ -12,7 +12,19 @@ class MembershipFake extends Fake {
         Http::fake(function($request) use ($memberId, $membershipIds) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
             if ($request->url() === $url && $request->method() === 'GET') {
-                return $this->collection(collect($membershipIds)->map(fn ($membershipId) => ['id' => $membershipId]));
+                return $this->collection(collect($membershipIds)->map(function ($membership) {
+                    return [
+                        ...[
+                            'entries_aktivBis' => '2021-02-04 00:00:00',
+                            'entries_aktivVon' => '2021-02-03 00:00:00',
+                            'entries_untergliederung' => '::unter::',
+                            'entries_taetigkeit' => 'Leiter (6)',
+                            'id' => 55,
+                            'entries_gruppierung' => '::group::',
+                        ],
+                        ...(is_array($membership) ? $membership : ['id' => $membership])
+                    ];
+                }));
             }
         });
 
