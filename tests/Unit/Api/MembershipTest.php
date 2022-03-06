@@ -23,6 +23,7 @@ class MembershipTest extends TestCase
                 'gruppierungId' => 1000,
                 'taetigkeitId' => 15,
                 'untergliederungId' => 16,
+                'gruppierung' => '::group::',
             ]);
 
         $membership = $this->login()->membership(6, 10);
@@ -34,6 +35,7 @@ class MembershipTest extends TestCase
         $this->assertSame(1000, $membership->groupId);
         $this->assertSame(15, $membership->activityId);
         $this->assertSame(16, $membership->subactivityId);
+        $this->assertSame('::group::', $membership->group);
     }
 
     public function testFetchesMembership(): void

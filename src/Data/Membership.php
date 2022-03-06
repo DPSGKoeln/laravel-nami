@@ -30,6 +30,9 @@ class Membership extends DataTransferObject {
     #[MapFrom('untergliederungId')]
     public int $subactivityId;
 
+    #[MapFrom('gruppierung')]
+    public ?string $group;
+
     public function toNami(): array
     {
         return [
