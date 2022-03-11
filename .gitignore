@@ -6,3 +6,4 @@ tags
 .cookies
 .cookies_test
 /.phpunit.result.cache
+/.php-cs-fixer.cache
