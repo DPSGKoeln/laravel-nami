@@ -39,7 +39,7 @@ class Membership extends DataTransferObject
             'gruppierungId' => $this->groupId,
             'id' => $this->id,
             'aktivVon' => $this->startsAt->format('Y-m-d').'T00:00:00',
-            'aktivBis' => $this->endsAt ? $this->endsAt->toDateTimeString() : null,
+            'aktivBis' => $this->endsAt ? $this->endsAt->format('Y-m-d').'T00:00:00' : null,
             'taetigkeitId' => $this->activityId,
             'untergliederungId' => $this->subactivityId,
         ];

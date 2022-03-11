@@ -96,4 +96,59 @@ class MembershipTest extends TestCase
             'gruppierungId' => 1400,
         ]);
     }
+
+    public function testItCanDeleteAMembership(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
+        app(MembershipFake::class)->deletesSuccessfully(6, 133);
+
+        $this->login()->deleteMembership(6, Membership::fromArray([
+            'id' => 133,
+            'subactivityId' => 3,
+            'activityId' => 2,
+            'groupId' => 1400,
+            'startsAt' => Carbon::parse('2022-02-03 00:00:00'),
+            'endsAt' => null,
+        ]));
+
+        app(MembershipFake::class)->assertDeleted(6, 133);
+    }
+
+    public function testItSetsAMembershipsEndDateWhenDeletingFails(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
+        app(MembershipFake::class)->failsDeleting(6, 133);
+        app(MembershipFake::class)->updatesSuccessfully(6, 133);
+
+        $this->login()->deleteMembership(6, Membership::fromArray([
+            'id' => 133,
+            'subactivityId' => 3,
+            'activityId' => 2,
+            'groupId' => 1400,
+            'startsAt' => Carbon::parse('2022-02-03 00:00:00'),
+            'endsAt' => null,
+        ]));
+
+        app(MembershipFake::class)->assertUpdated(6, [
+            'aktivBis' => '2022-02-03T00:00:00',
+            'id' => 133,
+        ]);
+    }
+
+    public function testItDoesntUpdateMembershipWhenNoIdGiven(): void
+    {
+        $this->expectException(NamiException::class);
+        Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
+        app(MembershipFake::class)->failsDeleting(6, null);
+        app(MembershipFake::class)->updatesSuccessfully(6, null);
+
+        $this->login()->deleteMembership(6, Membership::fromArray([
+            'id' => null,
+            'subactivityId' => 3,
+            'activityId' => 2,
+            'groupId' => 1400,
+            'startsAt' => Carbon::parse('2022-02-03 00:00:00'),
+            'endsAt' => null,
+        ]));
+    }
 }

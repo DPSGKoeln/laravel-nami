@@ -176,6 +176,21 @@ class Api
             ->map(fn ($membership) => new MembershipEntry($membership));
     }
 
+    public function deleteMembership(int $memberId, Membership $membership): void
+    {
+        $this->assertLoggedIn();
+
+        try {
+            $this->delete("/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membership->id}", 'Deleting membership failed');
+        } catch (NamiException $e) {
+            if (is_null($membership->id)) {
+                throw new NamiException('ID not given in membership');
+            }
+            $membership->endsAt = today();
+            $this->putMembership($memberId, $membership);
+        }
+    }
+
     public function subactivitiesOf(int $activityId): Collection
     {
         $this->assertLoggedIn();
@@ -478,5 +493,18 @@ class Api
         }
 
         return $response['data'];
+    }
+
+    private function delete(string $url, string $error): void
+    {
+        $response = $this->http()->delete($this->url.$url);
+
+        if (null === $response->json()) {
+            $this->exception($error, $url, $response->json());
+        }
+
+        if (false === $response['success']) {
+            $this->exception($error, $url, $response->json());
+        }
     }
 }

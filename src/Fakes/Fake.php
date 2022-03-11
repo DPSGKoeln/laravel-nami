@@ -41,6 +41,14 @@ abstract class Fake
         ]));
     }
 
+    public function nullResponse(): PromiseInterface
+    {
+        return Http::response(json_encode([
+            'success' => true,
+            'data' => null,
+        ]));
+    }
+
     public function htmlResponse(): PromiseInterface
     {
         return Http::response('<html></html>');
