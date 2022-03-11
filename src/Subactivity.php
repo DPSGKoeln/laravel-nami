@@ -2,30 +2,34 @@
 
 namespace Zoomyboy\LaravelNami;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 
-class Subactivity extends Model {
-
+class Subactivity extends Model
+{
     protected $guarded = [];
 
-    public static function fromNami($item) {
+    public static function fromNami($item)
+    {
         $item = collect($item)
             ->only(['descriptor', 'id'])
-            ->mapWithKeys(function($item,$key) {
-                if ($key == 'id') { return ['id' => $item]; }
+            ->mapWithKeys(function ($item, $key) {
+                if ('id' == $key) {
+                    return ['id' => $item];
+                }
+
                 return ['name' => $item];
             })->toArray();
 
-        return (new self($item));
+        return new self($item);
     }
 
-    public function getNameAttribute() {
+    public function getNameAttribute()
+    {
         return ucfirst($this->attributes['name']);
     }
 
-    public function getIsNullAttribute() {
+    public function getIsNullAttribute()
+    {
         return $this->attributes['id'] == self::getNullValue();
     }
-
 }

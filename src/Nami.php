@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool isLoggedIn()
  * @method static \Zoomyboy\LaravelNami\Api fake()
  */
-class Nami extends Facade {
-
-    protected static function getFacadeAccessor() { return 'nami.api'; }
-
+class Nami extends Facade
+{
+    protected static function getFacadeAccessor()
+    {
+        return 'nami.api';
+    }
 }

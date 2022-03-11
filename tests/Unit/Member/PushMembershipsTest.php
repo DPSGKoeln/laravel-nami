@@ -7,13 +7,11 @@ use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
 use Zoomyboy\LaravelNami\Member;
-use Zoomyboy\LaravelNami\Nami;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PushMembershipsTest extends TestCase
 {
-
-    public function test_create_a_membership(): void
+    public function testCreateAMembership(): void
     {
         Carbon::setTestNow(Carbon::parse('2021-02-03 06:00:00'));
         app(MembershipFake::class)->createsSuccessfully(16, 65);
@@ -36,5 +34,4 @@ class PushMembershipsTest extends TestCase
             'gruppierungId' => 150,
         ]);
     }
-
 }

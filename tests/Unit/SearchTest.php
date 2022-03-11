@@ -2,21 +2,13 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Fakes\SearchFake;
-use Zoomyboy\LaravelNami\Group;
-use Zoomyboy\LaravelNami\LoginException;
-use Zoomyboy\LaravelNami\Member;
-use Zoomyboy\LaravelNami\Nami;
 use Zoomyboy\LaravelNami\NamiException;
-use Zoomyboy\LaravelNami\NamiServiceProvider;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class SearchTest extends TestCase
 {
-
     public array $attributes = [
         [
             'firstname' => 'Max',
@@ -32,7 +24,7 @@ class SearchTest extends TestCase
             'group_id' => 103,
             'gender_id' => null,
             'id' => 17,
-        ]
+        ],
     ];
 
     public function dataProvider(): array
@@ -42,7 +34,7 @@ class SearchTest extends TestCase
         ];
     }
 
-    public function test_find_a_member_by_mglnr(): void
+    public function testFindAMemberByMglnr(): void
     {
         Http::fake([
             $this->url(['mitgliedsNummber' => 150]) => Http::response($this->fakeJson('searchResponse.json'), 200),
@@ -51,15 +43,15 @@ class SearchTest extends TestCase
         $member = $this->login()->findNr(150);
 
         $this->assertEquals('Philipp', $member->firstname);
-        Http::assertSent(function($request) {
+        Http::assertSent(function ($request) {
             return $request->url() == $this->url(['mitgliedsNummber' => 150])
-                && $request->method() == 'GET';
+                && 'GET' == $request->method();
         });
 
         Http::assertSentCount(1);
     }
 
-    public function test_it_throws_exception_when_search_fails(): void
+    public function testItThrowsExceptionWhenSearchFails(): void
     {
         $this->withoutExceptionHandling()->expectException(NamiException::class);
         app(SearchFake::class)->fetchFails($page = 1, $start = 0, 'unknown error');
@@ -73,5 +65,4 @@ class SearchTest extends TestCase
 
         return "https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues={$payload}&page=1&start=0&limit=100";
     }
-
 }

@@ -6,8 +6,8 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
-abstract class Fake {
-
+abstract class Fake
+{
     public function errorResponse(string $error): PromiseInterface
     {
         return Http::response(json_encode([
@@ -45,5 +45,4 @@ abstract class Fake {
     {
         return Http::response('<html></html>');
     }
-
 }

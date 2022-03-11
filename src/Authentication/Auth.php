@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static void assertNotLoggedInWith(int $mglnr, string $password)
  * @method static void assertLoggedIn()
  */
-class Auth extends Facade {
-
-    public static function getFacadeAccessor() {
+class Auth extends Facade
+{
+    public static function getFacadeAccessor()
+    {
         return Authenticator::class;
     }
 
@@ -24,5 +25,4 @@ class Auth extends Facade {
 
         return $fake;
     }
-
 }

@@ -8,8 +8,8 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\LoginException;
 
-class MainCookie extends Authenticator {
-
+class MainCookie extends Authenticator
+{
     private CookieJar $cookie;
     private string $url = 'https://nami.dpsg.de';
     private ?int $mglnr = null;
@@ -33,10 +33,10 @@ class MainCookie extends Authenticator {
             'Login' => 'API',
             'redirectTo' => './app.jsp',
             'username' => $mglnr,
-            'password' => $password
+            'password' => $password,
         ]);
 
-        if ($response->json()['statusCode'] !== 0) {
+        if (0 !== $response->json()['statusCode']) {
             $e = new LoginException();
             $e->setResponse($response->json());
             throw $e;
@@ -49,11 +49,11 @@ class MainCookie extends Authenticator {
 
     public function isLoggedIn(): bool
     {
-        if ($this->file() === null) {
+        if (null === $this->file()) {
             return false;
         }
 
-        return ! $this->isExpired();
+        return !$this->isExpired();
     }
 
     public function refresh(): void
@@ -81,7 +81,7 @@ class MainCookie extends Authenticator {
     }
 
     /**
-     * Get the cookie file if it exists
+     * Get the cookie file if it exists.
      *
      * @return ?string
      */
@@ -97,9 +97,7 @@ class MainCookie extends Authenticator {
     }
 
     /**
-     * Loads the cookie for a new request
-     *
-     * @return CookieJar
+     * Loads the cookie for a new request.
      */
     private function load(): CookieJar
     {
@@ -113,5 +111,4 @@ class MainCookie extends Authenticator {
 
         return $this->cookie = new CookieJar();
     }
-
 }

@@ -3,11 +3,10 @@
 namespace Zoomyboy\LaravelNami;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class NamiException extends \Exception {
-
+class NamiException extends \Exception
+{
     private array $data;
     private array $response;
     private string $requestUrl;
@@ -52,8 +51,8 @@ class NamiException extends \Exception {
 
     public function outputToConsole(Command $command): void
     {
-        $command->info("Request URL: ".$this->requestUrl);
-        $command->info("response: ".json_encode($this->response));
+        $command->info('Request URL: '.$this->requestUrl);
+        $command->info('response: '.json_encode($this->response));
         $command->info($this->getMessage());
     }
 }

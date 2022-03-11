@@ -2,14 +2,8 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Zoomyboy\LaravelNami\Group;
-use Zoomyboy\LaravelNami\LoginException;
-use Zoomyboy\LaravelNami\Member;
 use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\NamiServiceProvider;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PushMemberTest extends TestCase
@@ -33,10 +27,11 @@ class PushMemberTest extends TestCase
             'joined_at' => '2021-02-02T00:00:00',
             'birthday' => '2021-02-02',
             'id' => 17,
-        ]
+        ],
     ];
 
-    public function dataProvider(): array {
+    public function dataProvider(): array
+    {
         return [
             'firstname' => [['firstname' => 'Max'], ['vorname' => 'Max']],
             'lastname' => [['lastname' => 'Nach1'], ['nachname' => 'Nach1']],
@@ -49,7 +44,8 @@ class PushMemberTest extends TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function test_push_a_single_member(array $overwrites, array $check): void {
+    public function testPushASingleMember(array $overwrites, array $check): void
+    {
         Http::fake([
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('{"success": true, "data": {"id": 16}}', 200),
         ]);
@@ -58,8 +54,8 @@ class PushMemberTest extends TestCase
         $res = Nami::putMember(array_merge($this->attributes[0], $overwrites));
         $this->assertEquals(16, $res['id']);
 
-        Http::assertSent(function($request) use ($check) {
-            if ($request->url() != 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' || $request->method() !== 'PUT') {
+        Http::assertSent(function ($request) use ($check) {
+            if ('https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' != $request->url() || 'PUT' !== $request->method()) {
                 return false;
             }
 
@@ -69,10 +65,9 @@ class PushMemberTest extends TestCase
                 }
             }
 
-            return $request->method() === 'PUT';
+            return 'PUT' === $request->method();
         });
 
         Http::assertSentCount(2);
     }
-
 }

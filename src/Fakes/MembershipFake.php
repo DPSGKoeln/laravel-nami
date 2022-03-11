@@ -2,16 +2,15 @@
 
 namespace Zoomyboy\LaravelNami\Fakes;
 
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
-class MembershipFake extends Fake {
-
+class MembershipFake extends Fake
+{
     public function fetches(int $memberId, array $membershipIds): self
     {
-        Http::fake(function($request) use ($memberId, $membershipIds) {
+        Http::fake(function ($request) use ($memberId, $membershipIds) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
-            if ($request->url() === $url && $request->method() === 'GET') {
+            if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->collection(collect($membershipIds)->map(function ($membership) {
                     return [
                         ...[
@@ -22,7 +21,7 @@ class MembershipFake extends Fake {
                             'id' => 55,
                             'entries_gruppierung' => '::group::',
                         ],
-                        ...(is_array($membership) ? $membership : ['id' => $membership])
+                        ...(is_array($membership) ? $membership : ['id' => $membership]),
                     ];
                 }));
             }
@@ -33,9 +32,9 @@ class MembershipFake extends Fake {
 
     public function failsFetching(int $memberId, string $error = 'Error'): self
     {
-        Http::fake(function($request) use ($memberId, $error) {
+        Http::fake(function ($request) use ($memberId, $error) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
-            if ($request->url() === $url && $request->method() === 'GET') {
+            if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->errorResponse($error);
             }
         });
@@ -45,9 +44,9 @@ class MembershipFake extends Fake {
 
     public function failsFetchingWithHtml(int $memberId): self
     {
-        Http::fake(function($request) use ($memberId) {
+        Http::fake(function ($request) use ($memberId) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist';
-            if ($request->url() === $url && $request->method() === 'GET') {
+            if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->htmlResponse();
             }
         });
@@ -57,19 +56,19 @@ class MembershipFake extends Fake {
 
     public function shows(int $memberId, array $data): self
     {
-        Http::fake(function($request) use ($memberId, $data) {
+        Http::fake(function ($request) use ($memberId, $data) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$data['id'];
-            if ($request->url() === $url && $request->method() === 'GET') {
+            if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->dataResponse(array_merge([
-                    "id" => 68,
-                    "gruppierung" => "Diözesanleitung Köln 100000",
-                    "gruppierungId" => 103,
-                    "taetigkeit" => "ReferentIn",
-                    "taetigkeitId" => 33,
-                    "untergliederung" => "Pfadfinder",
-                    "untergliederungId" => 55,
-                    "aktivVon" => "2017-02-11 00:00:00",
-                    "aktivBis" => "2017-03-11 00:00:00"
+                    'id' => 68,
+                    'gruppierung' => 'Diözesanleitung Köln 100000',
+                    'gruppierungId' => 103,
+                    'taetigkeit' => 'ReferentIn',
+                    'taetigkeitId' => 33,
+                    'untergliederung' => 'Pfadfinder',
+                    'untergliederungId' => 55,
+                    'aktivVon' => '2017-02-11 00:00:00',
+                    'aktivBis' => '2017-03-11 00:00:00',
                 ], $data));
             }
         });
@@ -79,9 +78,9 @@ class MembershipFake extends Fake {
 
     public function failsShowing(int $memberId, int $membershipId, ?string $error = 'Error'): self
     {
-        Http::fake(function($request) use ($memberId, $membershipId, $error) {
+        Http::fake(function ($request) use ($memberId, $membershipId, $error) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
-            if ($request->url() === $url && $request->method() === 'GET') {
+            if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->errorResponse($error);
             }
         });
@@ -91,9 +90,9 @@ class MembershipFake extends Fake {
 
     public function failsShowingWithHtml(int $memberId, int $membershipId): self
     {
-        Http::fake(function($request) use ($memberId, $membershipId) {
+        Http::fake(function ($request) use ($memberId, $membershipId) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/'.$membershipId;
-            if ($request->url() === $url && $request->method() === 'GET') {
+            if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->htmlResponse();
             }
         });
@@ -103,24 +102,24 @@ class MembershipFake extends Fake {
 
     public function assertFetched(int $memberId): void
     {
-        Http::assertSent(function($request) use ($memberId) {
+        Http::assertSent(function ($request) use ($memberId) {
             return $request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/flist"
-                && $request->method() === 'GET';
+                && 'GET' === $request->method();
         });
     }
 
     public function assertFetchedSingle(int $memberId, int $membershipId): void
     {
-        Http::assertSent(function($request) use ($memberId, $membershipId) {
+        Http::assertSent(function ($request) use ($memberId, $membershipId) {
             return $request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membershipId}"
-                && $request->method() === 'GET';
+                && 'GET' === $request->method();
         });
     }
 
     public function createsSuccessfully(int $memberId, int $membershipId): void
     {
-        Http::fake(function($request) use ($memberId, $membershipId) {
-            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}" && $request->method() === 'POST') {
+        Http::fake(function ($request) use ($memberId, $membershipId) {
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}" && 'POST' === $request->method()) {
                 return $this->idResponse($membershipId);
             }
         });
@@ -128,9 +127,9 @@ class MembershipFake extends Fake {
 
     public function assertCreated(int $memberId, array $payload): void
     {
-        $url =  "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
+        $url = "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
         Http::assertSent(function ($request) use ($url, $payload) {
-            if ($request->url() !== $url || $request->method() !== 'POST') {
+            if ($request->url() !== $url || 'POST' !== $request->method()) {
                 return false;
             }
 
@@ -150,5 +149,4 @@ class MembershipFake extends Fake {
             return true;
         });
     }
-
 }

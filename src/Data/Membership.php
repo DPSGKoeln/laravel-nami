@@ -9,8 +9,8 @@ use Spatie\DataTransferObject\DataTransferObject;
 use Zoomyboy\LaravelNami\Casters\CarbonCaster;
 use Zoomyboy\LaravelNami\Casters\NullableCarbonCaster;
 
-class Membership extends DataTransferObject {
-
+class Membership extends DataTransferObject
+{
     public ?int $id;
 
     #[MapFrom('gruppierungId')]
@@ -56,6 +56,4 @@ class Membership extends DataTransferObject {
             'untergliederungId' => data_get($data, 'subactivityId'),
         ]);
     }
-
 }
-

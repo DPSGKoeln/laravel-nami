@@ -2,18 +2,17 @@
 
 namespace Zoomyboy\LaravelNami;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 
-class Country extends Model {
-
+class Country extends Model
+{
     protected $guarded = [];
 
-    public static function fromNami($item) {
+    public static function fromNami($item)
+    {
         return new self([
             'id' => $item['id'],
-            'name' => $item['descriptor']
+            'name' => $item['descriptor'],
         ]);
     }
-
 }

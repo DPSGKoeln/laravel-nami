@@ -2,4 +2,6 @@
 
 namespace Zoomyboy\LaravelNami\Data;
 
-class Baustein extends EnumData { }
+class Baustein extends EnumData
+{
+}

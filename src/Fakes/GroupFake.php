@@ -2,11 +2,10 @@
 
 namespace Zoomyboy\LaravelNami\Fakes;
 
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
-class GroupFake extends Fake {
-
+class GroupFake extends Fake
+{
     public function fetches(?int $parent = null, array $data): self
     {
         $this->fakeResponse($parent, $data);
@@ -17,7 +16,7 @@ class GroupFake extends Fake {
     public function failsToFetch(int $parentId = null, ?string $error = 'wrong message'): void
     {
         $url = 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentId ?: 'root');
-        Http::fake(function($request) use ($url, $error) {
+        Http::fake(function ($request) use ($url, $error) {
             if ($request->url() === $url) {
                 return $this->errorResponse($error);
             }
@@ -27,7 +26,7 @@ class GroupFake extends Fake {
     public function failsToFetchWithoutJson(int $parentId = null, ?string $error = 'wrong message'): void
     {
         $url = 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentId ?: 'root');
-        Http::fake(function($request) use ($url, $error) {
+        Http::fake(function ($request) use ($url) {
             if ($request->url() === $url) {
                 return $this->htmlResponse();
             }
@@ -37,7 +36,7 @@ class GroupFake extends Fake {
     private function fakeResponse(?int $parentId = null, array $data): void
     {
         $url = 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentId ?: 'root');
-        Http::fake(function($request) use ($data, $url) {
+        Http::fake(function ($request) use ($data, $url) {
             if ($request->url() === $url) {
                 return Http::response(json_encode([
                     'success' => true,
@@ -50,15 +49,15 @@ class GroupFake extends Fake {
 
     public function assertRootFetched(): void
     {
-        Http::assertSent(fn ($request) => $request->url() === 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root'
-            && $request->method() === 'GET'
+        Http::assertSent(fn ($request) => 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' === $request->url()
+            && 'GET' === $request->method()
         );
     }
 
     public function assertFetched(int $id): void
     {
         Http::assertSent(fn ($request) => $request->url() === 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.$id
-            && $request->method() === 'GET'
+            && 'GET' === $request->method()
         );
     }
 
@@ -69,5 +68,4 @@ class GroupFake extends Fake {
             'descriptor' => $group['name'],
         ])->values()->toArray();
     }
-
 }

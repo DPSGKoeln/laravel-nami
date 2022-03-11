@@ -2,18 +2,12 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit\Api;
 
-use Carbon\Carbon;
-use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Data\MembershipEntry;
-use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
-use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class MembershipIndexTest extends TestCase
 {
-
     public function testGetMembershipsCount(): void
     {
         app(MembershipFake::class)->fetches(6, [10, 11]);
@@ -46,7 +40,6 @@ class MembershipIndexTest extends TestCase
         $this->assertSame('::unter::', $membership->subactivity);
     }
 
-
     public function testStringsCanBeNull(): void
     {
         app(MembershipFake::class)
@@ -60,6 +53,4 @@ class MembershipIndexTest extends TestCase
         $this->assertNull($membership->endsAt);
         $this->assertNull($membership->subactivity);
     }
-
-
 }

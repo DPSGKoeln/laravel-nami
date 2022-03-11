@@ -4,10 +4,9 @@ namespace Zoomyboy\LaravelNami;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\LazyCollection;
 
-class Group implements Arrayable {
-
+class Group implements Arrayable
+{
     public string $name;
     public int $id;
     public ?int $parentId;
@@ -41,44 +40,50 @@ class Group implements Arrayable {
         return $this;
     }
 
-    public function toArray() {
-        return [ 'id' => $this->id, 'name' => $this->name, 'parent_id' => $this->parentId ];
+    public function toArray()
+    {
+        return ['id' => $this->id, 'name' => $this->name, 'parent_id' => $this->parentId];
     }
 
-    public function subgroups() {
+    public function subgroups()
+    {
         return Nami::subgroupsOf($this->id);
     }
 
-    public function fees() {
+    public function fees()
+    {
         return Nami::feesOf($this->id);
     }
 
-    public function members(): MemberCollection {
+    public function members(): MemberCollection
+    {
         $members = Nami::membersOf($this->id);
 
-        return MemberCollection::make(function() use ($members) {
+        return MemberCollection::make(function () use ($members) {
             foreach ($members as $member) {
                 yield $this->member($member['id']);
             }
         });
-        return new MemberCollection(Nami::membersOf($this->id)->map(function($member) {
+
+        return new MemberCollection(Nami::membersOf($this->id)->map(function ($member) {
             return $this->member($member['id']);
         }));
     }
 
-    public function member(int $id): Member {
+    public function member(int $id): Member
+    {
         return Member::fromNami(Nami::member($this->id, $id));
     }
 
     public function memberOverview(): Collection
     {
-        return Nami::memberOverviewOf($this->id)->map(function($member) {
+        return Nami::memberOverviewOf($this->id)->map(function ($member) {
             return Member::fromNami($member);
         });
     }
 
-    public function activities(): Collection {
+    public function activities(): Collection
+    {
         return Nami::activities($this->id);
     }
-
 }

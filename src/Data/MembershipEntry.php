@@ -10,8 +10,8 @@ use Zoomyboy\LaravelNami\Casters\CarbonCaster;
 use Zoomyboy\LaravelNami\Casters\NullableCarbonCaster;
 use Zoomyboy\LaravelNami\Casters\NullableString;
 
-class MembershipEntry extends DataTransferObject {
-
+class MembershipEntry extends DataTransferObject
+{
     public ?int $id;
 
     #[MapFrom('entries_gruppierung')]
@@ -31,6 +31,4 @@ class MembershipEntry extends DataTransferObject {
     #[MapFrom('entries_untergliederung')]
     #[CastWith(NullableString::class)]
     public ?string $subactivity;
-
 }
-

@@ -5,8 +5,8 @@ namespace Zoomyboy\LaravelNami\Data;
 use Spatie\DataTransferObject\Attributes\MapFrom;
 use Spatie\DataTransferObject\DataTransferObject;
 
-class Course extends DataTransferObject {
-
+class Course extends DataTransferObject
+{
     public int $id;
 
     #[MapFrom('bausteinId')]
@@ -20,5 +20,4 @@ class Course extends DataTransferObject {
 
     #[MapFrom('vstgTag')]
     public string $completedAt;
-
 }

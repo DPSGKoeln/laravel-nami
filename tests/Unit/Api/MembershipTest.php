@@ -4,15 +4,12 @@ namespace Zoomyboy\LaravelNami\Tests\Unit\Api;
 
 use Carbon\Carbon;
 use Zoomyboy\LaravelNami\Data\Membership;
-use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
-use Zoomyboy\LaravelNami\Nami;
 use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class MembershipTest extends TestCase
 {
-
     public function testMembershipIsInstanceOfDto(): void
     {
         app(MembershipFake::class)
@@ -67,7 +64,7 @@ class MembershipTest extends TestCase
     /**
      * @testWith ["Sicherheitsverletzung: Zugriff auf Rechte Recht (n:2001002 o:2) fehlgeschlagen", "Access denied - no right for requested operation"]
      */
-    public function test_it_gets_no_memberships_with_no_rights(string $error): void
+    public function testItGetsNoMembershipsWithNoRights(string $error): void
     {
         app(MembershipFake::class)->failsShowing(16, 68, $error);
 
@@ -99,5 +96,4 @@ class MembershipTest extends TestCase
             'gruppierungId' => 1400,
         ]);
     }
-
 }

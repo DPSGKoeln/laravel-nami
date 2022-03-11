@@ -5,18 +5,17 @@ namespace Zoomyboy\LaravelNami;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\LazyCollection;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 
-class Member extends Model {
-
+class Member extends Model
+{
     public $timestamps = false;
 
     public $geschlechtMaps = [
         'männlich' => 19,
         'weiblich' => 20,
-        'keine Angabe' => 23
+        'keine Angabe' => 23,
     ];
 
     protected static $overviewAttributes = [
@@ -63,11 +62,12 @@ class Member extends Model {
     {
         $item = collect($item)
             ->only(array_keys(static::$overviewAttributes))
-            ->mapWithKeys(function($item, $key) {
-                return [ data_get(static::$overviewAttributes, $key, $key) => $item ];
+            ->mapWithKeys(function ($item, $key) {
+                return [data_get(static::$overviewAttributes, $key, $key) => $item];
             })
             ->toArray();
-        return (new self($item));
+
+        return new self($item);
     }
 
     public static function fromAttributes(array $attributes): self
@@ -129,12 +129,14 @@ class Member extends Model {
         return $this->attributes['gender_id'] == Gender::getNullValue() ? null : $this->attributes['gender_id'];
     }
 
-    public function setGeschlechtTextAttribute($v) {
+    public function setGeschlechtTextAttribute($v)
+    {
         $this->attributes['gender_id'] = data_get($this->geschlechtMaps, $v, null);
     }
 
-    public function setAttribute($key, $value) {
-        if (in_array($key, $this->nullable) && $value === '') {
+    public function setAttribute($key, $value)
+    {
+        if (in_array($key, $this->nullable) && '' === $value) {
             return parent::setAttribute($key, null);
         }
 
@@ -166,12 +168,12 @@ class Member extends Model {
         ]);
     }
 
-    public function membership($id): ?Membership {
+    public function membership($id): ?Membership
+    {
         try {
             return Membership::fromNami(Nami::membership($this->id, $id));
         } catch (RightException $e) {
             return null;
         }
     }
-
 }

@@ -3,25 +3,17 @@
 namespace Zoomyboy\LaravelNami\Backend;
 
 use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use Zoomyboy\LaravelNami\Fakes\CourseFake;
-use Zoomyboy\LaravelNami\Fakes\Fake;
-use Zoomyboy\LaravelNami\Fakes\FakeInstance;
-use Zoomyboy\LaravelNami\Fakes\LoginFake;
 
-class FakeBackend {
-
+class FakeBackend
+{
     /**
-     * @param int $mitgliedsNr
      * @param array <string, mixed> $data
      */
     public function addSearch(int $mitgliedsNr, array $data): self
     {
-        Http::fake(function($request) use ($data, $mitgliedsNr) {
+        Http::fake(function ($request) use ($data, $mitgliedsNr) {
             if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode(['mitgliedsNummber' => $mitgliedsNr]) ?: '{}').'&page=1&start=0&limit=100') {
                 $content = [
                     'success' => true,
@@ -29,6 +21,7 @@ class FakeBackend {
                     'responseType' => 'OK',
                     'totalEntries' => 1,
                 ];
+
                 return Http::response(json_encode($content) ?: '{}', 200);
             }
         });
@@ -41,8 +34,8 @@ class FakeBackend {
      */
     public function fakeNationalities(array $data): self
     {
-        Http::fake(function($request) use ($data) {
-            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/staatsangehoerigkeit') {
+        Http::fake(function ($request) use ($data) {
+            if ('https://nami.dpsg.de/ica/rest/baseadmin/staatsangehoerigkeit' === $request->url()) {
                 return $this->dataResponse($data);
             }
         });
@@ -68,9 +61,9 @@ class FakeBackend {
      */
     public function fakeMembers(array $data): self
     {
-        Http::fake(function($request) use ($data) {
+        Http::fake(function ($request) use ($data) {
             foreach ($data as $member) {
-                if ($request->url() === $this->singleMemberUrl($member['gruppierungId'], $member['id']) && $request->method() === 'GET') {
+                if ($request->url() === $this->singleMemberUrl($member['gruppierungId'], $member['id']) && 'GET' === $request->method()) {
                     $content = [
                         'success' => true,
                         'data' => $member,
@@ -82,7 +75,7 @@ class FakeBackend {
                 if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$member['id']}/flist") {
                     $content = [
                         'success' => true,
-                        'data' => array_map(function($membership) {
+                        'data' => array_map(function ($membership) {
                             return (object) [
                                 'entries_aktivVon' => $membership['aktivVon'],
                                 'entries_aktivBis' => $membership['aktivBis'],
@@ -91,7 +84,7 @@ class FakeBackend {
                                 'entries_taetigkeit' => $membership['taetigkeit'],
                                 'entries_untergliederung' => $membership['untergliederung'],
                             ];
-                        }, $member['memberships'] ?? [])
+                        }, $member['memberships'] ?? []),
                     ];
 
                     return Http::response(json_encode($content) ?: '{}', 200);
@@ -99,7 +92,7 @@ class FakeBackend {
             }
 
             foreach (collect($data)->chunk(100) as $i => $chunk) {
-                if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode('{}').'&page='.($i+1).'&start='.($i*100).'&limit=100') {
+                if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode('{}').'&page='.($i + 1).'&start='.($i * 100).'&limit=100') {
                     return Http::response(json_encode([
                         'success' => true,
                         'totalEntries' => count($data),
@@ -123,8 +116,9 @@ class FakeBackend {
         return $this;
     }
 
-    public function fakeSingleMembership(int $memberId, int $membershipId, array $data) {
-        Http::fake(function($request) use ($data, $memberId, $membershipId) {
+    public function fakeSingleMembership(int $memberId, int $membershipId, array $data)
+    {
+        Http::fake(function ($request) use ($data, $memberId, $membershipId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membershipId}") {
                 $content = [
                     'success' => true,
@@ -144,8 +138,8 @@ class FakeBackend {
      */
     public function fakeCountries(array $data): self
     {
-        Http::fake(function($request) use ($data) {
-            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/land') {
+        Http::fake(function ($request) use ($data) {
+            if ('https://nami.dpsg.de/ica/rest/baseadmin/land' === $request->url()) {
                 return $this->dataResponse($data);
             }
         });
@@ -158,8 +152,8 @@ class FakeBackend {
      */
     public function fakeCourses(array $data): self
     {
-        Http::fake(function($request) use ($data) {
-            if ($request->url() === 'https://nami.dpsg.de/ica/rest/module/baustein') {
+        Http::fake(function ($request) use ($data) {
+            if ('https://nami.dpsg.de/ica/rest/module/baustein' === $request->url()) {
                 return $this->dataResponse($data);
             }
         });
@@ -172,8 +166,8 @@ class FakeBackend {
      */
     public function fakeGenders(array $data): self
     {
-        Http::fake(function($request) use ($data) {
-            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/geschlecht') {
+        Http::fake(function ($request) use ($data) {
+            if ('https://nami.dpsg.de/ica/rest/baseadmin/geschlecht' === $request->url()) {
                 return $this->dataResponse($data);
             }
         });
@@ -186,8 +180,8 @@ class FakeBackend {
      */
     public function fakeRegions(array $data): self
     {
-        Http::fake(function($request) use ($data) {
-            if ($request->url() === 'https://nami.dpsg.de/ica/rest/baseadmin/region') {
+        Http::fake(function ($request) use ($data) {
+            if ('https://nami.dpsg.de/ica/rest/baseadmin/region' === $request->url()) {
                 return $this->dataResponse($data);
             }
         });
@@ -196,12 +190,11 @@ class FakeBackend {
     }
 
     /**
-     * @param int $groupId
      * @param array<int, array{name: string, id: int}> $data
      */
     public function fakeActivities(int $groupId, array $data): self
     {
-        Http::fake(function($request) use ($data, $groupId) {
+        Http::fake(function ($request) use ($data, $groupId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/{$groupId}") {
                 return $this->dataResponse($data);
             }
@@ -215,7 +208,7 @@ class FakeBackend {
      */
     public function fakeSubactivities(array $matches): self
     {
-        Http::fake(function($request) use ($matches) {
+        Http::fake(function ($request) use ($matches) {
             foreach ($matches as $activityId => $data) {
                 if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/{$activityId}") {
                     return $this->dataResponse($data);
@@ -227,12 +220,11 @@ class FakeBackend {
     }
 
     /**
-     * @param int $groupId
      * @param array<int, array{name: string, id: int}> $data
      */
     public function fakeFees(int $groupId, array $data): self
     {
-        Http::fake(function($request) use ($data, $groupId) {
+        Http::fake(function ($request) use ($data, $groupId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/namiBeitrag/beitragsartmgl/gruppierung/{$groupId}") {
                 return $this->dataResponse($data);
             }
@@ -246,8 +238,8 @@ class FakeBackend {
      */
     public function fakeConfessions(array $data): self
     {
-        Http::fake(function($request) use ($data) {
-            if ($request->url() === "https://nami.dpsg.de/ica/rest/baseadmin/konfession") {
+        Http::fake(function ($request) use ($data) {
+            if ('https://nami.dpsg.de/ica/rest/baseadmin/konfession' === $request->url()) {
                 return $this->dataResponse($data);
             }
         });
@@ -269,5 +261,4 @@ class FakeBackend {
 
         return Http::response(json_encode($content) ?: '{}', 200);
     }
-
 }

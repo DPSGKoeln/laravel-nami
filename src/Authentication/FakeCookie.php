@@ -2,15 +2,13 @@
 
 namespace Zoomyboy\LaravelNami\Authentication;
 
-use Carbon\Carbon;
-use GuzzleHttp\Cookie\FileCookieJar;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Assert;
 use Zoomyboy\LaravelNami\LoginException;
 
-class FakeCookie extends Authenticator {
-
+class FakeCookie extends Authenticator
+{
     private array $validAccounts = [];
     public ?array $invalidAccounts = null;
     public ?array $authenticated = null;
@@ -21,11 +19,11 @@ class FakeCookie extends Authenticator {
             fn ($account) => $account['mglnr'] === $mglnr && $account['password'] === $password
         );
 
-        if ($authenticated !== false) {
+        if (false !== $authenticated) {
             $this->authenticated = ['mglnr' => $mglnr, 'password' => $password];
         } else {
             $e = new LoginException();
-            $e->setResponse(['statusMessage' => "Benutzer nicht gefunden oder Passwort falsch"]);
+            $e->setResponse(['statusMessage' => 'Benutzer nicht gefunden oder Passwort falsch']);
 
             throw $e;
         }
@@ -35,7 +33,7 @@ class FakeCookie extends Authenticator {
 
     public function isLoggedIn(): bool
     {
-        return $this->authenticated !== null;
+        return null !== $this->authenticated;
     }
 
     public function http(): PendingRequest
@@ -45,12 +43,7 @@ class FakeCookie extends Authenticator {
 
     /**
      * Reisters an account that can successfully login with
-     * the given password
-     *
-     * @param int $mglnr
-     * @param string $password
-     *
-     * @return void
+     * the given password.
      */
     public function success(int $mglnr, string $password): void
     {
@@ -58,12 +51,7 @@ class FakeCookie extends Authenticator {
     }
 
     /**
-     * Reisters an account that cannot login with the given password
-     *
-     * @param int $mglnr
-     * @param string $password
-     *
-     * @return void
+     * Reisters an account that cannot login with the given password.
      */
     public function failed(int $mglnr, string $password): void
     {
@@ -87,7 +75,6 @@ class FakeCookie extends Authenticator {
 
     public function refresh(): void
     {
-        //
     }
 
     public function assertNotLoggedIn(): void
@@ -102,5 +89,4 @@ class FakeCookie extends Authenticator {
     {
         Assert::assertTrue($this->isLoggedIn());
     }
-
 }
