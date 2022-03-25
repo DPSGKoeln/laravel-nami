@@ -17,12 +17,12 @@ class MainCookie extends Authenticator
 
     public function login(int $mglnr, string $password): self
     {
+        $this->mglnr = $mglnr;
+        $this->password = $password;
+
         if ($this->isLoggedIn()) {
             return $this;
         }
-
-        $this->mglnr = $mglnr;
-        $this->password = $password;
 
         while ($file = $this->file()) {
             unlink($file);
