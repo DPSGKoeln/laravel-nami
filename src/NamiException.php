@@ -3,6 +3,7 @@
 namespace Zoomyboy\LaravelNami;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class NamiException extends \Exception
@@ -36,6 +37,11 @@ class NamiException extends \Exception
         $this->response = $response;
 
         return $this;
+    }
+
+    public function isConflict(): bool
+    {
+        return Str::contains(data_get($this->response, 'message'), 'Der Datensatz wurde zwischenzeitlich verändert');
     }
 
     public function report(): void
