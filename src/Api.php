@@ -121,17 +121,16 @@ class Api
         if (data_get($attributes, 'id')) {
             $payload = array_merge($existing, $member->toNami());
             $payload['kontoverbindung'] = json_encode(data_get($payload, 'kontoverbindung', []));
-            $response = $this->http()->put(
-                $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id,
-                $payload
-            );
+            $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id;
+            $response = $this->http()->put($url, $payload);
             if (true !== data_get($response->json(), 'success')) {
-                $this->exception('Update failed', $member->toNami(), $response->json());
+                $this->exception('Update failed', $url, $response->json(), $member->toNami());
             }
         } else {
-            $response = $this->http()->post($this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id, $member->toNami());
+            $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id;
+            $response = $this->http()->post($url, $member->toNami());
             if (true !== data_get($response->json(), 'success')) {
-                $this->exception('Update failed', $member->toNami(), $response->json());
+                $this->exception('Update failed', $url, $response->json(), $member->toNami());
             }
 
             return ['id' => $response->json()['data']];
