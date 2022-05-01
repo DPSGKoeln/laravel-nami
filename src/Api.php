@@ -117,8 +117,8 @@ class Api
     {
         $this->assertLoggedIn();
         $member = Member::fromAttributes($attributes);
-        $existing = $this->member($member->group_id, $member->id);
         if (data_get($attributes, 'id')) {
+            $existing = $this->member($member->group_id, $member->id);
             $payload = array_merge($existing, $member->toNami());
             $payload['kontoverbindung'] = json_encode(data_get($payload, 'kontoverbindung', []));
             $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id;
