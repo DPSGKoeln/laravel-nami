@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Zoomyboy\LaravelNami\Data\Membership;
+use Zoomyboy\LaravelNami\Data\MembershipEntry;
 use Zoomyboy\LaravelNami\Exceptions\RightException;
 
 class Member extends Model
@@ -144,7 +145,7 @@ class Member extends Model
     }
 
     /**
-     * @return Collection<Membership>
+     * @return Collection<int, MembershipEntry>
      */
     public function memberships(): Collection
     {
@@ -156,22 +157,15 @@ class Member extends Model
         return Nami::putMembership($this->id, $membership);
     }
 
-    public function deleteMembership(int $id): int
+    public function deleteMembership(int $id): void
     {
-        $membership = $this->membership($id);
-
-        return Nami::putMembership($this->id, [
-            'gruppierungId' => $membership->group_id,
-            'aktivVon' => $membership->starts_at.'T00:00:00',
-            'aktivBis' => now()->format('Y-m-d').'T00:00:00',
-            'id' => $membership->id,
-        ]);
+        Nami::deleteMembership($this->id, $this->membership($id));
     }
 
-    public function membership($id): ?Membership
+    public function membership(int $id): ?Membership
     {
         try {
-            return Membership::fromNami(Nami::membership($this->id, $id));
+            return Nami::membership($this->id, $id);
         } catch (RightException $e) {
             return null;
         }

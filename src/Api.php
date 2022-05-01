@@ -161,7 +161,7 @@ class Api
     }
 
     /**
-     * @return Collection<MembershipEntry>
+     * @return Collection<int, MembershipEntry>
      */
     public function membershipsOf(int $memberId): Collection
     {
