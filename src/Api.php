@@ -499,7 +499,7 @@ class Api
         $response = $this->http()->delete($this->url.$url);
 
         if (null === $response->json()) {
-            $this->exception($error, $url, $response->json());
+            $this->exception($error, $url, []);
         }
 
         if (false === $response['success']) {
