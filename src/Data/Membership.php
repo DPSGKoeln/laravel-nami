@@ -28,7 +28,7 @@ class Membership extends DataTransferObject
     public int $activityId;
 
     #[MapFrom('untergliederungId')]
-    public int $subactivityId;
+    public ?int $subactivityId;
 
     #[MapFrom('gruppierung')]
     public ?string $group;
