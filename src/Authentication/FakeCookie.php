@@ -53,7 +53,7 @@ class FakeCookie extends Authenticator
     /**
      * Reisters an account that cannot login with the given password.
      */
-    public function failed(int $mglnr, string $password): void
+    public function fails(int $mglnr, string $password): void
     {
         $this->invalidAccounts[] = ['mglnr' => $mglnr, 'password' => $password];
     }

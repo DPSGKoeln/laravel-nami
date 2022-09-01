@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static void assertNotLoggedIn()
  * @method static void success(int $mglnr, string $password)
- * @method static void failed(int $mglnr, string $password)
+ * @method static void fails(int $mglnr, string $password)
  * @method static void assertLoggedInWith(int $mglnr, string $password)
  * @method static void assertNotLoggedInWith(int $mglnr, string $password)
  * @method static void assertLoggedIn()
