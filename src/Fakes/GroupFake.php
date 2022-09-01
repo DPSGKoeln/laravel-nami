@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Http;
 
 class GroupFake extends Fake
 {
+    /**
+     * @param array<int, array{name: string}> $data
+     */
     public function fetches(?int $parent = null, array $data): self
     {
         $this->fakeResponse($parent, $data);
