@@ -13,6 +13,7 @@ use Zoomyboy\LaravelNami\Data\Course;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Data\MembershipEntry;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
+use Zoomyboy\LaravelNami\Support\Paginator;
 
 class Api
 {
@@ -55,24 +56,20 @@ class Api
     {
         $this->assertLoggedIn();
 
-        return LazyCollection::make(function () use ($payload) {
-            $page = 1;
-            while (!isset($totalEntries) || ($page - 1) * 100 + 1 <= $totalEntries) {
-                $start = ($page - 1) * 100;
-                $url = $this->url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode((object) $payload) ?: '{}').'&page='.$page.'&start='.$start.'&limit=100';
-                $response = $this->http()->get($url);
+        return app(Paginator::class)->startResult(100,
+            fn ($page, $start) => $this->http()->get($this->url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode((object) $payload) ?: '{}').'&page='.$page.'&start='.$start.'&limit=100'),
+            function ($response) {
                 if (true !== $response->json()['success']) {
-                    $this->exception('Search failed', $url, $response->json(), ['page' => $page, 'start' => $start]);
+                    $this->exception('Search failed', '', $response->json(), []);
                 }
-                $totalEntries = $response->json()['totalEntries'];
                 foreach ($response->json()['data'] as $member) {
                     yield Member::fromNami(collect($member)->mapWithKeys(function ($value, $key) {
                         return [str_replace('entries_', '', (string) $key) => $value];
                     }));
                 }
-                ++$page;
-            }
-        });
+            },
+            fn ($response) => $response->json()['totalEntries'],
+        );
     }
 
     public function deleteMember(int $id): void
