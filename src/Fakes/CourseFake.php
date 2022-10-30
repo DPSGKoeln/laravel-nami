@@ -161,7 +161,7 @@ class CourseFake extends Fake
     public function assertUpdated(int $memberId, int $courseId, array $payload): void
     {
         Http::assertSent(function ($request) use ($memberId, $courseId, $payload) {
-            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/${courseId}"
+            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}"
                 && 'PUT' === $request->method()
                 && data_get($request, 'bausteinId') === $payload['bausteinId']
                 && data_get($request, 'veranstalter') === $payload['veranstalter']
@@ -173,7 +173,7 @@ class CourseFake extends Fake
     public function assertDeleted(int $memberId, int $courseId): void
     {
         Http::assertSent(function ($request) use ($memberId, $courseId) {
-            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/${courseId}"
+            return $request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}"
                 && 'DELETE' === $request->method();
         });
     }
