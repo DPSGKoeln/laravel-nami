@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Http;
 
 class MembershipFake extends Fake
 {
+    /**
+     * @param array<int, int|array{id: int, entries_taetigkeit?: string, entries_aktivVon?: string, entries_aktivBis?: string, entries_untergliederung?: string, entries_gruppierung?: string}> $membershipIds
+     */
     public function fetches(int $memberId, array $membershipIds): self
     {
         Http::fake(function ($request) use ($memberId, $membershipIds) {
@@ -54,6 +57,9 @@ class MembershipFake extends Fake
         return $this;
     }
 
+    /**
+     * @param array{id: int, gruppierung?: string, taetigkeit?: string, taetigkeitId?: int, untergliederung?: string, untergliederungId?: int, aktivVon?: string, aktivBis?: string} $data
+     */
     public function shows(int $memberId, array $data): self
     {
         Http::fake(function ($request) use ($memberId, $data) {
