@@ -9,6 +9,9 @@ use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class SearchTest extends TestCase
 {
+    /**
+     * @var array<int, array<string, string|int|null>>
+     */
     public array $attributes = [
         [
             'firstname' => 'Max',
@@ -27,6 +30,9 @@ class SearchTest extends TestCase
         ],
     ];
 
+    /**
+     * @return array<string, array{0: string, 1: array<int, string>}>
+     */
     public function dataProvider(): array
     {
         return [
@@ -59,6 +65,9 @@ class SearchTest extends TestCase
         $this->login()->search([])->first();
     }
 
+    /**
+     * @param array<string, string|int|null> $payload
+     */
     private function url(array $payload): string
     {
         $payload = rawurlencode(json_encode($payload));
