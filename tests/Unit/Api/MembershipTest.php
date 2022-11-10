@@ -100,7 +100,7 @@ class MembershipTest extends TestCase
     public function testItCanDeleteAMembership(): void
     {
         Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
-        app(MembershipFake::class)->deletesSuccessfully(6, 133);
+        app(MembershipFake::class)->destroysSuccessfully(6, 133);
 
         $this->login()->deleteMembership(6, Membership::fromArray([
             'id' => 133,
