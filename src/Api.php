@@ -147,7 +147,8 @@ class Api
             $response = $this->http()->post($url, $data->toNami());
         }
         if (true !== data_get($response->json(), 'success')) {
-            $this->exception(data_get($response->json(), 'message', 'Update failed'), $url, $response->json(), $data->toArray());
+            $defaultError = 'Erstellen der Mitgliedschaft fehlgeschlagen';
+            $this->exception(data_get($response->json(), 'message', $defaultError) ?: $defaultError, $url, $response->json(), $data->toArray());
         }
 
         if (data_get($data, 'id')) {
