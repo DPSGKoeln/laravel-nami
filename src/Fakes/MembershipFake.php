@@ -152,13 +152,15 @@ class MembershipFake extends Fake
         });
     }
 
-    public function deletesSuccessfully(int $memberId, int $membershipId): void
+    public function destroysSuccessfully(int $memberId, int $membershipId): self
     {
         Http::fake(function ($request) use ($memberId, $membershipId) {
             if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membershipId}" && 'DELETE' === $request->method()) {
                 return $this->nullResponse();
             }
         });
+
+        return $this;
     }
 
     public function failsDeleting(int $memberId, ?int $membershipId): void
