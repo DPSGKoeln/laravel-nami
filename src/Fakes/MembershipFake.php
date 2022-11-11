@@ -176,7 +176,7 @@ class MembershipFake extends Fake
     {
         $url = "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membershipId}";
         Http::assertSent(function ($request) use ($url) {
-            return $request->url() === $url && 'DELETE' === $request->method();
+            return $request->hasHeader('content-type', 'application/json') && $request->hasHeader('content-type', 'application/json') && $request->url() === $url && 'DELETE' === $request->method();
         });
     }
 

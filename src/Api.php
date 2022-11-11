@@ -494,7 +494,10 @@ class Api
 
     private function delete(string $url, string $error): void
     {
-        $response = $this->http()->delete($this->url.$url);
+        $response = $this->http()->withHeaders([
+            'content-type' => 'application/json',
+            'accept' => 'application/json',
+        ])->delete($this->url.$url);
 
         if (null === $response->json()) {
             $this->exception($error, $url, []);
