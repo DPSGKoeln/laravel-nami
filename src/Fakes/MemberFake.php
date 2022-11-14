@@ -53,6 +53,33 @@ class MemberFake extends Fake
         });
     }
 
+    public function createsSuccessfully(int $groupId, int $memberId): void
+    {
+        Http::fake(function ($request) use ($memberId, $groupId) {
+            $url = "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$groupId}";
+
+            if ($request->url() === $url || 'POST' === $request->method()) {
+                return $this->idResponse($memberId);
+            }
+        });
+    }
+
+    /**
+     * @param array<string, string|int|null> $body
+     */
+    public function assertCreated(int $groupId, array $body): void
+    {
+        Http::assertSent(function ($request) use ($groupId) {
+            $url = "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$groupId}";
+
+            if ($request->url() !== $url || 'POST' !== $request->method()) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
     public function assertDeleted(int $memberId, Carbon $date): void
     {
         Http::assertSent(function ($request) use ($memberId, $date) {
