@@ -17,15 +17,41 @@ class MemberFake extends Fake
         });
     }
 
-    public function shows(int $groupId, int $memberId, array $data): void
+    public function shows(int $groupId, int $memberId, array $data): self
     {
         Http::fake(function ($request) use ($groupId, $memberId, $data) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
             if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->dataResponse(array_merge([
+                    'id' => $memberId,
+                    'eintrittsdatum' => '2005-05-01 00:00:00',
+                    'geburtsDatum' => '1991-06-20 00:00:00',
+                    'gruppierungId' => $groupId,
+                    'geschlechtId' => 19,
+                    'staatsangehoerigkeitId' => 1054,
                 ], $data));
             }
         });
+
+        return $this;
+    }
+
+    /**
+     * @param array<string, string|int|null> $data
+     */
+    public function updates(int $groupId, int $memberId, array $data): self
+    {
+        Http::fake(function ($request) use ($groupId, $memberId, $data) {
+            $url = 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
+            if ($request->url() === $url && 'PUT' === $request->method()) {
+                return $this->dataResponse([
+                    'id' => $memberId,
+                    ...$data,
+                ]);
+            }
+        });
+
+        return $this;
     }
 
     public function deletes(int $memberId, Carbon $date): void
@@ -53,7 +79,7 @@ class MemberFake extends Fake
         });
     }
 
-    public function createsSuccessfully(int $groupId, int $memberId): void
+    public function createsSuccessfully(int $groupId, int $memberId): self
     {
         Http::fake(function ($request) use ($memberId, $groupId) {
             $url = "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$groupId}";
@@ -62,6 +88,8 @@ class MemberFake extends Fake
                 return $this->idResponse($memberId);
             }
         });
+
+        return $this;
     }
 
     /**
@@ -69,11 +97,51 @@ class MemberFake extends Fake
      */
     public function assertCreated(int $groupId, array $body): void
     {
-        Http::assertSent(function ($request) use ($groupId) {
+        Http::assertSent(function ($request) use ($groupId, $body) {
             $url = "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$groupId}";
 
             if ($request->url() !== $url || 'POST' !== $request->method()) {
                 return false;
+            }
+
+            $requestBody = json_decode($request->body(), true);
+
+            foreach ($body as $key => $value) {
+                if (!isset($requestBody[$key])) {
+                    return false;
+                }
+
+                if ($requestBody[$key] !== $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * @param array<string, string|int|null> $body
+     */
+    public function assertUpdated(int $groupId, int $memberId, array $body): void
+    {
+        Http::assertSent(function ($request) use ($groupId, $memberId, $body) {
+            $url = "https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/{$groupId}/{$memberId}";
+
+            if ($request->url() !== $url || 'PUT' !== $request->method()) {
+                return false;
+            }
+
+            $requestBody = json_decode($request->body(), true);
+
+            foreach ($body as $key => $value) {
+                if (!isset($requestBody[$key])) {
+                    return false;
+                }
+
+                if ($requestBody[$key] !== $value) {
+                    return false;
+                }
             }
 
             return true;

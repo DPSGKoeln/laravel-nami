@@ -106,8 +106,8 @@ class Member extends Model
             'nameZusatz' => $this->further_address ?: '',
             'konfessionId' => $this->confession_id,
             'staatsangehoerigkeitText' => $this->other_country ?: '',
-            'ersteTaetigkeitId' => $this->first_activity_id ?: null,
-            'ersteUntergliederungId' => $this->first_subactivity_id ?: null,
+            'ersteTaetigkeitId' => $this->first_activity ?: null,
+            'ersteUntergliederungId' => $this->first_subactivity ?: null,
         ];
     }
 
