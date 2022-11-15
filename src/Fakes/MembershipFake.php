@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 class MembershipFake extends Fake
 {
     /**
-     * @param array<int, int|array{id?: int, entries_taetigkeit?: string, entries_aktivVon?: string, entries_aktivBis?: string, entries_untergliederung?: string, entries_gruppierung?: string}> $membershipIds
+     * @param array<int, int|array{id?: int, entries_taetigkeit?: string, entries_aktivVon?: string, entries_aktivBis?: string|null, entries_untergliederung?: string, entries_gruppierung?: string}> $membershipIds
      */
     public function fetches(int $memberId, array $membershipIds): self
     {
