@@ -24,6 +24,13 @@ class MemberFake extends Fake
             if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->dataResponse(array_merge([
                     'id' => $memberId,
+                    'vorname' => '::firstname::',
+                    'nachname' => '::lastname::',
+                    'zeitschriftenversand' => true,
+                    'strasse' => '::address::',
+                    'plz' => '12345',
+                    'ort' => 'SG',
+                    'version' => 1,
                     'eintrittsdatum' => '2005-05-01 00:00:00',
                     'geburtsDatum' => '1991-06-20 00:00:00',
                     'gruppierungId' => $groupId,
