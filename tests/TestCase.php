@@ -2,6 +2,7 @@
 
 namespace Zoomyboy\LaravelNami\Tests;
 
+use Spatie\LaravelData\LaravelDataServiceProvider;
 use Zoomyboy\LaravelNami\Api;
 use Zoomyboy\LaravelNami\Authentication\Auth;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
@@ -19,7 +20,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getPackageProviders($app)
     {
-        return [NamiServiceProvider::class];
+        return [LaravelDataServiceProvider::class, NamiServiceProvider::class];
     }
 
     public function getAnnotations(): array

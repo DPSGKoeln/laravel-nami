@@ -1,13 +1,13 @@
 <?php
 
-namespace Zoomyboy\LaravelNami\Tests\Unit;
+namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
 
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Fakes\MemberFake;
 use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
-class PullMemberTest extends TestCase
+class PullTest extends TestCase
 {
     public string $groupsResponse = '{"success":true,"data":[{"descriptor":"Group","name":"","representedClass":"de.iconcept.nami.entity.org.Gruppierung","id":103}],"responseType":"OK"}';
     public string $unauthorizedResponse = '{"success":false,"data":null,"responseType":"EXCEPTION","message":"Access denied - no right for requested operation","title":"Exception"}';
@@ -81,9 +81,6 @@ class PullMemberTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
     public function testGetASingleMember(array $input, array $check): void
     {
         Http::fake([
@@ -91,13 +88,11 @@ class PullMemberTest extends TestCase
             'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->fakeJson('member-16.json', ['data' => $input]), 200),
         ]);
 
-        $group = $this->login()->group(103);
+        $member = $this->login()->member(103, 16);
 
-        foreach ($check as $key => $value) {
-            $this->assertSame($value, $group->member(16)->toArray()[$key]);
-        }
+        $this->assertEquals('Max', $member->firstname);
 
-        Http::assertSentCount(2);
+        Http::assertSentCount(1);
     }
 
     /**

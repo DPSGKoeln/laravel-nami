@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Data\Baustein;
 use Zoomyboy\LaravelNami\Data\Course;
+use Zoomyboy\LaravelNami\Data\Member;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Data\MembershipEntry;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
@@ -289,13 +290,11 @@ class Api
         }
     }
 
-    public function member(int $groupId, int $memberId): array
+    public function member(int $groupId, int $memberId): Member
     {
         $this->assertLoggedIn();
         $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
         $response = $this->http()->get($url);
-
-        Logger::http($url, $response, 'Show member '.$memberId, ['memberId' => $memberId]);
 
         if (false === $response->json()['success'] && Str::startsWith($response['message'], 'Access denied')) {
             return $this->singleMemberFallback($groupId, $memberId);
@@ -309,7 +308,7 @@ class Api
             $this->exception('Fetching member failed', $url, $response->json());
         }
 
-        return $response->json()['data'];
+        return Member::from($response->json()['data']);
     }
 
     public function hasGroup(int $groupId): bool

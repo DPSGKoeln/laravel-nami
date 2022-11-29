@@ -1,6 +1,6 @@
 <?php
 
-namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
+namespace Zoomyboy\LaravelNami\Tests\Unit\Membership;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;

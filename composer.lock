@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "456a8c775e0524d9b5be373e4177cbff",
+    "content-hash": "346a5a2a97f685b2c63ce6fb3d29b2be",
     "packages": [
         {
             "name": "brick/math",
@@ -1867,6 +1867,109 @@
             "time": "2022-01-24T11:29:14+00:00"
         },
         {
+            "name": "phpdocumentor/reflection-common",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpDocumentor/ReflectionCommon.git",
+                "reference": "1d01c49d4ed62f25aa84a747ad35d5a16924662b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/1d01c49d4ed62f25aa84a747ad35d5a16924662b",
+                "reference": "1d01c49d4ed62f25aa84a747ad35d5a16924662b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-2.x": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "phpDocumentor\\Reflection\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jaap van Otterdijk",
+                    "email": "opensource@ijaap.nl"
+                }
+            ],
+            "description": "Common reflection classes used by phpdocumentor to reflect the code structure",
+            "homepage": "http://www.phpdoc.org",
+            "keywords": [
+                "FQSEN",
+                "phpDocumentor",
+                "phpdoc",
+                "reflection",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/phpDocumentor/ReflectionCommon/issues",
+                "source": "https://github.com/phpDocumentor/ReflectionCommon/tree/2.x"
+            },
+            "time": "2020-06-27T09:03:43+00:00"
+        },
+        {
+            "name": "phpdocumentor/type-resolver",
+            "version": "1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpDocumentor/TypeResolver.git",
+                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/93ebd0014cab80c4ea9f5e297ea48672f1b87706",
+                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0",
+                "phpdocumentor/reflection-common": "^2.0"
+            },
+            "require-dev": {
+                "ext-tokenizer": "*",
+                "psalm/phar": "^4.8"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "phpDocumentor\\Reflection\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mike van Riel",
+                    "email": "me@mikevanriel.com"
+                }
+            ],
+            "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
+            "support": {
+                "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
+                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.6.0"
+            },
+            "time": "2022-01-04T19:58:01+00:00"
+        },
+        {
             "name": "phpoption/phpoption",
             "version": "1.8.1",
             "source": {
@@ -2523,32 +2626,51 @@
             "time": "2021-09-25T23:10:38+00:00"
         },
         {
-            "name": "spatie/data-transfer-object",
-            "version": "3.7.3",
+            "name": "spatie/laravel-data",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/spatie/data-transfer-object.git",
-                "reference": "341f72c77e0fce40ea2e0dcb212cb54dc27bbe72"
+                "url": "https://github.com/spatie/laravel-data.git",
+                "reference": "17d1ddfc5170e85f69bf92498e4b7fc09cf30792"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/data-transfer-object/zipball/341f72c77e0fce40ea2e0dcb212cb54dc27bbe72",
-                "reference": "341f72c77e0fce40ea2e0dcb212cb54dc27bbe72",
+                "url": "https://api.github.com/repos/spatie/laravel-data/zipball/17d1ddfc5170e85f69bf92498e4b7fc09cf30792",
+                "reference": "17d1ddfc5170e85f69bf92498e4b7fc09cf30792",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.0"
+                "illuminate/contracts": "^8.71|^9.0",
+                "php": "^8.1",
+                "phpdocumentor/type-resolver": "^1.5",
+                "spatie/laravel-package-tools": "^1.9.0"
             },
             "require-dev": {
-                "illuminate/collections": "^8.36",
-                "jetbrains/phpstorm-attributes": "^1.0",
-                "larapack/dd": "^1.1",
-                "phpunit/phpunit": "^9.0"
+                "fakerphp/faker": "^1.14",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "inertiajs/inertia-laravel": "^0.6.3",
+                "nette/php-generator": "^3.5",
+                "nunomaduro/larastan": "^2.0|^1.0.3",
+                "orchestra/testbench": "^6.24|^7.5",
+                "phpstan/extension-installer": "^1.1",
+                "phpunit/phpunit": "^9.3",
+                "spatie/invade": "^1.0",
+                "spatie/laravel-typescript-transformer": "^2.0",
+                "spatie/phpunit-snapshot-assertions": "^4.2",
+                "spatie/test-time": "^1.2"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\LaravelData\\LaravelDataServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
-                    "Spatie\\DataTransferObject\\": "src"
+                    "Spatie\\LaravelData\\": "src",
+                    "Spatie\\LaravelData\\Database\\Factories\\": "database/factories"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2557,33 +2679,87 @@
             ],
             "authors": [
                 {
-                    "name": "Brent Roose",
-                    "email": "brent@spatie.be",
-                    "homepage": "https://spatie.be",
+                    "name": "Ruben Van Assche",
+                    "email": "ruben@spatie.be",
                     "role": "Developer"
                 }
             ],
-            "description": "Data transfer objects with batteries included",
-            "homepage": "https://github.com/spatie/data-transfer-object",
+            "description": "Create unified resources and data transfer objects",
+            "homepage": "https://github.com/spatie/laravel-data",
             "keywords": [
-                "data-transfer-object",
+                "laravel",
+                "laravel-data",
                 "spatie"
             ],
             "support": {
-                "issues": "https://github.com/spatie/data-transfer-object/issues",
-                "source": "https://github.com/spatie/data-transfer-object/tree/3.7.3"
+                "source": "https://github.com/spatie/laravel-data/tree/2.0.2"
             },
             "funding": [
-                {
-                    "url": "https://spatie.be/open-source/support-us",
-                    "type": "custom"
-                },
                 {
                     "url": "https://github.com/spatie",
                     "type": "github"
                 }
             ],
-            "time": "2021-12-30T20:31:10+00:00"
+            "time": "2022-07-29T09:32:53+00:00"
+        },
+        {
+            "name": "spatie/laravel-package-tools",
+            "version": "1.12.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-package-tools.git",
+                "reference": "09f80fa240d44fafb1c70657c74ee44ffa929357"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/09f80fa240d44fafb1c70657c74ee44ffa929357",
+                "reference": "09f80fa240d44fafb1c70657c74ee44ffa929357",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^7.0|^8.0|^9.0",
+                "php": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.4",
+                "orchestra/testbench": "^5.0|^6.23|^7.0",
+                "phpunit/phpunit": "^9.4",
+                "spatie/test-time": "^1.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\LaravelPackageTools\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Tools for creating Laravel packages",
+            "homepage": "https://github.com/spatie/laravel-package-tools",
+            "keywords": [
+                "laravel-package-tools",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-package-tools/issues",
+                "source": "https://github.com/spatie/laravel-package-tools/tree/1.12.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-06-28T14:29:26+00:00"
         },
         {
             "name": "symfony/console",
@@ -6298,59 +6474,6 @@
             "time": "2022-02-21T01:04:05+00:00"
         },
         {
-            "name": "phpdocumentor/reflection-common",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpDocumentor/ReflectionCommon.git",
-                "reference": "1d01c49d4ed62f25aa84a747ad35d5a16924662b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/1d01c49d4ed62f25aa84a747ad35d5a16924662b",
-                "reference": "1d01c49d4ed62f25aa84a747ad35d5a16924662b",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-2.x": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "phpDocumentor\\Reflection\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jaap van Otterdijk",
-                    "email": "opensource@ijaap.nl"
-                }
-            ],
-            "description": "Common reflection classes used by phpdocumentor to reflect the code structure",
-            "homepage": "http://www.phpdoc.org",
-            "keywords": [
-                "FQSEN",
-                "phpDocumentor",
-                "phpdoc",
-                "reflection",
-                "static analysis"
-            ],
-            "support": {
-                "issues": "https://github.com/phpDocumentor/ReflectionCommon/issues",
-                "source": "https://github.com/phpDocumentor/ReflectionCommon/tree/2.x"
-            },
-            "time": "2020-06-27T09:03:43+00:00"
-        },
-        {
             "name": "phpdocumentor/reflection-docblock",
             "version": "5.3.0",
             "source": {
@@ -6406,56 +6529,6 @@
                 "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.3.0"
             },
             "time": "2021-10-19T17:43:47+00:00"
-        },
-        {
-            "name": "phpdocumentor/type-resolver",
-            "version": "1.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/93ebd0014cab80c4ea9f5e297ea48672f1b87706",
-                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0",
-                "phpdocumentor/reflection-common": "^2.0"
-            },
-            "require-dev": {
-                "ext-tokenizer": "*",
-                "psalm/phar": "^4.8"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "phpDocumentor\\Reflection\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Mike van Riel",
-                    "email": "me@mikevanriel.com"
-                }
-            ],
-            "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
-            "support": {
-                "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
-                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.6.0"
-            },
-            "time": "2022-01-04T19:58:01+00:00"
         },
         {
             "name": "phpspec/prophecy",

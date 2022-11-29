@@ -1,6 +1,6 @@
 <?php
 
-namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
+namespace Zoomyboy\LaravelNami\Tests\Unit\Membership;
 
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
 use Zoomyboy\LaravelNami\Member;
