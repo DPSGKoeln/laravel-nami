@@ -5,6 +5,7 @@ namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Fakes\MemberFake;
 use Zoomyboy\LaravelNami\NamiException;
+use Zoomyboy\LaravelNami\Tests\Factories\MemberRequestFactory;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PullTest extends TestCase
@@ -81,18 +82,34 @@ class PullTest extends TestCase
         ];
     }
 
-    public function testGetASingleMember(array $input, array $check): void
+    public function testGetASingleMember(): void
     {
         Http::fake([
-            'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response($this->fakeJson('member-16.json', ['data' => $input]), 200),
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => MemberRequestFactory::new()->state([
+                'vorname' => 'Max',
+                'nachname' => 'Nach',
+                'spitzname' => 'spitz1',
+            ])->toSingleHttp(),
         ]);
 
         $member = $this->login()->member(103, 16);
 
         $this->assertEquals('Max', $member->firstname);
+        $this->assertEquals('Nach', $member->lastname);
+        $this->assertEquals('spitz1', $member->nickname);
+    }
 
-        Http::assertSentCount(1);
+    public function testGetASingleMemberWithEmptyNames(): void
+    {
+        Http::fake([
+            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => MemberRequestFactory::new()->withEmptyNames()->toSingleHttp(),
+        ]);
+
+        $member = $this->login()->member(103, 16);
+
+        $this->assertNull($member->firstname);
+        $this->assertNull($member->lastname);
+        $this->assertNull($member->nickname);
     }
 
     /**
