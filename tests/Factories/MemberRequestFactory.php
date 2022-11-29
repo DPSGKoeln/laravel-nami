@@ -17,8 +17,23 @@ class MemberRequestFactory extends RequestFactory
         ];
     }
 
+    public function withEmptyNames(): self
+    {
+        return $this->state([
+            'vorname' => '',
+            'nachname' => '',
+            'nickname' => '',
+        ]);
+    }
+
     public function toSingleHttp(): FulfilledPromise
     {
-        return Http::response($this->create(), 200);
+        return Http::response(json_encode([
+            'success' => true,
+            'message' => null,
+            'title' => null,
+            'data' => $this->create(),
+            'responseType' => null,
+        ]), 200);
     }
 }
