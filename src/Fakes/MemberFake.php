@@ -17,7 +17,7 @@ class MemberFake extends Fake
         });
     }
 
-    public function shows(int $groupId, int $memberId, array $data): self
+    public function shows(int $groupId, int $memberId, array $data = []): self
     {
         Http::fake(function ($request) use ($groupId, $memberId, $data) {
             $url = 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
@@ -34,6 +34,7 @@ class MemberFake extends Fake
                     'eintrittsdatum' => '2005-05-01 00:00:00',
                     'geburtsDatum' => '1991-06-20 00:00:00',
                     'gruppierungId' => $groupId,
+                    'gruppierung' => 'gei0OhSh0quahcoh',
                     'geschlechtId' => 19,
                     'staatsangehoerigkeitId' => 1054,
                 ], $data));
