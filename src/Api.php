@@ -207,7 +207,7 @@ class Api
             "Fails fetching membership {$membershipId} for {$memberId}",
         );
 
-        return $membership ? new Membership($membership) : null;
+        return $membership ? Membership::from($membership) : null;
     }
 
     public function courses(): Collection

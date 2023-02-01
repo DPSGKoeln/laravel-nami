@@ -3,35 +3,37 @@
 namespace Zoomyboy\LaravelNami\Data;
 
 use Carbon\Carbon;
-use Spatie\DataTransferObject\Attributes\CastWith;
-use Spatie\DataTransferObject\Attributes\MapFrom;
-use Spatie\DataTransferObject\DataTransferObject;
-use Zoomyboy\LaravelNami\Casters\CarbonCaster;
-use Zoomyboy\LaravelNami\Casters\NullableCarbonCaster;
+use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Data;
+use Zoomyboy\LaravelNami\Casters\CarbonCast;
 
-class Membership extends DataTransferObject
+class Membership extends Data
 {
-    public ?int $id;
+    public function __construct(
+        public ?int $id,
 
-    #[MapFrom('gruppierungId')]
-    public int $groupId;
+        #[MapInputName('gruppierungId')]
+        public int $groupId,
 
-    #[MapFrom('aktivVon')]
-    #[CastWith(CarbonCaster::class)]
-    public Carbon $startsAt;
+        #[MapInputName('aktivVon')]
+        #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        public Carbon $startsAt,
 
-    #[MapFrom('aktivBis')]
-    #[CastWith(NullableCarbonCaster::class)]
-    public ?Carbon $endsAt;
+        #[MapInputName('aktivBis')]
+        #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        public ?Carbon $endsAt,
 
-    #[MapFrom('taetigkeitId')]
-    public int $activityId;
+        #[MapInputName('taetigkeitId')]
+        public int $activityId,
 
-    #[MapFrom('untergliederungId')]
-    public ?int $subactivityId;
+        #[MapInputName('untergliederungId')]
+        public ?int $subactivityId,
 
-    #[MapFrom('gruppierung')]
-    public ?string $group;
+        #[MapInputName('gruppierung')]
+        public ?string $group,
+    ) {
+    }
 
     public function toNami(): array
     {
@@ -43,17 +45,5 @@ class Membership extends DataTransferObject
             'taetigkeitId' => $this->activityId,
             'untergliederungId' => $this->subactivityId,
         ];
-    }
-
-    public static function fromArray(array $data): self
-    {
-        return new self([
-            'gruppierungId' => data_get($data, 'groupId'),
-            'id' => data_get($data, 'id'),
-            'aktivVon' => data_get($data, 'startsAt'),
-            'aktivBis' => data_get($data, 'endsAt'),
-            'taetigkeitId' => data_get($data, 'activityId'),
-            'untergliederungId' => data_get($data, 'subactivityId'),
-        ]);
     }
 }

@@ -78,7 +78,7 @@ class MembershipTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
         app(MembershipFake::class)->createsSuccessfully(6, 133);
 
-        $membershipId = $this->login()->putMembership(6, Membership::fromArray([
+        $membershipId = $this->login()->putMembership(6, Membership::from([
             'id' => null,
             'subactivityId' => 3,
             'activityId' => 2,
@@ -102,7 +102,7 @@ class MembershipTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
         app(MembershipFake::class)->destroysSuccessfully(6, 133);
 
-        $this->login()->deleteMembership(6, Membership::fromArray([
+        $this->login()->deleteMembership(6, Membership::from([
             'id' => 133,
             'subactivityId' => 3,
             'activityId' => 2,
@@ -120,7 +120,7 @@ class MembershipTest extends TestCase
         app(MembershipFake::class)->failsDeleting(6, 133);
         app(MembershipFake::class)->updatesSuccessfully(6, 133);
 
-        $this->login()->deleteMembership(6, Membership::fromArray([
+        $this->login()->deleteMembership(6, Membership::from([
             'id' => 133,
             'subactivityId' => 3,
             'activityId' => 2,
@@ -142,7 +142,7 @@ class MembershipTest extends TestCase
         app(MembershipFake::class)->failsDeleting(6, null);
         app(MembershipFake::class)->updatesSuccessfully(6, null);
 
-        $this->login()->deleteMembership(6, Membership::fromArray([
+        $this->login()->deleteMembership(6, Membership::from([
             'id' => null,
             'subactivityId' => 3,
             'activityId' => 2,
