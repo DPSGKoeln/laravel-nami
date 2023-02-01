@@ -46,6 +46,10 @@ class MembershipIndexTest extends TestCase
             ->fetches(6, [[
                 'entries_aktivBis' => '',
                 'entries_untergliederung' => '',
+                'entries_aktivVon' => '2021-02-03 00:00:00',
+                'entries_taetigkeit' => 'Leiter (6)',
+                'id' => 55,
+                'entries_gruppierung' => '::group::',
             ]]);
 
         $membership = $this->login()->membershipsOf(6)->first();

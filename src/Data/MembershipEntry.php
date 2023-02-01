@@ -3,32 +3,35 @@
 namespace Zoomyboy\LaravelNami\Data;
 
 use Carbon\Carbon;
-use Spatie\DataTransferObject\Attributes\CastWith;
-use Spatie\DataTransferObject\Attributes\MapFrom;
-use Spatie\DataTransferObject\DataTransferObject;
-use Zoomyboy\LaravelNami\Casters\CarbonCaster;
-use Zoomyboy\LaravelNami\Casters\NullableCarbonCaster;
-use Zoomyboy\LaravelNami\Casters\NullableString;
+use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Data;
+use Zoomyboy\LaravelNami\Casters\CarbonCast;
+use Zoomyboy\LaravelNami\Casters\StringCast;
 
-class MembershipEntry extends DataTransferObject
+class MembershipEntry extends Data
 {
-    public ?int $id;
+    public function __construct(
+        public ?int $id,
 
-    #[MapFrom('entries_gruppierung')]
-    public string $group;
+        #[MapInputName('entries_gruppierung')]
+        public string $group,
 
-    #[MapFrom('entries_aktivVon')]
-    #[CastWith(CarbonCaster::class)]
-    public Carbon $startsAt;
+        #[MapInputName('entries_aktivVon')]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d H:i:s')]
+        public Carbon $startsAt,
 
-    #[MapFrom('entries_aktivBis')]
-    #[CastWith(NullableCarbonCaster::class)]
-    public ?Carbon $endsAt;
+        #[MapInputName('entries_aktivBis')]
+        #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        public ?Carbon $endsAt,
 
-    #[MapFrom('entries_taetigkeit')]
-    public string $activity;
+        #[MapInputName('entries_taetigkeit')]
+        public ?string $activity,
 
-    #[MapFrom('entries_untergliederung')]
-    #[CastWith(NullableString::class)]
-    public ?string $subactivity;
+        #[MapInputName('entries_untergliederung')]
+        #[WithCast(StringCast::class)]
+        public ?string $subactivity,
+    ) {
+    }
 }

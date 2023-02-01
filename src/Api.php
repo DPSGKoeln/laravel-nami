@@ -171,7 +171,7 @@ class Api
                 '/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/'.$memberId.'/flist',
                 'Membership fetch failed'
             )
-            ->map(fn ($membership) => new MembershipEntry($membership));
+            ->map(fn ($membership) => MembershipEntry::from($membership));
     }
 
     public function deleteMembership(int $memberId, Membership $membership): void
