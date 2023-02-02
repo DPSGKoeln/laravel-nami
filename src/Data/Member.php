@@ -63,6 +63,9 @@ class Member extends Data
         #[MapInputName('gruppierungId')]
         public int $groupId,
 
+        #[MapInputName('gruppierung')]
+        public ?string $groupName,
+
         #[MapInputName('mitgliedsNummer')]
         public ?int $memberId,
 

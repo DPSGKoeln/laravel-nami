@@ -19,6 +19,7 @@ class FetchMemberTest extends TestCase
             'geschlechtId' => 19,
             'konfessionId' => 1,
             'landId' => 1,
+            'gruppierung' => 'Gruppe',
             'lastUpdated' => '2022-03-20 11:58:33',
             'nachname' => 'Lang',
             'nameZusatz' => 'zuss',
@@ -71,6 +72,7 @@ class FetchMemberTest extends TestCase
         $this->assertSame('Philipp', $member->firstname);
         $this->assertSame(false, $member->keepdata);
         $this->assertSame(true, $member->sendNewspaper);
+        $this->assertSame('Gruppe', $member->groupName);
     }
 
     public function testGetMinimalData(): void
