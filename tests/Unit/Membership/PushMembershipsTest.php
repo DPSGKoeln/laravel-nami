@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
-use Zoomyboy\LaravelNami\Member;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PushMembershipsTest extends TestCase
@@ -17,8 +16,7 @@ class PushMembershipsTest extends TestCase
         app(MembershipFake::class)->createsSuccessfully(16, 65);
         $this->login();
 
-        $member = new Member(['id' => 16]);
-        $id = $member->putMembership(Membership::fromArray([
+        $id = $this->login()->putMembership(16, Membership::from([
             'startsAt' => now(),
             'groupId' => 150,
             'activityId' => 56,

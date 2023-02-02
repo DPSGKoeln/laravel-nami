@@ -11,6 +11,7 @@ use Zoomyboy\LaravelNami\Authentication\Authenticator;
 use Zoomyboy\LaravelNami\Data\Baustein;
 use Zoomyboy\LaravelNami\Data\Course;
 use Zoomyboy\LaravelNami\Data\Member;
+use Zoomyboy\LaravelNami\Data\MemberEntry;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Data\MembershipEntry;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
@@ -31,7 +32,7 @@ class Api
         return $this->authenticator->http();
     }
 
-    public function findNr(int $nr): Member
+    public function findNr(int $nr): ?MemberEntry
     {
         $this->assertLoggedIn();
 
@@ -41,7 +42,7 @@ class Api
     /**
      * @param array<string, mixed> $payload
      */
-    public function find(array $payload): ?Member
+    public function find(array $payload): ?MemberEntry
     {
         $this->assertLoggedIn();
 
@@ -51,7 +52,7 @@ class Api
     /**
      * @param array<string, mixed> $payload
      *
-     * @return LazyCollection<int, Member>
+     * @return LazyCollection<int, MemberEntry>
      */
     public function search(array $payload): LazyCollection
     {
@@ -64,9 +65,7 @@ class Api
                     $this->exception('Search failed', '', $response->json(), []);
                 }
                 foreach ($response->json()['data'] as $member) {
-                    yield Member::fromNami(collect($member)->mapWithKeys(function ($value, $key) {
-                        return [str_replace('entries_', '', (string) $key) => $value];
-                    }));
+                    yield MemberEntry::from($member);
                 }
             },
             fn ($response) => $response->json()['totalEntries'],
@@ -111,12 +110,11 @@ class Api
         );
     }
 
-    public function putMember(array $attributes): array
+    public function putMember(Member $member): int
     {
         $this->assertLoggedIn();
-        $member = Member::fromAttributes($attributes);
-        if (data_get($attributes, 'id')) {
-            $existing = $this->member($member->group_id, $member->id);
+        if ($member->id) {
+            $existing = $this->member($member->groupId, $member->id);
             $payload = array_merge($existing, $member->toNami());
             $payload['kontoverbindung'] = json_encode(data_get($payload, 'kontoverbindung', []));
             $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id;
@@ -125,13 +123,13 @@ class Api
                 $this->exception('Update failed', $url, $response->json(), $member->toNami());
             }
         } else {
-            $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id;
+            $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->groupId;
             $response = $this->http()->post($url, $member->toNami());
             if (true !== data_get($response->json(), 'success')) {
                 $this->exception('Update failed', $url, $response->json(), $member->toNami());
             }
 
-            return ['id' => $response->json()['data']];
+            return $response->json()['data'];
         }
 
         return $response->json()['data'];
@@ -215,7 +213,7 @@ class Api
         $this->assertLoggedIn();
 
         return $this->fetchCollection('/ica/rest/module/baustein', 'Fetch courses failed')
-            ->map(fn ($course) => new Baustein($course));
+            ->map(fn ($course) => Baustein::from($course));
     }
 
     /**
@@ -234,7 +232,7 @@ class Api
     {
         $single = $this->fetchData("/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", 'Error fetching single course');
 
-        return $single ? new Course($single) : null;
+        return $single ? Course::from($single) : null;
     }
 
     /**

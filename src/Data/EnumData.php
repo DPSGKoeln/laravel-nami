@@ -2,13 +2,13 @@
 
 namespace Zoomyboy\LaravelNami\Data;
 
-use Spatie\DataTransferObject\Attributes\MapFrom;
-use Spatie\DataTransferObject\DataTransferObject;
+use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Data;
 
-abstract class EnumData extends DataTransferObject
+abstract class EnumData extends Data
 {
     public int $id;
 
-    #[MapFrom('descriptor')]
+    #[MapInputName('descriptor')]
     public string $name;
 }

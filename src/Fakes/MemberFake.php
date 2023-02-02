@@ -23,20 +23,36 @@ class MemberFake extends Fake
             $url = 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
             if ($request->url() === $url && 'GET' === $request->method()) {
                 return $this->dataResponse(array_merge([
-                    'id' => $memberId,
-                    'vorname' => '::firstname::',
-                    'nachname' => '::lastname::',
-                    'zeitschriftenversand' => true,
-                    'strasse' => '::address::',
-                    'plz' => '12345',
-                    'ort' => 'SG',
-                    'version' => 1,
+                    'beitragsartId' => 1,
                     'eintrittsdatum' => '2005-05-01 00:00:00',
+                    'email' => 'pille@stamm-silva.de',
+                    'emailVertretungsberechtigter' => '',
                     'geburtsDatum' => '1991-06-20 00:00:00',
-                    'gruppierungId' => $groupId,
-                    'gruppierung' => 'gei0OhSh0quahcoh',
                     'geschlechtId' => 19,
+                    'gruppierung' => 'gei0OhSh0quahcoh',
+                    'gruppierungId' => $groupId,
+                    'mitgliedsNummer' => 55,
+                    'id' => $memberId,
+                    'konfessionId' => 1,
+                    'landId' => 1,
+                    'lastUpdated' => '2022-03-20 11:58:33',
+                    'nachname' => '::lastname::',
+                    'nameZusatz' => 'zuss',
+                    'ort' => 'SG',
+                    'plz' => '12345',
+                    'regionId' => 10,
+                    'spitzname' => 'pille',
                     'staatsangehoerigkeitId' => 1054,
+                    'staatsangehoerigkeitText' => '',
+                    'strasse' => '::address::',
+                    'telefax' => '+49 176 44333',
+                    'telefon1' => '+49 212 1399418',
+                    'telefon2' => '+49 176 555555',
+                    'telefon3' => '+49 176 5544466',
+                    'version' => 1,
+                    'vorname' => '::firstname::',
+                    'wiederverwendenFlag' => false,
+                    'zeitschriftenversand' => true,
                 ], $data));
             }
         });
@@ -115,7 +131,7 @@ class MemberFake extends Fake
             $requestBody = json_decode($request->body(), true);
 
             foreach ($body as $key => $value) {
-                if (!isset($requestBody[$key])) {
+                if (!array_key_exists($key, $requestBody)) {
                     return false;
                 }
 

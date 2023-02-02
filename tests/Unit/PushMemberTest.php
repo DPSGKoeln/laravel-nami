@@ -2,72 +2,49 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
-use Illuminate\Support\Facades\Http;
-use Zoomyboy\LaravelNami\Nami;
+use Zoomyboy\LaravelNami\Data\Member;
+use Zoomyboy\LaravelNami\Fakes\MemberFake;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PushMemberTest extends TestCase
 {
-    public array $attributes = [
-        [
+    public function testPushASingleMember(): void
+    {
+        app(MemberFake::class)->createsSuccessfully(103, 16);
+        $response = $this->login()->putMember(Member::from([
             'firstname' => 'Max',
             'lastname' => 'Nach1',
-            'group_id' => 103,
             'nickname' => 'spitz1',
-            'gender_id' => 17,
-            'joined_at' => '2021-02-02T00:00:00',
-            'birthday' => '2021-02-02',
-            'id' => 16,
-        ], [
-            'firstname' => 'Jane',
-            'lastname' => 'Nach2',
-            'nickname' => null,
-            'group_id' => 103,
-            'gender_id' => null,
-            'joined_at' => '2021-02-02T00:00:00',
-            'birthday' => '2021-02-02',
-            'id' => 17,
-        ],
-    ];
+            'groupId' => 103,
+            'genderId' => 17,
+            'confessionId' => 33,
+            'joinedAt' => '2021-02-02 00:00:00',
+            'birthday' => '2021-02-02 00:00:00',
+            'email' => 'aa@b.de',
+            'countryId' => 78,
+            'keepdata' => false,
+            'sendNewspaper' => false,
+            'regionId' => 11,
+            'nationalityId' => 12,
+            'beitragsartId' => null,
+        ]));
 
-    public function dataProvider(): array
-    {
-        return [
-            'firstname' => [['firstname' => 'Max'], ['vorname' => 'Max']],
-            'lastname' => [['lastname' => 'Nach1'], ['nachname' => 'Nach1']],
-            'nickname' => [['nickname' => 'nick'], ['spitzname' => 'nick']],
-            'nicknameEmpty' => [['nickname' => null], ['spitzname' => '']],
-            'gender_id' => [['gender_id' => 17], ['geschlechtId' => 17]],
-        ];
-    }
+        $this->assertEquals(16, $response);
 
-    /**
-     * @dataProvider dataProvider
-     */
-    public function testPushASingleMember(array $overwrites, array $check): void
-    {
-        Http::fake([
-            'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' => Http::response('{"success": true, "data": {"id": 16}}', 200),
+        app(MemberFake::class)->assertCreated(103, [
+            'spitzname' => 'spitz1',
+            'vorname' => 'Max',
+            'nachname' => 'Nach1',
+            'geschlechtId' => 17,
+            'email' => 'aa@b.de',
+            'beitragsartId' => null,
+            'geburtsDatum' => '2021-02-02 00:00:00',
+            'konfessionId' => 33,
+            'landId' => 78,
+            'wiederverwendenFlag' => false,
+            'zeitschriftenversand' => false,
+            'regionId' => 11,
+            'staatsangehoerigkeitId' => 12,
         ]);
-        $this->login();
-
-        $res = Nami::putMember(array_merge($this->attributes[0], $overwrites));
-        $this->assertEquals(16, $res['id']);
-
-        Http::assertSent(function ($request) use ($check) {
-            if ('https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/103/16' != $request->url() || 'PUT' !== $request->method()) {
-                return false;
-            }
-
-            foreach ($check as $key => $value) {
-                if ($request[$key] !== $value) {
-                    return false;
-                }
-            }
-
-            return 'PUT' === $request->method();
-        });
-
-        Http::assertSentCount(2);
     }
 }

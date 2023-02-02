@@ -2,22 +2,25 @@
 
 namespace Zoomyboy\LaravelNami\Data;
 
-use Spatie\DataTransferObject\Attributes\MapFrom;
-use Spatie\DataTransferObject\DataTransferObject;
+use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Data;
 
-class Course extends DataTransferObject
+class Course extends Data
 {
-    public int $id;
+    public function __construct(
+        public int $id,
 
-    #[MapFrom('bausteinId')]
-    public string $courseId;
+        #[MapInputName('bausteinId')]
+        public string $courseId,
 
-    #[MapFrom('veranstalter')]
-    public string $organizer;
+        #[MapInputName('veranstalter')]
+        public string $organizer,
 
-    #[MapFrom('vstgName')]
-    public string $eventName;
+        #[MapInputName('vstgName')]
+        public string $eventName,
 
-    #[MapFrom('vstgTag')]
-    public string $completedAt;
+        #[MapInputName('vstgTag')]
+        public string $completedAt,
+    ) {
+    }
 }

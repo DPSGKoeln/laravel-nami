@@ -2,18 +2,133 @@
 
 namespace Zoomyboy\LaravelNami\Data;
 
+use Carbon\Carbon;
 use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
+use Zoomyboy\LaravelNami\Casters\CarbonCast;
+use Zoomyboy\LaravelNami\Casters\StringCast;
 
 class Member extends Data
 {
     public function __construct(
         #[MapInputName('vorname')]
-        public string $firstname,
+        #[WithCast(StringCast::class)]
+        public ?string $firstname,
+
         #[MapInputName('nachname')]
-        public string $lastname,
+        #[WithCast(StringCast::class)]
+        public ?string $lastname,
+
         #[MapInputName('spitzname')]
-        public string $nickname,
+        #[WithCast(StringCast::class)]
+        public ?string $nickname,
+
+        #[MapInputName('beitragsartId')]
+        public ?int $feeId,
+
+        #[MapInputName('eintrittsdatum')]
+        #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        public Carbon $joinedAt,
+
+        #[MapInputName('geburtsDatum')]
+        #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        public Carbon $birthday,
+
+        public string $email,
+
+        #[MapInputName('geschlechtId')]
+        public int $genderId,
+
+        #[MapInputName('konfessionId')]
+        public ?int $confessionId,
+
+        #[MapInputName('landId')]
+        public int $countryId,
+
+        #[MapInputName('lastUpdated')]
+        #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        public ?Carbon $updatedAt,
+
+        #[MapInputName('nameZusatz')]
+        #[WithCast(StringCast::class)]
+        public ?string $furtherAddress,
+
+        #[MapInputName('emailVertretungsberechtigter')]
+        #[WithCast(StringCast::class)]
+        public ?string $emailParents,
+
+        public ?int $id,
+
+        #[MapInputName('gruppierungId')]
+        public int $groupId,
+
+        #[MapInputName('mitgliedsNummer')]
+        public ?int $memberId,
+
+        #[MapInputName('plz')]
+        public ?string $zip,
+
+        #[MapInputName('ort')]
+        public ?string $location,
+
+        public int $regionId,
+
+        #[MapInputName('staatsangehoerigkeitId')]
+        public int $nationalityId,
+
+        #[MapInputName('strasse')]
+        public ?string $address,
+
+        #[MapInputName('telefax')]
+        #[WithCast(StringCast::class)]
+        public ?string $fax,
+
+        #[MapInputName('telefon1')]
+        #[WithCast(StringCast::class)]
+        public ?string $mainPhone,
+
+        #[MapInputName('telefon2')]
+        #[WithCast(StringCast::class)]
+        public ?string $mobilePhone,
+
+        #[MapInputName('telefon3')]
+        #[WithCast(StringCast::class)]
+        public ?string $workPhone,
+
+        #[MapInputName('staatsangehoerigkeitText')]
+        #[WithCast(StringCast::class)]
+        public ?string $otherCountry,
+
+        public ?int $version,
+
+        #[MapInputName('wiederverwendenFlag')]
+        public bool $keepdata,
+
+        #[MapInputName('zeitschriftenversand')]
+        public bool $sendNewspaper,
     ) {
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toNami(): array
+    {
+        return [
+            'spitzname' => $this->nickname ?: '',
+            'vorname' => $this->firstname ?: '',
+            'nachname' => $this->lastname ?: '',
+            'geschlechtId' => $this->genderId,
+            'email' => $this->email,
+            'beitragsartId' => $this->feeId,
+            'geburtsDatum' => $this->birthday->format('Y-m-d 00:00:00'),
+            'konfessionId' => $this->confessionId,
+            'landId' => $this->countryId,
+            'wiederverwendenFlag' => $this->keepdata,
+            'regionId' => $this->regionId,
+            'staatsangehoerigkeitId' => $this->nationalityId,
+            'zeitschriftenversand' => $this->sendNewspaper,
+        ];
     }
 }
