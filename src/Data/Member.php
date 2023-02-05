@@ -8,6 +8,7 @@ use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 use Zoomyboy\LaravelNami\Casters\CarbonCast;
 use Zoomyboy\LaravelNami\Casters\StringCast;
+use Zoomyboy\LaravelNami\Tests\Factories\MemberRequestFactory;
 
 class Member extends Data
 {
@@ -133,5 +134,10 @@ class Member extends Data
             'staatsangehoerigkeitId' => $this->nationalityId,
             'zeitschriftenversand' => $this->sendNewspaper,
         ];
+    }
+
+    public static function factory(): MemberRequestFactory
+    {
+        return MemberRequestFactory::new();
     }
 }

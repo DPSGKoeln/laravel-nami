@@ -11,7 +11,7 @@ class PutMemberTest extends TestCase
     public function testPushASingleMember(): void
     {
         app(MemberFake::class)->createsSuccessfully(103, 16);
-        $member = Member::from([
+        $member = Member::factory()->toMember([
             'firstname' => 'Max',
             'lastname' => 'Nach1',
             'nickname' => 'spitz1',
@@ -55,10 +55,8 @@ class PutMemberTest extends TestCase
     {
         app(MemberFake::class)
             ->updatesSuccessfully(103, 16)
-            ->shows(103, 16, [
-                'foreign' => 'fff',
-            ]);
-        $member = Member::from([
+            ->shows(103, 16);
+        $member = Member::factory()->toMember([
             'firstname' => 'Max',
             'lastname' => 'Nach1',
             'nickname' => 'spitz1',
@@ -94,6 +92,23 @@ class PutMemberTest extends TestCase
             'zeitschriftenversand' => false,
             'regionId' => 11,
             'staatsangehoerigkeitId' => 12,
+        ]);
+    }
+
+    public function testItMergesKontoverbindung(): void
+    {
+        app(MemberFake::class)
+            ->updatesSuccessfully(103, 16)
+            ->shows(103, 16, [
+                'foreign' => 'fff',
+                'kontoverbindung' => ['a' => 'b'],
+            ]);
+        $response = $this->login()->putMember(Member::factory()->inNami(103, 16)->toMember());
+
+        $this->assertEquals(16, $response);
+
+        app(MemberFake::class)->assertUpdated(103, 16, [
+            'kontoverbindung' => '{"a":"b"}',
             'foreign' => 'fff',
         ]);
     }
