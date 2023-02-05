@@ -60,24 +60,6 @@ class MemberFake extends Fake
         return $this;
     }
 
-    /**
-     * @param array<string, string|int|null> $data
-     */
-    public function updates(int $groupId, int $memberId, array $data): self
-    {
-        Http::fake(function ($request) use ($groupId, $memberId, $data) {
-            $url = 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
-            if ($request->url() === $url && 'PUT' === $request->method()) {
-                return $this->dataResponse([
-                    'id' => $memberId,
-                    ...$data,
-                ]);
-            }
-        });
-
-        return $this;
-    }
-
     public function deletes(int $memberId, Carbon $date): void
     {
         Http::fake(function ($request) use ($memberId, $date) {
@@ -101,6 +83,24 @@ class MemberFake extends Fake
 
             return $this->nullResponse();
         });
+    }
+
+    /**
+     * @param array<string, string|int|null> $data
+     */
+    public function updatesSuccessfully(int $groupId, int $memberId, array $data = []): self
+    {
+        Http::fake(function ($request) use ($groupId, $memberId, $data) {
+            $url = 'https://nami.dpsg.de/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
+            if ($request->url() === $url && 'PUT' === $request->method()) {
+                return $this->dataResponse([
+                    'id' => $memberId,
+                    ...$data,
+                ]);
+            }
+        });
+
+        return $this;
     }
 
     public function createsSuccessfully(int $groupId, int $memberId): self
@@ -159,7 +159,7 @@ class MemberFake extends Fake
             $requestBody = json_decode($request->body(), true);
 
             foreach ($body as $key => $value) {
-                if (!isset($requestBody[$key])) {
+                if (!array_key_exists($key, $requestBody)) {
                     return false;
                 }
 

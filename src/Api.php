@@ -110,29 +110,33 @@ class Api
         );
     }
 
-    public function putMember(Member $member): int
+    public function putMember(Member $member, ?int $firstActivity = null, ?int $firstSubactivity = null): int
     {
         $this->assertLoggedIn();
         if ($member->id) {
-            $existing = $this->member($member->groupId, $member->id);
+            $existing = $this->rawMember($member->groupId, $member->id);
             $payload = array_merge($existing, $member->toNami());
             $payload['kontoverbindung'] = json_encode(data_get($payload, 'kontoverbindung', []));
-            $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->group_id.'/'.$member->id;
+            $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->groupId.'/'.$member->id;
             $response = $this->http()->put($url, $payload);
             if (true !== data_get($response->json(), 'success')) {
                 $this->exception('Update failed', $url, $response->json(), $member->toNami());
             }
+
+            return $response->json()['data']['id'];
         } else {
             $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->groupId;
-            $response = $this->http()->post($url, $member->toNami());
+            $response = $this->http()->post($url, [
+                ...$member->toNami(),
+                'ersteTaetigkeitId' => $firstActivity,
+                'ersteUntergliederungId' => $firstSubactivity,
+            ]);
             if (true !== data_get($response->json(), 'success')) {
                 $this->exception('Update failed', $url, $response->json(), $member->toNami());
             }
 
             return $response->json()['data'];
         }
-
-        return $response->json()['data'];
     }
 
     public function putMembership(int $memberId, Membership $data): int
@@ -290,23 +294,7 @@ class Api
 
     public function member(int $groupId, int $memberId): Member
     {
-        $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
-        $response = $this->http()->get($url);
-
-        if (false === $response->json()['success'] && Str::startsWith($response['message'], 'Access denied')) {
-            return $this->singleMemberFallback($groupId, $memberId);
-        }
-
-        if (false === $response->json()['success'] && Str::startsWith($response['message'], 'Sicherheitsverletzung: Zugriff')) {
-            return $this->singleMemberFallback($groupId, $memberId);
-        }
-
-        if (true !== $response->json()['success']) {
-            $this->exception('Fetching member failed', $url, $response->json());
-        }
-
-        return Member::from($response->json()['data']);
+        return Member::from($this->rawMember($groupId, $memberId));
     }
 
     public function hasGroup(int $groupId): bool
@@ -503,5 +491,29 @@ class Api
         if (false === $response['success']) {
             $this->exception($error, $url, $response->json());
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function rawMember(int $groupId, int $memberId): array
+    {
+        $this->assertLoggedIn();
+        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
+        $response = $this->http()->get($url);
+
+        if (false === $response->json()['success'] && Str::startsWith($response['message'], 'Access denied')) {
+            return $this->singleMemberFallback($groupId, $memberId);
+        }
+
+        if (false === $response->json()['success'] && Str::startsWith($response['message'], 'Sicherheitsverletzung: Zugriff')) {
+            return $this->singleMemberFallback($groupId, $memberId);
+        }
+
+        if (true !== $response->json()['success']) {
+            $this->exception('Fetching member failed', $url, $response->json());
+        }
+
+        return $response->json()['data'];
     }
 }
