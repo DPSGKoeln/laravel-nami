@@ -27,6 +27,7 @@ class PutMemberTest extends TestCase
             'regionId' => 11,
             'nationalityId' => 12,
             'beitragsartId' => null,
+            'emailParents' => 'a@b.de',
         ]);
         $response = $this->login()->putMember($member, 78, 79);
 
@@ -48,6 +49,7 @@ class PutMemberTest extends TestCase
             'staatsangehoerigkeitId' => 12,
             'ersteTaetigkeitId' => 78,
             'ersteUntergliederungId' => 79,
+            'emailVertretungsberechtigter' => 'a@b.de',
         ]);
     }
 

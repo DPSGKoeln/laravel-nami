@@ -133,6 +133,7 @@ class Member extends Data
             'regionId' => $this->regionId,
             'staatsangehoerigkeitId' => $this->nationalityId,
             'zeitschriftenversand' => $this->sendNewspaper,
+            'emailVertretungsberechtigter' => $this->emailParents,
         ];
     }
 
