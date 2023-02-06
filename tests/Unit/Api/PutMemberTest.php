@@ -138,4 +138,21 @@ class PutMemberTest extends TestCase
             'foreign' => 'fff',
         ]);
     }
+
+    public function testGenderCanBeNull(): void
+    {
+        app(MemberFake::class)
+            ->updatesSuccessfully(103, 16)
+            ->shows(103, 16, [
+                'foreign' => 'fff',
+                'kontoverbindung' => ['a' => 'b'],
+            ]);
+        $response = $this->login()->putMember(Member::factory()->inNami(103, 16)->toMember(['genderId' => null]));
+
+        $this->assertEquals(16, $response);
+
+        app(MemberFake::class)->assertUpdated(103, 16, [
+            'geschlechtId' => 23,
+        ]);
+    }
 }

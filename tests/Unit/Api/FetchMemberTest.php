@@ -91,6 +91,7 @@ class FetchMemberTest extends TestCase
             'mitgliedsNummer' => null,
             'beitragsartId' => null,
             'konfessionId' => null,
+            'geschlechtId' => 23,
         ]);
 
         $member = $this->login()->member(1000, 1001);
@@ -108,6 +109,7 @@ class FetchMemberTest extends TestCase
         $this->assertNull($member->memberId);
         $this->assertNull($member->feeId);
         $this->assertNull($member->confessionId);
+        $this->assertNull($member->genderId);
     }
 
     public function testMemberFetchCanFail(): void

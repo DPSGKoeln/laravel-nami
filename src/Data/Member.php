@@ -7,6 +7,7 @@ use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 use Zoomyboy\LaravelNami\Casters\CarbonCast;
+use Zoomyboy\LaravelNami\Casters\GenderCast;
 use Zoomyboy\LaravelNami\Casters\StringCast;
 use Zoomyboy\LaravelNami\Tests\Factories\MemberRequestFactory;
 
@@ -39,7 +40,8 @@ class Member extends Data
         public string $email,
 
         #[MapInputName('geschlechtId')]
-        public int $genderId,
+        #[WithCast(GenderCast::class)]
+        public ?int $genderId,
 
         #[MapInputName('konfessionId')]
         public ?int $confessionId,
@@ -123,7 +125,7 @@ class Member extends Data
             'spitzname' => $this->nickname ?: '',
             'vorname' => $this->firstname ?: '',
             'nachname' => $this->lastname ?: '',
-            'geschlechtId' => $this->genderId,
+            'geschlechtId' => $this->genderId ?: 23,
             'email' => $this->email,
             'beitragsartId' => $this->feeId,
             'geburtsDatum' => $this->birthday->format('Y-m-d 00:00:00'),
