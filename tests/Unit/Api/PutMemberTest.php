@@ -28,6 +28,18 @@ class PutMemberTest extends TestCase
             'nationalityId' => 12,
             'beitragsartId' => null,
             'emailParents' => 'a@b.de',
+            'location' => 'SG',
+            'zip' => 55555,
+            'address' => 'Maxstr 5',
+            'fax' => '+49 111',
+            'mainPhone' => '+49 222',
+            'mobilePhone' => '+49 333',
+            'workPhone' => '+49 3333',
+            'keepdata' => true,
+            'sendNewspaper' => true,
+            'otherCountry' => 'Land',
+            'furtherAddress' => 'Name',
+            'version' => 40,
         ]);
         $response = $this->login()->putMember($member, 78, 79);
 
@@ -50,6 +62,18 @@ class PutMemberTest extends TestCase
             'ersteTaetigkeitId' => 78,
             'ersteUntergliederungId' => 79,
             'emailVertretungsberechtigter' => 'a@b.de',
+            'ort' => 'SG',
+            'plz' => '55555',
+            'strasse' => 'Maxstr 5',
+            'telefax' => '+49 111',
+            'telefon1' => '+49 222',
+            'telefon2' => '+49 333',
+            'telefon3' => '+49 3333',
+            'wiederverwendenFlag' => true,
+            'zeitschriftenversand' => true,
+            'staatsangehoerigkeitText' => 'Land',
+            'nameZusatz' => 'Name',
+            'version' => 40,
         ]);
     }
 

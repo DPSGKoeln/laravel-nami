@@ -134,6 +134,17 @@ class Member extends Data
             'staatsangehoerigkeitId' => $this->nationalityId,
             'zeitschriftenversand' => $this->sendNewspaper,
             'emailVertretungsberechtigter' => $this->emailParents,
+            'ort' => $this->location,
+            'plz' => $this->zip,
+            'strasse' => $this->address,
+            'telefax' => $this->fax,
+            'telefon1' => $this->mainPhone,
+            'telefon2' => $this->mobilePhone,
+            'telefon3' => $this->workPhone,
+            'zeitschriftenversand' => $this->sendNewspaper,
+            'staatsangehoerigkeitText' => $this->otherCountry,
+            'nameZusatz' => $this->furtherAddress,
+            'version' => $this->version,
         ];
     }
 
