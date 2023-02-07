@@ -2,6 +2,7 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
 
+use Zoomyboy\LaravelNami\Exceptions\MemberDataCorruptedException;
 use Zoomyboy\LaravelNami\Fakes\MemberFake;
 use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
@@ -110,6 +111,19 @@ class FetchMemberTest extends TestCase
         $this->assertNull($member->feeId);
         $this->assertNull($member->confessionId);
         $this->assertNull($member->genderId);
+    }
+
+    /**
+     * @testWith [{"eintrittsdatum": null}]
+     *           [{"landId": null}]
+     */
+    public function testFailsFetchingWhenJoinedAtDateIsMissing(array $data): void
+    {
+        $this->expectException(MemberDataCorruptedException::class);
+
+        app(MemberFake::class)->shows(1000, 1001, $data);
+
+        $this->login()->member(1000, 1001);
     }
 
     public function testMemberFetchCanFail(): void

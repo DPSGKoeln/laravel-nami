@@ -14,6 +14,7 @@ use Zoomyboy\LaravelNami\Data\Member;
 use Zoomyboy\LaravelNami\Data\MemberEntry;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Data\MembershipEntry;
+use Zoomyboy\LaravelNami\Exceptions\MemberDataCorruptedException;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Support\Paginator;
 
@@ -294,7 +295,11 @@ class Api
 
     public function member(int $groupId, int $memberId): Member
     {
-        return Member::from($this->rawMember($groupId, $memberId));
+        $rawMember = $this->rawMember($groupId, $memberId);
+
+        throw_unless(Member::isCorrupted($rawMember), MemberDataCorruptedException::class, $rawMember);
+
+        return Member::from($rawMember);
     }
 
     public function hasGroup(int $groupId): bool

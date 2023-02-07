@@ -155,4 +155,20 @@ class Member extends Data
     {
         return MemberRequestFactory::new();
     }
+
+    /**
+     * @param array<string, mixed> $rawData
+     */
+    public static function isCorrupted(array $rawData): bool
+    {
+        if (!data_get($rawData, 'eintrittsdatum')) {
+            return false;
+        }
+
+        if (!data_get($rawData, 'landId')) {
+            return false;
+        }
+
+        return true;
+    }
 }
