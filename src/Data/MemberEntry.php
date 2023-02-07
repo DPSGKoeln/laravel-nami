@@ -17,6 +17,11 @@ class MemberEntry extends Data
         #[MapInputName('entries_nachname')]
         #[WithCast(StringCast::class)]
         public ?string $lastname,
+
+        public int $id,
+
+        #[MapInputName('entries_gruppierungId')]
+        public int $groupId,
     ) {
     }
 }

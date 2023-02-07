@@ -49,6 +49,8 @@ class SearchTest extends TestCase
         $member = $this->login()->findNr(150);
 
         $this->assertEquals('Philipp', $member->firstname);
+        $this->assertEquals(89418, $member->id);
+        $this->assertEquals(100105, $member->groupId);
         Http::assertSent(function ($request) {
             return $request->url() == $this->url(['mitgliedsNummber' => 150])
                 && 'GET' == $request->method();
