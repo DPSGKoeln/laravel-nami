@@ -15,7 +15,7 @@ class Course extends Data
         public int $id,
 
         #[MapInputName('bausteinId')]
-        public string $courseId,
+        public int $courseId,
 
         #[MapInputName('veranstalter')]
         public string $organizer,
