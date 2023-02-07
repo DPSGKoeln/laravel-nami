@@ -22,7 +22,6 @@ class SearchFake extends Fake
     public function fetches(int $page, int $start, array $data): void
     {
         Http::fake(function ($request) use ($page, $start, $data) {
-            dump($request->url());
             if ($request->url() === 'https://nami.dpsg.de/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode('{}').'&page='.$page.'&start='.$start.'&limit=100') {
                 return $this->collection(collect($data)->map(fn ($member) => [
                     'id' => $member->id,
