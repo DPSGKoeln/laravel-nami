@@ -147,12 +147,13 @@ class PutMemberTest extends TestCase
                 'foreign' => 'fff',
                 'kontoverbindung' => ['a' => 'b'],
             ]);
-        $response = $this->login()->putMember(Member::factory()->inNami(103, 16)->toMember(['genderId' => null]));
+        $response = $this->login()->putMember(Member::factory()->inNami(103, 16)->toMember(['genderId' => null, 'regionId' => null]));
 
         $this->assertEquals(16, $response);
 
         app(MemberFake::class)->assertUpdated(103, 16, [
             'geschlechtId' => 23,
+            'regionId' => 23,
         ]);
     }
 }

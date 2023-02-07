@@ -7,7 +7,7 @@ use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 use Zoomyboy\LaravelNami\Casters\CarbonCast;
-use Zoomyboy\LaravelNami\Casters\GenderCast;
+use Zoomyboy\LaravelNami\Casters\NullValueCast;
 use Zoomyboy\LaravelNami\Casters\StringCast;
 use Zoomyboy\LaravelNami\Tests\Factories\MemberRequestFactory;
 
@@ -40,7 +40,7 @@ class Member extends Data
         public string $email,
 
         #[MapInputName('geschlechtId')]
-        #[WithCast(GenderCast::class)]
+        #[WithCast(NullValueCast::class, id: 23)]
         public ?int $genderId,
 
         #[MapInputName('konfessionId')]
@@ -78,7 +78,8 @@ class Member extends Data
         #[MapInputName('ort')]
         public ?string $location,
 
-        public int $regionId,
+        #[WithCast(NullValueCast::class, id: 23)]
+        public ?int $regionId,
 
         #[MapInputName('staatsangehoerigkeitId')]
         public int $nationalityId,
@@ -132,7 +133,7 @@ class Member extends Data
             'konfessionId' => $this->confessionId,
             'landId' => $this->countryId,
             'wiederverwendenFlag' => $this->keepdata,
-            'regionId' => $this->regionId,
+            'regionId' => $this->regionId ?: 23,
             'staatsangehoerigkeitId' => $this->nationalityId,
             'zeitschriftenversand' => $this->sendNewspaper,
             'emailVertretungsberechtigter' => $this->emailParents,

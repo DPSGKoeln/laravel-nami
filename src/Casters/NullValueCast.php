@@ -7,11 +7,16 @@ use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Support\DataProperty;
 
-class GenderCast implements Cast
+class NullValueCast implements Cast
 {
+    public function __construct(
+        private int $id
+    ) {
+    }
+
     public function cast(DataProperty $property, mixed $value, array $context): DateTimeInterface|Uncastable|null|int
     {
-        if (23 === $value) {
+        if ($this->id === $value) {
             return null;
         }
 
