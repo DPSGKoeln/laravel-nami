@@ -3,14 +3,11 @@
 namespace Zoomyboy\LaravelNami\Fakes;
 
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Data\Course;
 
 class CourseFake extends Fake
 {
     private array $defaults = [
-        'bausteinId' => 506,
-        'veranstalter' => 'KJA',
-        'vstgName' => 'eventname',
-        'vstgTag' => '2021-11-12 00:00:00',
     ];
 
     /**
@@ -38,14 +35,17 @@ class CourseFake extends Fake
         return $this;
     }
 
-    /**
-     * @param array<string, mixed> $data
-     */
-    public function shows(int $memberId, array $data): self
+    public function shows(int $memberId, Course $data): self
     {
         Http::fake(function ($request) use ($memberId, $data) {
-            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$data['id']}") {
-                return $this->dataResponse(array_merge($this->defaults, $data));
+            if ($request->url() === "https://nami.dpsg.de/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$data->id}") {
+                return $this->dataResponse([
+                    'bausteinId' => $data->courseId,
+                    'veranstalter' => $data->organizer,
+                    'vstgName' => $data->eventName,
+                    'vstgTag' => $data->completedAt->format('Y-m-d').' 00:00:00',
+                    'id' => $data->id,
+                ]);
             }
         });
 

@@ -6,6 +6,7 @@ use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 use Zoomyboy\LaravelNami\Casters\StringCast;
+use Zoomyboy\LaravelNami\Tests\Factories\MemberEntryRequestFactory;
 
 class MemberEntry extends Data
 {
@@ -23,5 +24,10 @@ class MemberEntry extends Data
         #[MapInputName('entries_gruppierungId')]
         public int $groupId,
     ) {
+    }
+
+    public static function factory(): MemberEntryRequestFactory
+    {
+        return MemberEntryRequestFactory::new();
     }
 }

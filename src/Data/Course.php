@@ -2,8 +2,12 @@
 
 namespace Zoomyboy\LaravelNami\Data;
 
+use Carbon\Carbon;
 use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
+use Zoomyboy\LaravelNami\Casters\CarbonCast;
+use Zoomyboy\LaravelNami\Tests\Factories\CourseFactory;
 
 class Course extends Data
 {
@@ -20,7 +24,13 @@ class Course extends Data
         public string $eventName,
 
         #[MapInputName('vstgTag')]
-        public string $completedAt,
+        #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        public Carbon $completedAt,
     ) {
+    }
+
+    public static function factory(): CourseFactory
+    {
+        return CourseFactory::new();
     }
 }

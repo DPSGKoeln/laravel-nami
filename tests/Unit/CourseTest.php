@@ -2,6 +2,7 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
+use Zoomyboy\LaravelNami\Data\Course;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
 use Zoomyboy\LaravelNami\Fakes\CourseFake;
 use Zoomyboy\LaravelNami\LoginException;
@@ -15,13 +16,13 @@ class CourseTest extends TestCase
     {
         app(CourseFake::class)
             ->fetches(11111, [788])
-            ->shows(11111, [
+            ->shows(11111, Course::factory()->toModel([
                 'bausteinId' => 506,
                 'id' => 788,
                 'veranstalter' => 'KJA',
                 'vstgName' => 'eventname',
                 'vstgTag' => '2021-11-12 00:00:00',
-            ]);
+            ]));
 
         $course = $this->login()->coursesFor(11111)->first();
 
@@ -39,8 +40,8 @@ class CourseTest extends TestCase
     {
         app(CourseFake::class)
             ->fetches(11111, [788, 789])
-            ->shows(11111, ['id' => 788])
-            ->shows(11111, ['id' => 789]);
+            ->shows(11111, Course::factory()->id(788)->toModel())
+            ->shows(11111, Course::factory()->id(789)->toModel());
 
         $courses = $this->login()->coursesFor(11111);
 
@@ -52,7 +53,7 @@ class CourseTest extends TestCase
         app(CourseFake::class)
             ->fetches(11111, [788, 789])
             ->failsShowingWithHtml(11111, 788)
-            ->shows(11111, ['id' => 789]);
+            ->shows(11111, Course::factory()->id(789)->toModel());
 
         $courses = $this->login()->coursesFor(11111);
 
