@@ -5,11 +5,13 @@ namespace Zoomyboy\LaravelNami\Data;
 use Carbon\Carbon;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Zoomyboy\LaravelNami\Casters\CarbonCast;
 use Zoomyboy\LaravelNami\Casters\NullValueCast;
 use Zoomyboy\LaravelNami\Casters\StringCast;
 use Zoomyboy\LaravelNami\Tests\Factories\MemberRequestFactory;
+use Zoomyboy\LaravelNami\Transformers\CarbonTransformer;
 
 class Member extends Data
 {
@@ -31,10 +33,12 @@ class Member extends Data
 
         #[MapInputName('eintrittsdatum')]
         #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        #[WithTransformer(CarbonTransformer::class, format: 'Y-m-d H:i:s')]
         public Carbon $joinedAt,
 
         #[MapInputName('geburtsDatum')]
         #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        #[WithTransformer(CarbonTransformer::class, format: 'Y-m-d H:i:s')]
         public Carbon $birthday,
 
         public string $email,
@@ -51,6 +55,7 @@ class Member extends Data
 
         #[MapInputName('lastUpdated')]
         #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        #[WithTransformer(CarbonTransformer::class, format: 'Y-m-d H:i:s')]
         public ?Carbon $updatedAt,
 
         #[MapInputName('nameZusatz')]
