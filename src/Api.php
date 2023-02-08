@@ -16,6 +16,7 @@ use Zoomyboy\LaravelNami\Data\Member;
 use Zoomyboy\LaravelNami\Data\MemberEntry;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Data\MembershipEntry;
+use Zoomyboy\LaravelNami\Exceptions\ConflictException;
 use Zoomyboy\LaravelNami\Exceptions\HttpException;
 use Zoomyboy\LaravelNami\Exceptions\MemberDataCorruptedException;
 use Zoomyboy\LaravelNami\Exceptions\NoJsonReceivedException;
@@ -126,9 +127,7 @@ class Api
             $payload['kontoverbindung'] = json_encode(data_get($payload, 'kontoverbindung', []));
             $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->groupId.'/'.$member->id;
             $response = $this->http()->put($url, $payload);
-            if (true !== data_get($response->json(), 'success')) {
-                $this->exception(NotSuccessfulException::class, 'Update failed', $url, $response->json(), $member->toNami());
-            }
+            $this->assertOk($response, $url, 'Update failed');
 
             return $response->json()['data']['id'];
         } else {
@@ -478,6 +477,10 @@ class Api
 
         if (data_get($response, 'message') && Str::contains($response['message'], 'Sicherheitsverletzung')) {
             $this->exception(RightException::class, $error, $url, $response->json());
+        }
+
+        if (data_get($response, 'message') && Str::contains($response['message'], 'Der Datensatz wurde zwischenzeitlich verändert')) {
+            $this->exception(ConflictException::class, $error, $url, $response->json());
         }
 
         if (false === $response['success']) {

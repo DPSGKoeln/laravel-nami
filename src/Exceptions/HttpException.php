@@ -4,7 +4,6 @@ namespace Zoomyboy\LaravelNami\Exceptions;
 
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 abstract class HttpException extends Exception
@@ -54,9 +53,9 @@ abstract class HttpException extends Exception
         return $this;
     }
 
-    public function isConflict(): bool
+    public function render(): void
     {
-        return Str::contains(data_get($this->response, 'message'), 'Der Datensatz wurde zwischenzeitlich verändert');
+        throw ValidationException::withMessages(['id' => 'Unbekannter Fehler']);
     }
 
     public function report(): void
@@ -66,11 +65,6 @@ abstract class HttpException extends Exception
             'data' => $this->data,
             'response' => json_encode($this->response),
         ]);
-    }
-
-    public function render(): void
-    {
-        throw ValidationException::withMessages(['id' => 'Unbekannter Fehler']);
     }
 
     public function outputToConsole(Command $command): void
