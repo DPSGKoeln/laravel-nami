@@ -1,20 +1,23 @@
 <?php
 
-namespace Zoomyboy\LaravelNami;
+namespace Zoomyboy\LaravelNami\Exceptions;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-/**
- * @todo remove this class
- */
-class NamiException extends \Exception
+abstract class HttpException extends Exception
 {
+    /** @var array<string, mixed> */
     private array $data;
+    /** @var array<string, mixed> */
     private array $response;
     private string $requestUrl;
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function setData(array $data): self
     {
         $this->data = $data;
@@ -22,11 +25,17 @@ class NamiException extends \Exception
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getData(): array
     {
         return $this->data;
     }
 
+    /**
+     * @param array<string, mixed>|null $data
+     */
     public function request(string $url, ?array $data = []): self
     {
         $this->requestUrl = $url;
@@ -35,6 +44,9 @@ class NamiException extends \Exception
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $response
+     */
     public function response(array $response): self
     {
         $this->response = $response;
@@ -54,7 +66,10 @@ class NamiException extends \Exception
             'data' => $this->data,
             'response' => json_encode($this->response),
         ]);
+    }
 
+    public function render(): void
+    {
         throw ValidationException::withMessages(['id' => 'Unbekannter Fehler']);
     }
 

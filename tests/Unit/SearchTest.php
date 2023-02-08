@@ -3,8 +3,8 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
 use Zoomyboy\LaravelNami\Fakes\SearchFake;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class SearchTest extends TestCase
@@ -61,7 +61,7 @@ class SearchTest extends TestCase
 
     public function testItThrowsExceptionWhenSearchFails(): void
     {
-        $this->withoutExceptionHandling()->expectException(NamiException::class);
+        $this->withoutExceptionHandling()->expectException(NotSuccessfulException::class);
         app(SearchFake::class)->fetchFails($page = 1, $start = 0, 'unknown error');
 
         $this->login()->search([])->first();

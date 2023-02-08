@@ -3,8 +3,8 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
 
 use Zoomyboy\LaravelNami\Exceptions\MemberDataCorruptedException;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
 use Zoomyboy\LaravelNami\Fakes\MemberFake;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class FetchMemberTest extends TestCase
@@ -128,7 +128,7 @@ class FetchMemberTest extends TestCase
 
     public function testMemberFetchCanFail(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         app(MemberFake::class)->fetchFails(103, 16);
 
         $this->login()->member(103, 16);

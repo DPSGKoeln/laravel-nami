@@ -3,9 +3,9 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Zoomyboy\LaravelNami\Authentication\Auth;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
 use Zoomyboy\LaravelNami\Fakes\BausteinFake;
 use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class BausteinTest extends TestCase
@@ -32,7 +32,7 @@ class BausteinTest extends TestCase
 
     public function testThrowExceptionWhenBausteinFetchingFails(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         Auth::success(12345, 'secret');
         app(BausteinFake::class)->failsToFetch();
 

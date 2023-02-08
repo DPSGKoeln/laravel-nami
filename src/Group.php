@@ -75,13 +75,6 @@ class Group implements Arrayable
         return Member::fromNami(Nami::member($this->id, $id));
     }
 
-    public function memberOverview(): Collection
-    {
-        return Nami::memberOverviewOf($this->id)->map(function ($member) {
-            return Member::fromNami($member);
-        });
-    }
-
     public function activities(): Collection
     {
         return Nami::activities($this->id);

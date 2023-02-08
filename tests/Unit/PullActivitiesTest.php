@@ -3,8 +3,9 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Exceptions\NoJsonReceivedException;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
 use Zoomyboy\LaravelNami\Fakes\SubactivityFake;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class PullActivitiesTest extends TestCase
@@ -46,7 +47,7 @@ class PullActivitiesTest extends TestCase
 
     public function testThrowErrorWhenSubactivitiesRequestFails(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         app(SubactivityFake::class)->fetchFails(4, 'sorry dude');
 
         $subactivities = $this->login()->subactivitiesOf(4);
@@ -54,10 +55,9 @@ class PullActivitiesTest extends TestCase
 
     public function testContinueIfSubactivitiesRequestReturnsHtml(): void
     {
+        $this->expectException(NoJsonReceivedException::class);
         app(SubactivityFake::class)->fetchFailsWithoutJson(4);
 
-        $subactivities = $this->login()->subactivitiesOf(4);
-
-        $this->assertCount(0, $subactivities);
+        $this->login()->subactivitiesOf(4);
     }
 }

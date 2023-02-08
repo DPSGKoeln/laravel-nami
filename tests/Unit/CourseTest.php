@@ -3,11 +3,12 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Zoomyboy\LaravelNami\Data\Course;
+use Zoomyboy\LaravelNami\Exceptions\NoJsonReceivedException;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
 use Zoomyboy\LaravelNami\Fakes\CourseFake;
 use Zoomyboy\LaravelNami\LoginException;
 use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class CourseTest extends TestCase
@@ -62,11 +63,10 @@ class CourseTest extends TestCase
 
     public function testReturnEmptyWhenCourseIndexReturnsHtml(): void
     {
+        $this->expectException(NoJsonReceivedException::class);
         app(CourseFake::class)->failsFetchingWithHtml(11111);
 
-        $courses = $this->login()->coursesFor(11111);
-
-        $this->assertCount(0, $courses);
+        $this->login()->coursesFor(11111);
     }
 
     public function testItNeedsLoginToGetCourses(): void
@@ -128,7 +128,7 @@ class CourseTest extends TestCase
 
     public function testThrowExceptionWhenCourseUpdateFailed(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         app(CourseFake::class)->failsUpdating(123, 999);
 
         $this->login()->updateCourse(123, 999, [
@@ -160,7 +160,7 @@ class CourseTest extends TestCase
 
     public function testThrowExceptionWhenStoringFailed(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         app(CourseFake::class)->failsCreating(123);
 
         $this->login()->createCourse(123, [
@@ -182,7 +182,7 @@ class CourseTest extends TestCase
 
     public function testShrowExceptionWhenDeletingFailed(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         app(CourseFake::class)->failsDeleting(123, 999);
 
         $this->login()->deleteCourse(123, 999);

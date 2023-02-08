@@ -2,6 +2,6 @@
 
 namespace Zoomyboy\LaravelNami\Exceptions;
 
-class RightException extends HttpException
+class SearchFailedException extends HttpException
 {
 }

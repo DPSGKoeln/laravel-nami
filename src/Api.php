@@ -3,7 +3,9 @@
 namespace Zoomyboy\LaravelNami;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
@@ -14,8 +16,12 @@ use Zoomyboy\LaravelNami\Data\Member;
 use Zoomyboy\LaravelNami\Data\MemberEntry;
 use Zoomyboy\LaravelNami\Data\Membership;
 use Zoomyboy\LaravelNami\Data\MembershipEntry;
+use Zoomyboy\LaravelNami\Exceptions\HttpException;
 use Zoomyboy\LaravelNami\Exceptions\MemberDataCorruptedException;
+use Zoomyboy\LaravelNami\Exceptions\NoJsonReceivedException;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
+use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\Support\Paginator;
 
 class Api
@@ -63,7 +69,7 @@ class Api
             fn ($page, $start) => $this->http()->get($this->url.'/ica/rest/nami/search-multi/result-list?searchedValues='.rawurlencode(json_encode((object) $payload) ?: '{}').'&page='.$page.'&start='.$start.'&limit=100'),
             function ($response) {
                 if (true !== $response->json()['success']) {
-                    $this->exception('Search failed', '', $response->json(), []);
+                    $this->exception(NotSuccessfulException::class, 'Search failed', '', $response->json(), []);
                 }
                 foreach ($response->json()['data'] as $member) {
                     yield MemberEntry::from($member);
@@ -85,7 +91,7 @@ class Api
         $response = $this->http()->asForm()->post($url, $payload);
 
         if (true !== $response['success']) {
-            $this->exception('Deleting member failed', $url, $response->json(), $payload);
+            $this->exception(NotSuccessfulException::class, 'Deleting member failed', $url, $response->json(), $payload);
         }
     }
 
@@ -121,7 +127,7 @@ class Api
             $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$member->groupId.'/'.$member->id;
             $response = $this->http()->put($url, $payload);
             if (true !== data_get($response->json(), 'success')) {
-                $this->exception('Update failed', $url, $response->json(), $member->toNami());
+                $this->exception(NotSuccessfulException::class, 'Update failed', $url, $response->json(), $member->toNami());
             }
 
             return $response->json()['data']['id'];
@@ -133,7 +139,7 @@ class Api
                 'ersteUntergliederungId' => $firstSubactivity,
             ]);
             if (true !== data_get($response->json(), 'success')) {
-                $this->exception('Update failed', $url, $response->json(), $member->toNami());
+                $this->exception(NotSuccessfulException::class, 'Update failed', $url, $response->json(), $member->toNami());
             }
 
             return $response->json()['data'];
@@ -152,7 +158,7 @@ class Api
         }
         if (true !== data_get($response->json(), 'success')) {
             $defaultError = 'Erstellen der Mitgliedschaft fehlgeschlagen';
-            $this->exception(data_get($response->json(), 'message', $defaultError) ?: $defaultError, $url, $response->json(), $data->toArray());
+            $this->exception(NotSuccessfulException::class, data_get($response->json(), 'message', $defaultError) ?: $defaultError, $url, $response->json(), $data->toArray());
         }
 
         if (data_get($data, 'id')) {
@@ -180,12 +186,13 @@ class Api
     public function deleteMembership(int $memberId, Membership $membership): void
     {
         $this->assertLoggedIn();
+        $url = "/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membership->id}";
 
         try {
-            $this->delete("/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}/{$membership->id}", 'Deleting membership failed');
-        } catch (NamiException $e) {
+            $this->delete($url, 'Deleting membership failed');
+        } catch (NotSuccessfulException $e) {
             if (is_null($membership->id)) {
-                throw new NamiException('ID not given in membership');
+                throw new Exception('ID not given in Membership');
             }
             $membership->endsAt = today();
             $this->putMembership($memberId, $membership);
@@ -202,7 +209,7 @@ class Api
         )->map(fn ($subactivity) => Subactivity::fromNami($subactivity));
     }
 
-    public function membership(int $memberId, int $membershipId): ?Membership
+    public function membership(int $memberId, int $membershipId): Membership
     {
         $this->assertLoggedIn();
         $membership = $this->fetchData(
@@ -210,7 +217,7 @@ class Api
             "Fails fetching membership {$membershipId} for {$memberId}",
         );
 
-        return $membership ? Membership::from($membership) : null;
+        return Membership::from($membership);
     }
 
     public function courses(): Collection
@@ -229,15 +236,15 @@ class Api
         $this->assertLoggedIn();
 
         return $this->fetchCollection("/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/flist", 'Courses fetch failed')
-            ->map(fn ($course) => $this->course($memberId, $course['id']))
+            ->map(fn ($course) => rescue(fn () => $this->course($memberId, $course['id']), null))
             ->filter(fn ($course) => null !== $course);
     }
 
-    public function course(int $memberId, int $courseId): ?Course
+    public function course(int $memberId, int $courseId): Course
     {
         $single = $this->fetchData("/ica/rest/nami/mitglied-ausbildung/filtered-for-navigation/mitglied/mitglied/{$memberId}/{$courseId}", 'Error fetching single course');
 
-        return $single ? Course::from($single) : null;
+        return Course::from($single);
     }
 
     /**
@@ -256,7 +263,7 @@ class Api
         $response = $this->http()->post($url, $payload);
 
         if (true !== data_get($response->json(), 'success')) {
-            $this->exception('Course creation failed', $url, $response->json(), $payload);
+            $this->exception(NotSuccessfulException::class, 'Course creation failed', $url, $response->json(), $payload);
         }
 
         return $response['data'];
@@ -278,7 +285,7 @@ class Api
         $response = $this->http()->put($url, $payload);
 
         if (true !== data_get($response->json(), 'success')) {
-            $this->exception('Course update failed', $url, $response->json(), $payload);
+            $this->exception(NotSuccessfulException::class, 'Course update failed', $url, $response->json(), $payload);
         }
     }
 
@@ -289,7 +296,7 @@ class Api
         $response = $this->http()->delete($url);
 
         if (null !== $response->json() && true !== data_get($response->json(), 'success')) {
-            $this->exception('Course deletion failed', $url, $response->json());
+            $this->exception(NotSuccessfulException::class, 'Course deletion failed', $url, $response->json());
         }
     }
 
@@ -383,7 +390,7 @@ class Api
             ->map(fn ($confession) => Confession::fromNami($confession));
     }
 
-    public function activities($groupId)
+    public function activities(int $groupId): Collection
     {
         $this->assertLoggedIn();
 
@@ -391,40 +398,27 @@ class Api
             ->map(fn ($activity) => Activity::fromNami($activity));
     }
 
-    public function memberOverviewOf(int $groupId): Collection
+    /**
+     * @param class-string<HttpException> $e
+     * @param array<string, mixed>        $response
+     * @param array<string, mixed>        $requestData
+     */
+    private function exception(string $e, string $message, string $url, array $response, array $requestData = []): void
+    {
+        throw (new $e($message))->response($response)->request($url, $requestData);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function rawMember(int $groupId, int $memberId): array
     {
         $this->assertLoggedIn();
 
-        return $this->fetchCollection('/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist', 'Fetch membership overview failed')
-            ->map(function ($member) use ($groupId) {
-                $member = collect($member)->mapWithKeys(function ($value, $key) {
-                    return [str_replace('entries_', '', $key) => $value];
-                });
-                $member['gruppierungId'] = $groupId;
-
-                return $member;
-            });
-    }
-
-    private function singleMemberFallback(int $groupId, int $memberId): array
-    {
-        $this->assertLoggedIn();
-
-        $member = $this->fetchCollection('/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist', 'Fetch single member fallback failed')->first(function ($member) use ($memberId) {
-            return $member['id'] == $memberId;
-        });
-
-        $member = collect($member)->mapWithKeys(function ($value, $key) {
-            return [str_replace('entries_', '', $key) => $value];
-        });
-        $member['gruppierungId'] = $groupId;
-
-        return $member->toArray();
-    }
-
-    private function exception(string $message, string $url, array $response, array $requestData = []): void
-    {
-        throw (new NamiException($message))->response($response)->request($url, $requestData);
+        return $this->fetchData(
+            '/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId,
+            'Fetch von Mitglied '.$memberId.' in Gruppe '.$groupId.' fehlgeschlagen'
+        );
     }
 
     private function assertLoggedIn(): void
@@ -436,50 +430,30 @@ class Api
         }
     }
 
+    /**
+     * @return Collection<int, mixed>
+     */
     private function fetchCollection(string $url, string $error): Collection
     {
         $response = $this->http()->get($this->url.$url);
 
-        if (null === $response->json()) {
-            return collect([]);
-        }
+        $this->assertOk($response, $url, $error);
+        /** @var array<int, mixed> */
+        $data = $response['data'];
 
-        if (data_get($response, 'message') && Str::contains($response['message'], 'no right')) {
-            return collect([]);
-        }
-
-        if (data_get($response, 'message') && Str::contains($response['message'], 'Sicherheitsverletzung')) {
-            return collect([]);
-        }
-
-        if (false === $response['success']) {
-            $this->exception($error, $url, $response->json());
-        }
-
-        return collect($response['data']);
+        return collect($data);
     }
 
-    private function fetchData(string $url, string $error): ?array
+    /**
+     * @return array<string, mixed>
+     */
+    private function fetchData(string $url, string $error): array
     {
         $response = $this->http()->get($this->url.$url);
 
-        if (null === $response->json()) {
-            return null;
-        }
+        $this->assertOk($response, $url, $error);
 
-        if (data_get($response, 'message') && Str::contains($response['message'], 'no right')) {
-            return null;
-        }
-
-        if (data_get($response, 'message') && Str::contains($response['message'], 'Sicherheitsverletzung')) {
-            return null;
-        }
-
-        if (false === $response['success']) {
-            $this->exception($error, $url, $response->json());
-        }
-
-        return $response['data'];
+        return $response->json()['data'];
     }
 
     private function delete(string $url, string $error): void
@@ -489,36 +463,25 @@ class Api
             'accept' => 'application/json',
         ])->delete($this->url.$url);
 
+        $this->assertOk($response, $url, $error);
+    }
+
+    private function assertOk(Response $response, string $url, string $error): void
+    {
         if (null === $response->json()) {
-            $this->exception($error, $url, []);
+            $this->exception(NoJsonReceivedException::class, $error, $url, []);
+        }
+
+        if (data_get($response, 'message') && Str::contains($response['message'], 'no right')) {
+            $this->exception(RightException::class, $error, $url, $response->json());
+        }
+
+        if (data_get($response, 'message') && Str::contains($response['message'], 'Sicherheitsverletzung')) {
+            $this->exception(RightException::class, $error, $url, $response->json());
         }
 
         if (false === $response['success']) {
-            $this->exception($error, $url, $response->json());
+            $this->exception(NotSuccessfulException::class, $error, $url, $response->json());
         }
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function rawMember(int $groupId, int $memberId): array
-    {
-        $this->assertLoggedIn();
-        $url = $this->url.'/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/'.$memberId;
-        $response = $this->http()->get($url);
-
-        if (false === $response->json()['success'] && Str::startsWith($response['message'], 'Access denied')) {
-            return $this->singleMemberFallback($groupId, $memberId);
-        }
-
-        if (false === $response->json()['success'] && Str::startsWith($response['message'], 'Sicherheitsverletzung: Zugriff')) {
-            return $this->singleMemberFallback($groupId, $memberId);
-        }
-
-        if (true !== $response->json()['success']) {
-            $this->exception('Fetching member failed', $url, $response->json());
-        }
-
-        return $response->json()['data'];
     }
 }

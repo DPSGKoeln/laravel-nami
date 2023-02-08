@@ -3,11 +3,12 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Zoomyboy\LaravelNami\Authentication\Auth;
+use Zoomyboy\LaravelNami\Exceptions\NoJsonReceivedException;
 use Zoomyboy\LaravelNami\Exceptions\NotAuthenticatedException;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
 use Zoomyboy\LaravelNami\Fakes\GroupFake;
 use Zoomyboy\LaravelNami\Group;
 use Zoomyboy\LaravelNami\Nami;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class GroupsTest extends TestCase
@@ -60,7 +61,7 @@ class GroupsTest extends TestCase
 
     public function testThrowsExceptionWhenGroupFetchFailed(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         Auth::success(12345, 'secret');
         app(GroupFake::class)->failsToFetch(null);
 
@@ -69,7 +70,7 @@ class GroupsTest extends TestCase
 
     public function testThrowsExceptionWhenSubgroupFetchFailed(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
         Auth::success(12345, 'secret');
         app(GroupFake::class)->fetches(null, [
             1234 => ['name' => 'testgroup'],
@@ -81,10 +82,10 @@ class GroupsTest extends TestCase
 
     public function testItDoesntReturnGroupWhenNoJsonIsReturned(): void
     {
+        $this->expectException(NoJsonReceivedException::class);
         Auth::success(12345, 'secret');
         app(GroupFake::class)->failsToFetchWithoutJson(null);
 
-        $group = Nami::login(12345, 'secret')->group(1234);
-        $this->assertNull($group);
+        Nami::login(12345, 'secret')->group(1234);
     }
 }

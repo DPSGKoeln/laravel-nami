@@ -3,9 +3,12 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit\Api;
 
 use Carbon\Carbon;
+use Exception;
 use Zoomyboy\LaravelNami\Data\Membership;
+use Zoomyboy\LaravelNami\Exceptions\NoJsonReceivedException;
+use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
+use Zoomyboy\LaravelNami\Exceptions\RightException;
 use Zoomyboy\LaravelNami\Fakes\MembershipFake;
-use Zoomyboy\LaravelNami\NamiException;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class MembershipTest extends TestCase
@@ -47,18 +50,17 @@ class MembershipTest extends TestCase
     public function testThrowExceptionWhenFetchingFails(): void
     {
         app(MembershipFake::class)->failsShowing(6, 11);
-        $this->expectException(NamiException::class);
+        $this->expectException(NotSuccessfulException::class);
 
         $this->login()->membership(6, 11);
     }
 
     public function testReturnsNothingWhenFetchingFailsWithHtml(): void
     {
+        $this->expectException(NoJsonReceivedException::class);
         app(MembershipFake::class)->failsShowingWithHtml(6, 11);
 
-        $membership = $this->login()->membership(6, 11);
-
-        $this->assertNull($membership);
+        $this->login()->membership(6, 11);
     }
 
     /**
@@ -66,6 +68,7 @@ class MembershipTest extends TestCase
      */
     public function testItGetsNoMembershipsWithNoRights(string $error): void
     {
+        $this->expectException(RightException::class);
         app(MembershipFake::class)->failsShowing(16, 68, $error);
 
         $membership = $this->login()->membership(16, 68);
@@ -137,7 +140,7 @@ class MembershipTest extends TestCase
 
     public function testItDoesntUpdateMembershipWhenNoIdGiven(): void
     {
-        $this->expectException(NamiException::class);
+        $this->expectException(Exception::class);
         Carbon::setTestNow(Carbon::parse('2022-02-03 03:00:00'));
         app(MembershipFake::class)->failsDeleting(6, null);
         app(MembershipFake::class)->updatesSuccessfully(6, null);
