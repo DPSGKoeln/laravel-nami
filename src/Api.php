@@ -219,6 +219,9 @@ class Api
         return Membership::from($membership);
     }
 
+    /**
+     * @return Collection<int, Baustein>
+     */
     public function courses(): Collection
     {
         $this->assertLoggedIn();
