@@ -35,6 +35,9 @@ class Membership extends Data
     ) {
     }
 
+    /**
+     * @return array<string, string|int|null>
+     */
     public function toNami(): array
     {
         return [

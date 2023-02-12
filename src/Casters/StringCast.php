@@ -11,6 +11,9 @@ class StringCast implements Cast
     {
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function cast(DataProperty $property, mixed $value, array $context): ?string
     {
         if ($property->type->isNullable && !$value) {

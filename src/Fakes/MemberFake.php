@@ -86,7 +86,7 @@ class MemberFake extends Fake
     }
 
     /**
-     * @param array<string, string|int|null> $data
+     * @param array<string, string|int|bool|null> $data
      */
     public function updatesSuccessfully(int $groupId, int $memberId, array $data = []): self
     {
@@ -117,7 +117,7 @@ class MemberFake extends Fake
     }
 
     /**
-     * @param array<string, string|int|null> $body
+     * @param array<string, string|int|bool|null> $body
      */
     public function assertCreated(int $groupId, array $body): void
     {
@@ -145,7 +145,7 @@ class MemberFake extends Fake
     }
 
     /**
-     * @param array<string, string|int|null> $body
+     * @param array<string, string|int|bool|null> $body
      */
     public function assertUpdated(int $groupId, int $memberId, array $body): void
     {

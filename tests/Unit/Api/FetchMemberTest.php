@@ -116,6 +116,8 @@ class FetchMemberTest extends TestCase
     /**
      * @testWith [{"eintrittsdatum": null}]
      *           [{"landId": null}]
+     *
+     * @param array<string, mixed> $data
      */
     public function testFailsFetchingWhenJoinedAtDateIsMissing(array $data): void
     {

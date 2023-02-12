@@ -55,26 +55,6 @@ class Group implements Arrayable
         return Nami::feesOf($this->id);
     }
 
-    public function members(): MemberCollection
-    {
-        $members = Nami::membersOf($this->id);
-
-        return MemberCollection::make(function () use ($members) {
-            foreach ($members as $member) {
-                yield $this->member($member['id']);
-            }
-        });
-
-        return new MemberCollection(Nami::membersOf($this->id)->map(function ($member) {
-            return $this->member($member['id']);
-        }));
-    }
-
-    public function member(int $id): Member
-    {
-        return Member::fromNami(Nami::member($this->id, $id));
-    }
-
     public function activities(): Collection
     {
         return Nami::activities($this->id);

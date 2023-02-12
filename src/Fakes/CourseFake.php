@@ -7,9 +7,6 @@ use Zoomyboy\LaravelNami\Data\Course;
 
 class CourseFake extends Fake
 {
-    private array $defaults = [
-    ];
-
     /**
      * @param array<int> $ids
      */

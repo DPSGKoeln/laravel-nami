@@ -2,13 +2,16 @@
 
 namespace Zoomyboy\LaravelNami\Tests\Factories;
 
-use GuzzleHttp\Promise\FulfilledPromise;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\Http;
 use Worksome\RequestFactories\RequestFactory;
 use Zoomyboy\LaravelNami\Data\Member;
 
 class MemberRequestFactory extends RequestFactory
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
         return [
@@ -48,7 +51,7 @@ class MemberRequestFactory extends RequestFactory
         ]);
     }
 
-    public function toSingleHttp(): FulfilledPromise
+    public function toSingleHttp(): PromiseInterface
     {
         return Http::response(json_encode([
             'success' => true,

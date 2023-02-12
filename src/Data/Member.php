@@ -135,7 +135,6 @@ class Member extends Data
             'wiederverwendenFlag' => $this->keepdata,
             'regionId' => $this->regionId ?: 23,
             'staatsangehoerigkeitId' => $this->nationalityId,
-            'zeitschriftenversand' => $this->sendNewspaper,
             'emailVertretungsberechtigter' => $this->emailParents,
             'ort' => $this->location,
             'plz' => $this->zip,

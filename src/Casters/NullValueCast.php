@@ -14,6 +14,9 @@ class NullValueCast implements Cast
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function cast(DataProperty $property, mixed $value, array $context): DateTimeInterface|Uncastable|null|int
     {
         if ($this->id === $value) {
