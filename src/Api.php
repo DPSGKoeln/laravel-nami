@@ -230,7 +230,7 @@ class Api
     /**
      * @return Collection<Course>
      */
-    public function coursesFor(int $memberId): Collection
+    public function coursesOf(int $memberId): Collection
     {
         $this->assertLoggedIn();
 

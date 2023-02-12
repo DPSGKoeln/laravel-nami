@@ -25,7 +25,7 @@ class CourseTest extends TestCase
                 'vstgTag' => '2021-11-12 00:00:00',
             ]));
 
-        $course = $this->login()->coursesFor(11111)->first();
+        $course = $this->login()->coursesOf(11111)->first();
 
         $this->assertEquals(788, $course->id);
         $this->assertEquals('KJA', $course->organizer);
@@ -44,7 +44,7 @@ class CourseTest extends TestCase
             ->shows(11111, Course::factory()->id(788)->toModel())
             ->shows(11111, Course::factory()->id(789)->toModel());
 
-        $courses = $this->login()->coursesFor(11111);
+        $courses = $this->login()->coursesOf(11111);
 
         $this->assertCount(2, $courses);
     }
@@ -56,7 +56,7 @@ class CourseTest extends TestCase
             ->failsShowingWithHtml(11111, 788)
             ->shows(11111, Course::factory()->id(789)->toModel());
 
-        $courses = $this->login()->coursesFor(11111);
+        $courses = $this->login()->coursesOf(11111);
 
         $this->assertCount(1, $courses);
     }
@@ -66,14 +66,14 @@ class CourseTest extends TestCase
         $this->expectException(NoJsonReceivedException::class);
         app(CourseFake::class)->failsFetchingWithHtml(11111);
 
-        $this->login()->coursesFor(11111);
+        $this->login()->coursesOf(11111);
     }
 
     public function testItNeedsLoginToGetCourses(): void
     {
         $this->expectException(NotAuthenticatedException::class);
 
-        Nami::coursesFor(11111);
+        Nami::coursesOf(11111);
     }
 
     public function testStoreACourse(): void
@@ -155,7 +155,7 @@ class CourseTest extends TestCase
     {
         $this->expectException(LoginException::class);
 
-        $this->loginWithWrongCredentials()->coursesFor(11111);
+        $this->loginWithWrongCredentials()->coursesOf(11111);
     }
 
     public function testThrowExceptionWhenStoringFailed(): void
