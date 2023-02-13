@@ -22,7 +22,7 @@ class CourseFactory extends RequestFactory
     /**
      * @param array<string, mixed> $attributes
      */
-    public function toModel(array $attributes = []): Course
+    public function toCourse(array $attributes = []): Course
     {
         return Course::from($this->create($attributes));
     }

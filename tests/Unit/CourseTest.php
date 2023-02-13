@@ -17,7 +17,7 @@ class CourseTest extends TestCase
     {
         app(CourseFake::class)
             ->fetches(11111, [788])
-            ->shows(11111, Course::factory()->toModel([
+            ->shows(11111, Course::factory()->toCourse([
                 'bausteinId' => 506,
                 'id' => 788,
                 'veranstalter' => 'KJA',
@@ -41,8 +41,8 @@ class CourseTest extends TestCase
     {
         app(CourseFake::class)
             ->fetches(11111, [788, 789])
-            ->shows(11111, Course::factory()->id(788)->toModel())
-            ->shows(11111, Course::factory()->id(789)->toModel());
+            ->shows(11111, Course::factory()->id(788)->toCourse())
+            ->shows(11111, Course::factory()->id(789)->toCourse());
 
         $courses = $this->login()->coursesOf(11111);
 
@@ -54,7 +54,7 @@ class CourseTest extends TestCase
         app(CourseFake::class)
             ->fetches(11111, [788, 789])
             ->failsShowingWithHtml(11111, 788)
-            ->shows(11111, Course::factory()->id(789)->toModel());
+            ->shows(11111, Course::factory()->id(789)->toCourse());
 
         $courses = $this->login()->coursesOf(11111);
 

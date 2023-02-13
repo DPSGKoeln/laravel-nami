@@ -5,9 +5,11 @@ namespace Zoomyboy\LaravelNami\Data;
 use Carbon\Carbon;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Zoomyboy\LaravelNami\Casters\CarbonCast;
 use Zoomyboy\LaravelNami\Tests\Factories\CourseFactory;
+use Zoomyboy\LaravelNami\Transformers\CarbonTransformer;
 
 class Course extends Data
 {
@@ -25,6 +27,7 @@ class Course extends Data
 
         #[MapInputName('vstgTag')]
         #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
+        #[WithTransformer(CarbonTransformer::class, format: 'Y-m-d H:i:s')]
         public Carbon $completedAt,
     ) {
     }
