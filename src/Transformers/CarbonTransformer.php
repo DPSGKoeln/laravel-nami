@@ -8,7 +8,7 @@ use Spatie\LaravelData\Transformers\Transformer;
 class CarbonTransformer implements Transformer
 {
     public function __construct(
-        protected array|string|null $format = null
+        protected ?string $format = null
     ) {
     }
 
