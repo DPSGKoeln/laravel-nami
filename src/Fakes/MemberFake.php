@@ -17,6 +17,9 @@ class MemberFake extends Fake
         });
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function shows(int $groupId, int $memberId, array $data = []): self
     {
         Http::fake(function ($request) use ($groupId, $memberId, $data) {
