@@ -117,6 +117,25 @@ class PutMemberTest extends TestCase
         ]);
     }
 
+    public function testEmailCanBeNull(): void
+    {
+        app(MemberFake::class)
+            ->updatesSuccessfully(103, 16)
+            ->shows(103, 16);
+        $member = Member::factory()->toMember([
+            'email' => null,
+            'groupId' => 103,
+            'id' => 16,
+        ]);
+        $response = $this->login()->putMember($member);
+
+        $this->assertEquals(16, $response);
+
+        app(MemberFake::class)->assertUpdated(103, 16, [
+            'email' => null,
+        ]);
+    }
+
     public function testItMergesKontoverbindung(): void
     {
         app(MemberFake::class)

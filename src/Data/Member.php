@@ -41,7 +41,7 @@ class Member extends Data
         #[WithTransformer(CarbonTransformer::class, format: 'Y-m-d H:i:s')]
         public Carbon $birthday,
 
-        public string $email,
+        public ?string $email,
 
         #[MapInputName('geschlechtId')]
         #[WithCast(NullValueCast::class, id: 23)]
