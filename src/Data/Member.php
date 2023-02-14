@@ -152,6 +152,7 @@ class Member extends Data
             'staatsangehoerigkeitText' => $this->otherCountry,
             'nameZusatz' => $this->furtherAddress,
             'version' => $this->version,
+            'eintrittsdatum' => $this->joinedAt->format('Y-m-d 00:00:00'),
         ];
     }
 

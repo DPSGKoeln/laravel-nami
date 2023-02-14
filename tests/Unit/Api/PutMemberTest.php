@@ -70,6 +70,7 @@ class PutMemberTest extends TestCase
             'staatsangehoerigkeitText' => 'Land',
             'nameZusatz' => 'Name',
             'version' => 40,
+            'eintrittsdatum' => '2021-02-02 00:00:00',
         ]);
     }
 
