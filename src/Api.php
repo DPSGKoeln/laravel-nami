@@ -111,16 +111,6 @@ class Api
         return $this->authenticator->isLoggedIn();
     }
 
-    public function membersOf(int $groupId): Collection
-    {
-        $this->assertLoggedIn();
-
-        return $this->fetchCollection(
-            '/ica/rest/nami/mitglied/filtered-for-navigation/gruppierung/gruppierung/'.$groupId.'/flist',
-            'Member fetch failed'
-        );
-    }
-
     public function putMember(Member $member, ?int $firstActivity = null, ?int $firstSubactivity = null): int
     {
         $this->assertLoggedIn();
@@ -237,7 +227,7 @@ class Api
     }
 
     /**
-     * @return Collection<Course>
+     * @return Collection<int, Course>
      */
     public function coursesOf(int $memberId): Collection
     {
@@ -344,6 +334,9 @@ class Api
         return $this->groups()->first(fn ($group) => $group->id == $groupId);
     }
 
+    /**
+     * @return Collection<int, Gender>
+     */
     public function genders(): Collection
     {
         $this->assertLoggedIn();
@@ -354,6 +347,9 @@ class Api
             ->filter(fn ($gender) => !$gender->isNull);
     }
 
+    /**
+     * @return Collection<int, Nationality>
+     */
     public function nationalities(): Collection
     {
         $this->assertLoggedIn();
@@ -362,6 +358,9 @@ class Api
             ->map(fn ($nationality) => Nationality::fromNami($nationality));
     }
 
+    /**
+     * @return Collection<int, Country>
+     */
     public function countries(): Collection
     {
         $this->assertLoggedIn();
@@ -370,6 +369,9 @@ class Api
             ->map(fn ($country) => Country::fromNami($country));
     }
 
+    /**
+     * @return Collection<int, Region>
+     */
     public function regions(): Collection
     {
         $this->assertLoggedIn();
@@ -378,6 +380,9 @@ class Api
             ->map(fn ($region) => Region::fromNami($region));
     }
 
+    /**
+     * @return Collection<int, Fee>
+     */
     public function feesOf(int $groupid): Collection
     {
         $this->assertLoggedIn();
@@ -386,6 +391,9 @@ class Api
             ->map(fn ($fee) => Fee::fromNami($fee));
     }
 
+    /**
+     * @return Collection<int, Confession>
+     */
     public function confessions(): Collection
     {
         $this->assertLoggedIn();

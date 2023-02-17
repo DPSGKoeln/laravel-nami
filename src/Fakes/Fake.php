@@ -16,6 +16,9 @@ abstract class Fake
         ]));
     }
 
+    /**
+     * @param Collection<int, mixed> $collection
+     */
     public function collection(Collection $collection): PromiseInterface
     {
         return Http::response(json_encode([

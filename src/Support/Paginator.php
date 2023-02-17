@@ -12,6 +12,8 @@ class Paginator
      * @param callable(int): Response       $responseFactory
      * @param callable(Response): Generator $generator
      * @param callable(Response): int       $totalFetcher
+     *
+     * @return LazyCollection<int, mixed>
      */
     public function result(callable $responseFactory, callable $generator, callable $totalFetcher): LazyCollection
     {
@@ -27,6 +29,8 @@ class Paginator
      * @param callable(int, int): Response  $responseFactory
      * @param callable(Response): Generator $generator
      * @param callable(Response): int       $totalFetcher
+     *
+     * @return LazyCollection<int, mixed>
      */
     public function startResult(int $perPage, callable $responseFactory, callable $generator, callable $totalFetcher): LazyCollection
     {

@@ -48,7 +48,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function loginWithWrongCredentials(): Api
     {
         Auth::fake();
-        Auth::fails(12345, 'wrong');
 
         return Nami::login(12345, 'wrong');
     }

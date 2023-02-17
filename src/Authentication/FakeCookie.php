@@ -7,12 +7,19 @@ use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Assert;
 use Zoomyboy\LaravelNami\LoginException;
 
+/**
+ * @template Account of array{mglnr: int, password: string}
+ */
 class FakeCookie extends Authenticator
 {
+    /** @var array<int, Account> */
     private array $validAccounts = [];
-    public ?array $invalidAccounts = null;
+    /** @var Account|null */
     public ?array $authenticated = null;
 
+    /**
+     * @return self<Account>
+     */
     public function login(int $mglnr, string $password): self
     {
         $authenticated = collect($this->validAccounts)->search(
@@ -48,14 +55,6 @@ class FakeCookie extends Authenticator
     public function success(int $mglnr, string $password): void
     {
         $this->validAccounts[] = ['mglnr' => $mglnr, 'password' => $password];
-    }
-
-    /**
-     * Reisters an account that cannot login with the given password.
-     */
-    public function fails(int $mglnr, string $password): void
-    {
-        $this->invalidAccounts[] = ['mglnr' => $mglnr, 'password' => $password];
     }
 
     public function assertLoggedInWith(int $mglnr, string $password): void
