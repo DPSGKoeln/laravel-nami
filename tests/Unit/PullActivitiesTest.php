@@ -3,6 +3,7 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
+use Zoomyboy\LaravelNami\Data\Activity;
 use Zoomyboy\LaravelNami\Exceptions\NoJsonReceivedException;
 use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
 use Zoomyboy\LaravelNami\Fakes\SubactivityFake;
@@ -22,8 +23,8 @@ class PullActivitiesTest extends TestCase
         $activities = $this->login()->group(103)->activities();
 
         $this->assertSame([
-            ['name' => 'Ac1', 'id' => 4],
-            ['name' => 'Ac2', 'id' => 3],
+            ['id' => 4, 'name' => 'Ac1'],
+            ['id' => 3, 'name' => 'Ac2'],
         ], $activities->toArray());
         Http::assertSentCount(2);
     }
@@ -39,8 +40,8 @@ class PullActivitiesTest extends TestCase
         $subactivities = $this->login()->group(103)->activities()->first()->subactivities();
 
         $this->assertSame([
-            ['name' => 'Biber', 'id' => 40],
-            ['name' => 'Wölfling', 'id' => 30],
+            ['id' => 40, 'name' => 'Biber'],
+            ['id' => 30, 'name' => 'Wölfling'],
         ], $subactivities->toArray());
         Http::assertSentCount(3);
     }
@@ -50,7 +51,7 @@ class PullActivitiesTest extends TestCase
         $this->expectException(NotSuccessfulException::class);
         app(SubactivityFake::class)->fetchFails(4, 'sorry dude');
 
-        $subactivities = $this->login()->subactivitiesOf(4);
+        $this->login()->subactivitiesOf(Activity::from(['id' => 4]));
     }
 
     public function testContinueIfSubactivitiesRequestReturnsHtml(): void
@@ -58,6 +59,6 @@ class PullActivitiesTest extends TestCase
         $this->expectException(NoJsonReceivedException::class);
         app(SubactivityFake::class)->fetchFailsWithoutJson(4);
 
-        $this->login()->subactivitiesOf(4);
+        $this->login()->subactivitiesOf(Activity::from(['id' => 4]));
     }
 }

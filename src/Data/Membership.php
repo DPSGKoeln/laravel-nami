@@ -49,4 +49,9 @@ class Membership extends Data
             'untergliederungId' => $this->subactivityId,
         ];
     }
+
+    public function group(): Group {
+        return Group::from(['name' => $this->group ?: '', 'id' => $this->groupId]);
+    }
+
 }

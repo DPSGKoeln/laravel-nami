@@ -10,6 +10,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Zoomyboy\LaravelNami\Authentication\Authenticator;
+use Zoomyboy\LaravelNami\Data\Activity;
+use Zoomyboy\LaravelNami\Data\Group;
+use Zoomyboy\LaravelNami\Data\Subactivity;
 use Zoomyboy\LaravelNami\Data\Baustein;
 use Zoomyboy\LaravelNami\Data\Course;
 use Zoomyboy\LaravelNami\Data\Member;
@@ -198,14 +201,17 @@ class Api
         }
     }
 
-    public function subactivitiesOf(int $activityId): Collection
+    /**
+     * @return Collection<int, Subactivity>
+     */
+    public function subactivitiesOf(Activity $activity): Collection
     {
         $this->assertLoggedIn();
 
         return $this->fetchCollection(
-            '/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activityId,
+            '/ica/rest/nami/untergliederungauftaetigkeit/filtered/untergliederung/taetigkeit/'.$activity->id,
             'Fetch subactivities failed'
-        )->map(fn ($subactivity) => Subactivity::fromNami($subactivity));
+        )->map(fn ($subactivity) => Subactivity::from($subactivity));
     }
 
     public function membership(int $memberId, int $membershipId): Membership
@@ -318,14 +324,17 @@ class Api
         return false !== $this->groups()->search(fn ($group) => $group->id == $groupId);
     }
 
-    public function groups(int $parentGroupId = null): Collection
+    /**
+     * @return Collection<int, Group>
+     */
+    public function groups(?Group $parentGroup = null): Collection
     {
         $this->assertLoggedIn();
 
         return $this->fetchCollection(
-            '/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroupId ?: 'root'),
+            '/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/'.($parentGroup ? $parentGroup->id : 'root'),
             'Group fetch failed'
-        )->map(fn ($group) => Group::fromResponse($group, $parentGroupId));
+        )->map(fn ($group) => Group::from([...$group, 'parentId' => $parentGroup ? $parentGroup->id : null]));
     }
 
     public function group(int $groupId): ?Group
@@ -333,13 +342,6 @@ class Api
         $this->assertLoggedIn();
 
         return $this->groups()->first(fn ($group) => $group->id == $groupId);
-    }
-
-    public function subgroupsOf(int $groupId): Collection
-    {
-        $this->assertLoggedIn();
-
-        return $this->groups($groupId);
     }
 
     public function genders(): Collection
@@ -392,12 +394,15 @@ class Api
             ->map(fn ($confession) => Confession::fromNami($confession));
     }
 
-    public function activities(int $groupId): Collection
+    /**
+     * @return Collection<int, Activity>
+     */
+    public function activities(Group $group): Collection
     {
         $this->assertLoggedIn();
 
-        return $this->fetchCollection("/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/{$groupId}", 'Fetch activities failed')
-            ->map(fn ($activity) => Activity::fromNami($activity));
+        return $this->fetchCollection("/ica/rest/nami/taetigkeitaufgruppierung/filtered/gruppierung/gruppierung/{$group->id}", 'Fetch activities failed')
+            ->map(fn ($activity) => Activity::from($activity));
     }
 
     /**

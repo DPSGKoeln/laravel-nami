@@ -35,7 +35,8 @@ class MembershipTest extends TestCase
         $this->assertSame(1000, $membership->groupId);
         $this->assertSame(15, $membership->activityId);
         $this->assertSame(16, $membership->subactivityId);
-        $this->assertSame('::group::', $membership->group);
+        $this->assertSame('::group::', $membership->group()->name);
+        $this->assertSame(1000, $membership->group()->id);
     }
 
     public function testFetchesMembership(): void

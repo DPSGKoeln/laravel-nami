@@ -3,7 +3,7 @@
 namespace Zoomyboy\LaravelNami\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
-use Zoomyboy\LaravelNami\Group;
+use Zoomyboy\LaravelNami\Data\Group;
 use Zoomyboy\LaravelNami\Tests\TestCase;
 
 class GetGroupsTest extends TestCase
@@ -18,11 +18,11 @@ class GetGroupsTest extends TestCase
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' => Http::response($this->groupsResponse, 200),
         ]);
 
-        $groups = $this->login()->groups();
+        $group = $this->login()->groups()->first();
 
-        $this->assertEquals([
-            ['id' => 100, 'name' => 'Group', 'parent_id' => null],
-        ], $groups->toArray());
+        $this->assertSame(100, $group->id);
+        $this->assertSame('Group', $group->name);
+        $this->assertNull($group->parentId);
         Http::assertSent(function ($request) {
             return 'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/root' == $request->url();
         });
@@ -49,13 +49,13 @@ class GetGroupsTest extends TestCase
             'https://nami.dpsg.de/ica/rest/nami/gruppierungen/filtered-for-navigation/gruppierung/node/100' => Http::response($this->subgroupsResponse, 200),
         ]);
 
-        $subgroups = $this->login()->group(100)->subgroups();
+        $subgroups = $this->login()->group(100)->children();
 
         $this->assertEquals([
-            ['id' => 101300, 'parent_id' => 100, 'name' => 'Siebengebirge'],
-            ['id' => 100900, 'parent_id' => 100, 'name' => 'Sieg'],
-            ['id' => 100900, 'parent_id' => 100, 'name' => 'Sieg'],
-            ['id' => 101000, 'parent_id' => 100, 'name' => 'Voreifel'],
+            ['id' => 101300, 'parentId' => 100, 'name' => 'Siebengebirge'],
+            ['id' => 100900, 'parentId' => 100, 'name' => 'Sieg'],
+            ['id' => 100900, 'parentId' => 100, 'name' => 'Sieg'],
+            ['id' => 101000, 'parentId' => 100, 'name' => 'Voreifel'],
         ], $subgroups->toArray());
         $subgroups->each(function ($group) {
             $this->assertInstanceOf(Group::class, $group);
