@@ -96,7 +96,7 @@ class MembershipTest extends TestCase
             'taetigkeitId' => 2,
             'untergliederungId' => 3,
             'aktivVon' => '2022-02-03T00:00:00',
-            'aktivBis' => '',
+            'aktivBis' => null,
             'gruppierungId' => 1400,
         ]);
     }
