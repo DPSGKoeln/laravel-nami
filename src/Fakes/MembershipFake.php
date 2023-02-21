@@ -183,22 +183,22 @@ class MembershipFake extends Fake
     public function assertCreated(int $memberId, array $payload): void
     {
         $url = "https://nami.dpsg.de/ica/rest/nami/zugeordnete-taetigkeiten/filtered-for-navigation/gruppierung-mitglied/mitglied/{$memberId}";
+
         Http::assertSent(function ($request) use ($url, $payload) {
             if ($request->url() !== $url || 'POST' !== $request->method()) {
                 return false;
             }
 
-            if (
-                data_get($request, 'gruppierungId') !== data_get($payload, 'gruppierungId')
-                || data_get($request, 'id') !== data_get($payload, 'id')
-                || data_get($request, 'taetigkeitId') !== data_get($payload, 'taetigkeitId')
-                || data_get($request, 'untergliederungId') !== data_get($payload, 'untergliederungId')
-            ) {
-                return false;
-            }
+            $requestBody = json_decode($request->body(), true);
 
-            if (data_get($request, 'aktivVon') && $request['aktivVon'] !== data_get($payload, 'aktivVon')) {
-                return false;
+            foreach ($payload as $key => $value) {
+                if (!array_key_exists($key, $requestBody)) {
+                    return false;
+                }
+
+                if ($requestBody[$key] !== $value) {
+                    return false;
+                }
             }
 
             return true;
