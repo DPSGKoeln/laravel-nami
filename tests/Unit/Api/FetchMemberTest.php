@@ -1,6 +1,6 @@
 <?php
 
-namespace Zoomyboy\LaravelNami\Tests\Unit\Member;
+namespace Zoomyboy\LaravelNami\Tests\Unit\Api;
 
 use Zoomyboy\LaravelNami\Exceptions\MemberDataCorruptedException;
 use Zoomyboy\LaravelNami\Exceptions\NotSuccessfulException;
