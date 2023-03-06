@@ -12,6 +12,7 @@ class FetchMemberTest extends TestCase
     public function testGetASingleMember(): void
     {
         app(MemberFake::class)->shows(1000, 1001, [
+            'beitragsart' => 'Ba',
             'beitragsartId' => 1,
             'eintrittsdatum' => '2005-05-01 00:00:00',
             'email' => 'pille@stamm-silva.de',
@@ -45,6 +46,7 @@ class FetchMemberTest extends TestCase
         $member = $this->login()->member(1000, 1001);
 
         $this->assertSame(1, $member->feeId);
+        $this->assertSame('Ba', $member->feeName);
         $this->assertSame('2005-05-01 00:00:00', $member->joinedAt->toDateTimeString());
         $this->assertSame(1000, $member->groupId);
         $this->assertSame(1001, $member->id);

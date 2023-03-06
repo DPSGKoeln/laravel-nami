@@ -31,6 +31,9 @@ class Member extends Data
         #[MapInputName('beitragsartId')]
         public ?int $feeId,
 
+        #[MapInputName('beitragsart')]
+        public ?string $feeName,
+
         #[MapInputName('eintrittsdatum')]
         #[WithCast(CarbonCast::class, format: 'Y-m-d H:i:s')]
         #[WithTransformer(CarbonTransformer::class, format: 'Y-m-d H:i:s')]
