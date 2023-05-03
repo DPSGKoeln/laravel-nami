@@ -177,6 +177,10 @@ class Member extends Data
             return false;
         }
 
+        if (data_get($rawData, 'geburtsDatum') && Carbon::parse(data_get($rawData, 'geburtsDatum'))->diffInYears(now()) > 100) {
+            return false;
+        }
+
         return true;
     }
 }
