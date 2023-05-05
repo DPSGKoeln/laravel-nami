@@ -106,6 +106,13 @@ class Api
         return $this;
     }
 
+    public function freshLogin(int $mglnr, string $password): self
+    {
+        $this->authenticator->purge();
+
+        return $this->login($mglnr, $password);
+    }
+
     public function isLoggedIn(): bool
     {
         return $this->authenticator->isLoggedIn();

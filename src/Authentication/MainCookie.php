@@ -47,6 +47,13 @@ class MainCookie extends Authenticator
         return $this;
     }
 
+    public function purge(): void
+    {
+        while ($this->file()) {
+            unlink($this->file());
+        }
+    }
+
     public function isLoggedIn(): bool
     {
         if (null === $this->file()) {

@@ -72,6 +72,10 @@ class FakeCookie extends Authenticator
         );
     }
 
+    public function purge(): void
+    {
+    }
+
     public function refresh(): void
     {
     }
